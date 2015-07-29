@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>Babylon Dev Tool</title>
+
+	<link rel="stylesheet" type="text/css" href="../libs/bootstrap/css/bootstrap.min.css" />
+	<link href="//netdna.bootstrapcdn.com/bootswatch/3.1.0/slate/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="css/style.css"/>
+	<!-- Libraries -->
+	<script src="../libs/jquery-2.1.1.min.js"></script>
+	<script src="../libs/babylon.2.2-alpha.js"></script>
+	<script src="../libs/knockout-3.2.0.min.js"></script>
+	<script src="../libs/bootstrap/js/bootstrap.min.js"></script>
+
+	<!-- Custom Material -->
+	<script src="materials/waterMaterial.js"></script>
+
+	<script src="js/configuration.js"></script>
+	<script src="js/script.js"></script>
+	<script src="js/viewmodel.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+<!-- Navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">BJS MapEditor</a>
+		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">File <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#" data-bind="click: newScene">New</a></li>
+						<li><a href="#" data-bind="click: loadScene">Load</a></li>
+						<li><a href="#" data-bind="click: saveScene">Save</a></li>
+						<li class="divider"></li>
+						<li><a href="#">Separated link</a></li>
+					</ul>
+				</li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="#">Link</a></li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">Action</a></li>
+						<li><a href="#">Another action</a></li>
+						<li><a href="#">Something else here</a></li>
+						<li class="divider"></li>
+						<li><a href="#">Separated link</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+	</div><!-- /.container-fluid -->
+</nav>
+
+
+<!-- Babylon -->
+<canvas id="renderCanvas"></canvas>
+
+<div id="ui-left" class="ui-box" data-bind="if: selectedMesh, visible: selectedMesh">
+	<div class="clearfix">
+		<h3 class="pull-left">Selected Mesh</h3>
+		<button class="pull-right btn-link btn-margin-top" title="deselect" data-bind="click: $root.deselectMesh">
+			<span class="glyphicon glyphicon-remove"></span>
+		</button>
+	</div>
+
+	<h4>Position</h4>
+	<div>
+		X: <input data-bind="value: selectedMesh().positionX, valueUpdate: 'afterkeydown'" type="number" class="form-control input-sm inline-sm" />
+		Y: <input data-bind="value: selectedMesh().positionY, valueUpdate: 'afterkeydown'" type="number" class="form-control input-sm inline-sm" />
+		Z: <input data-bind="value: selectedMesh().positionZ, valueUpdate: 'afterkeydown'" type="number" class="form-control input-sm inline-sm" />
+	</div>
+
+	<h4>Scaling</h4>
+	<div>
+		X: <input data-bind="value: selectedMesh().scalingX, valueUpdate: 'afterkeydown'" type="number" class="form-control input-sm inline-sm" />
+		Y: <input data-bind="value: selectedMesh().scalingY, valueUpdate: 'afterkeydown'" type="number" class="form-control input-sm inline-sm" />
+		Z: <input data-bind="value: selectedMesh().scalingZ, valueUpdate: 'afterkeydown'" type="number" class="form-control input-sm inline-sm" />
+	</div>
+
+	<h4>Rotation</h4>
+	<div class="input-group input-group-sm input-group-compact">
+		<input data-bind="value: selectedMesh().rotationX, valueUpdate: 'afterkeydown'" type="number" step="0.1" class="form-control input-sm inline-sm" />
+		<div class="input-group-addon" data-bind="click: selectedMesh().rotateX" >
+			<i class="glyphicon glyphicon-refresh"></i>
+		</div>
+	</div>
+	<div class="input-group input-group-sm input-group-compact">
+		<input data-bind="value: selectedMesh().rotationY, valueUpdate: 'afterkeydown'" type="number" class="form-control input-sm inline-sm" />
+		<div class="input-group-addon" data-bind="click: selectedMesh().rotateY">
+			<i class="glyphicon glyphicon-refresh"></i>
+		</div>
+	</div>
+	<div class="input-group input-group-sm input-group-compact">
+		<input data-bind="value: selectedMesh().rotationZ, valueUpdate: 'afterkeydown'" type="number" class="form-control input-sm inline-sm" />
+		<div class="input-group-addon" data-bind="click: selectedMesh().rotateZ">
+			<i class="glyphicon glyphicon-refresh"></i>
+		</div>
+	</div>
+
+	<h4>Material</h4>
+	<select data-bind="value: selectedMesh().material, options: materials, optionsText: 'name'" class="form-control input-sm"></select>
+
+	<h4>Actions</h4>
+	<div><button class="btn btn-primary btn-sm btn-block" data-bind="click: cloneSelectedMesh"><i class="glyphicon glyphicon-share"></i> Clone Mesh</button></div>
+	<div><button class="btn btn-primary btn-sm btn-block" data-bind="click: removeSelectedMesh"><i class="glyphicon glyphicon-ban-circle"></i> Remove Mesh</button></div>
+	<div><button class="btn btn-default btn-sm btn-block" data-bind="click: focusOnSelectedMesh"><i class="glyphicon glyphicon-screenshot"></i> Focus Camera</button></div>
+</div>
+
+<div id="ui-right" class="ui-box">
+	<!--
+	<h3>Tools</h3>
+	<div class="tools" data-bind="foreach: tools">
+		<div data-bind="click: $parent.selectTool" style="cursor: pointer;">
+			<span class="glyphicon glyphicon-unchecked" data-bind="visible: $data != $parent.selectedTool()"></span>
+			<span class="glyphicon glyphicon-check" data-bind="visible: $data == $parent.selectedTool()"></span>
+			<span data-bind="text: name"></span>
+		</div>
+	</div>
+	-->
+
+	<h3>Meshes</h3>
+	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+		<!-- ko foreach: meshGroups -->
+		<div class="panel panel-default">
+			<div class="panel-heading" role="tab" id="headingOne">
+				<h4 class="panel-title">
+					<a data-toggle="collapse" data-parent="#accordion" aria-expanded="true" data-bind="text: name, attr: {href: '#collapse-'+$index()}"></a>
+				</h4>
+			</div>
+			<div class="panel-collapse collapse" role="tabpanel" data-bind="attr: {id: 'collapse-'+$index()}, css: {in: $index() == 0}">
+				<div class="panel-body">
+					<div class="meshes" data-bind="foreach: meshes">
+						<div data-bind="click: $root.selectMeshBlueprint" style="cursor: pointer;">
+							<span class="glyphicon glyphicon-unchecked" data-bind="visible: $data != $root.selectedMeshBlueprint()"></span>
+							<span class="glyphicon glyphicon-check" data-bind="visible: $data == $root.selectedMeshBlueprint()"></span>
+							<span data-bind="text: name"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /ko -->
+	</div>
+
+
+	<h3>Materials</h3>
+	<div class="materials" data-bind="foreach: materials">
+		<div data-bind="click: $parent.selectMaterial" style="cursor: pointer;">
+			<span class="glyphicon glyphicon-unchecked" data-bind="visible: $data != $parent.selectedMaterial()"></span>
+			<span class="glyphicon glyphicon-check" data-bind="visible: $data == $parent.selectedMaterial()"></span>
+			<span data-bind="text: name"></span>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

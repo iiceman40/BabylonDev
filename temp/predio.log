@@ -1,0 +1,31 @@
+	Babylon.js Exporter version: 1.8.0, Blender version: 2.74 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Python World class constructor completed
+	processing begun of material:  predio.Material
+	WARNING texture type not currently supported:  NONE, ignored.
+	processing begun of material:  predio.Material.001
+	Diffuse texture found
+Error encountered processing image file:  C:\Users\Sérgio Pinto\Desktop\cube\Untitled.png, Error:  'C:\\Users\\Sérgio Pinto\\Desktop\\cube\\Untitled.png' and 'C:\\Users\\Sérgio Pinto\\Desktop\\cube\\Untitled.png' are the same file
+	processing begun of material:  predio.Material.002
+	Diffuse texture found
+Error encountered processing image file:  C:\Users\Sérgio Pinto\Desktop\cube\plane.png, Error:  'C:\\Users\\Sérgio Pinto\\Desktop\\cube\\plane.png' and 'C:\\Users\\Sérgio Pinto\\Desktop\\cube\\plane.png' are the same file
+	processing begun of mesh:  Plane
+		num positions      :  4
+		num normals        :  4
+		num uvs            :  8
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  6
+	processing begun of mesh:  Cube
+		processing begun of multimaterial:  predio.Multimaterial#0
+		num positions      :  3446
+		num normals        :  3446
+		num uvs            :  6892
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  5820
+	processing begun of camera (FreeCamera):  Camera
+	processing begun of light (POINT):  Lamp
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========

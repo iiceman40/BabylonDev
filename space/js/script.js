@@ -23,7 +23,7 @@ var createScene = function (canvas) {
 
 	// create camera
 	var camera = new BABYLON.ArcRotateCamera("camera1", -Math.PI/2 , Math.PI/4, 50, new BABYLON.Vector3(0, 0, 5), scene);
-	camera.upperBetaLimit = 1;
+	//camera.upperBetaLimit = 1;
 	camera.lowerRadiusLimit = 4;
 	camera.attachControl(canvas, true);
 	scene.activeCamera = camera;
@@ -32,13 +32,37 @@ var createScene = function (canvas) {
 	var light = new BABYLON.DirectionalLight("Dir0", new BABYLON.Vector3(0, -1, 0), scene);
 	light.intensity = 0.3;
 
+	var fireTexture = new BABYLON.FireProceduralTexture("fire", 256, scene);
+	fireTexture.speed = {x: 0.001, y: 0.001};
+	console.log(fireTexture.fireColors);
+	console.log(fireTexture.alphaThreshold);
+	fireTexture.fireColors = [
+		new BABYLON.Color3(1,0.1,0),
+		new BABYLON.Color3(1,0.4,0),
+		new BABYLON.Color3(1,0,0),
+		new BABYLON.Color3(1,0.5,0.4),
+		new BABYLON.Color3(1,0.1,0),
+		new BABYLON.Color3(1,0,0)
+	];
+
 	// create sun - "God Rays" effect (volumetric light scattering)
 	var sunLight = new BABYLON.PointLight("Omni", new BABYLON.Vector3(20, 20, 100), scene);
-	var godrays = new BABYLON.VolumetricLightScatteringPostProcess('godrays', 1.0, camera, null, 100, BABYLON.Texture.BILINEAR_SAMPLINGMODE, engine, false);
+	var sun = BABYLON.Mesh.CreateSphere('sun', 16, 2000, scene);
+	sun.rotation.y = Math.PI;
+	sun.rotation.x = -Math.PI/8;
+	material = new BABYLON.StandardMaterial('sunMaterial', scene);
+	material.diffuseTexture = fireTexture;
+	sun.material = material;
+
+	var godrays = new BABYLON.VolumetricLightScatteringPostProcess('godrays', 1.0, camera, sun, 100, BABYLON.Texture.BILINEAR_SAMPLINGMODE, engine, false);
+	/*
+	var godrays = new BABYLON.VolumetricLightScatteringPostProcess('godrays', 0.8, camera, null, 100, BABYLON.Texture.BILINEAR_SAMPLINGMODE, engine, false);
 	godrays.mesh.material.diffuseTexture = new BABYLON.Texture('textures/sun.png', scene, true, false, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
 	godrays.mesh.material.diffuseTexture.hasAlpha = true;
-	godrays.mesh.position = new BABYLON.Vector3(-1000, -1000, 1000);
-	godrays.mesh.scaling = new BABYLON.Vector3(1000, 1000, 1000);
+
+	godrays.mesh.scaling = new BABYLON.Vector3(2000, 2000, 2000);
+	*/
+	godrays.mesh.position = new BABYLON.Vector3(-3000, -3000, 3000);
 
 	sunLight.position = godrays.mesh.position;
 
@@ -86,9 +110,11 @@ var createScene = function (canvas) {
 		spacecraft.ellipsoid = new BABYLON.Vector3(1, 1, 1);
 		spacecraft.ellipsoidOffset = new BABYLON.Vector3(0, 5, 0);
 
-		spacecraft.material.bumpTexture = new BABYLON.Texture('assets/space_frigate_6_bump.png', scene);
+		spacecraft.material.bumpTexture = new BABYLON.Texture('assets/space_frigate_6_normalmap.png', scene);
 		spacecraft.material.specularTexture = new BABYLON.Texture('assets/space_frigate_6_specular.png', scene);
 		spacecraft.material.emissiveTexture = new BABYLON.Texture('assets/space_frigate_6_illumination.png', scene);
+
+		createSpacecraftEngine(spacecraft, scene);
 
 		camera.target = spacecraft;
 	});
@@ -147,7 +173,8 @@ var createScene = function (canvas) {
 				targetIndicator.scaling.y = 0.01;
 				targetIndicator.material = new BABYLON.StandardMaterial('indicatiorMaterial', scene);
 				targetIndicator.material.emissiveColor = targetIndicatorColor;
-				targetIndicator.position = targetPoint;
+				targetIndicator.position = targetPoint.clone();
+				targetIndicator.position.y = -0.7;
 			}
 
 		}
@@ -168,7 +195,7 @@ var createScene = function (canvas) {
 		}
 
 		// rotate sun
-		godrays.mesh.rotation.z += 0.0003;
+		//godrays.mesh.rotation.z += 0.0003;
 
 		for(i=0; i<asteroids.length; i++) {
 			var direction = asteroids[i].rotationDirection;
@@ -308,10 +335,12 @@ function moveForward(objectToMove, pointToMoveTo, scene) {
 			targetIndicatorLine.dispose();
 		}
 		var currentPosition = objectToMove.position.clone();
+		var targetPosition = pointToMoveTo.clone();
 		currentPosition.y -= 0.7;
+		targetPosition.y -= 0.7;
 		targetIndicatorLine = BABYLON.Mesh.CreateLines('targetIndicator', [
 			currentPosition,
-			pointToMoveTo
+			targetPosition
 		], scene);
 		targetIndicatorLine.color = targetIndicatorColor;
 	} else {
@@ -339,8 +368,8 @@ function createStars(amount, scene){
 	particleSystem.particleTexture = new BABYLON.Texture("textures/star.png", scene);
 	// Where the particles come from
 	particleSystem.emitter = BABYLON.Vector3.Zero(); // the starting object, the emitter
-	particleSystem.minEmitBox = new BABYLON.Vector3(-1000, -1000, -1000); // Starting all from
-	particleSystem.maxEmitBox = new BABYLON.Vector3(1000, -200, 1000); // To...
+	particleSystem.minEmitBox = new BABYLON.Vector3(-1000, -800, -1000); // Starting all from
+	particleSystem.maxEmitBox = new BABYLON.Vector3(1000, -500, 1000); // To...
 	// Colors of all particles
 	particleSystem.color1 = new BABYLON.Color4(0.8, 0.8, 0.8, 0.8);
 	particleSystem.color2 = new BABYLON.Color4(0.2, 0.5, 0.7, 1.0);
@@ -374,12 +403,12 @@ function createNebulas(scene){
 	nebulaMaterial.opacityTexture.hasAlpha = true;
 	nebulaMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
 
-	var nebulaPlane = BABYLON.Mesh.CreatePlane('nebulaPlane', 500, scene);
+	var nebulaPlane = BABYLON.Mesh.CreatePlane('nebulaPlane', 2000, scene);
 	nebulaPlane.material = nebulaMaterial;
 	nebulaPlane.rotation.x = Math.PI/2;
-	nebulaPlane.position.y = -500;
-	nebulaPlane.position.x = 500;
-	nebulaPlane.position.z = 500;
+	nebulaPlane.position.y = -1000;
+	nebulaPlane.position.x = 1000;
+	nebulaPlane.position.z = 1000;
 	nebulaPlane.visibility = 0.7;
 
 	var nebulaTexture2 = new BABYLON.Texture('textures/nebula2.png', scene);
@@ -390,13 +419,13 @@ function createNebulas(scene){
 	nebulaMaterial2.opacityTexture.hasAlpha = true;
 	nebulaMaterial2.specularColor = new BABYLON.Color3(0, 0, 0);
 
-	var nebulaPlane2 = BABYLON.Mesh.CreatePlane('nebulaPlane2', 1000, scene);
+	var nebulaPlane2 = BABYLON.Mesh.CreatePlane('nebulaPlane2', 2000, scene);
 	nebulaPlane2.material = nebulaMaterial2;
 	nebulaPlane2.rotation.x = Math.PI/2;
 	nebulaPlane2.scaling.x = 2;
 	nebulaPlane2.position.y = -800;
-	nebulaPlane2.position.x = -250;
-	nebulaPlane2.position.z = -500;
+	nebulaPlane2.position.x = 750;
+	nebulaPlane2.position.z = -1000;
 	nebulaPlane2.visibility = 0.5;
 }
 
@@ -404,48 +433,131 @@ function createNebulas(scene){
  * @param scene
  */
 function createPlanets(scene) {
-	var planetTexture = new BABYLON.Texture('textures/planet_1_d.jpg', scene);
-	var planetBumpTexture = new BABYLON.Texture('textures/planet_1_d_normal.jpg', scene);
+	var planetTexture = new BABYLON.Texture('textures/planet_2_d.jpg', scene);
+	var planetBumpTexture = new BABYLON.Texture('textures/planet_2_d_normal.jpg', scene);
 
 	var planetMaterial = new BABYLON.StandardMaterial('planetMaterial', scene);
+	//planetMaterial.diffuseColor = new BABYLON.Color3(0.8, 1, 0.6);
+	//planetMaterial.emissiveColor = new BABYLON.Color3(0.15, 0.05, 0.05);
 	planetMaterial.diffuseTexture = planetTexture;
 	planetMaterial.bumpTexture = planetBumpTexture;
-	planetMaterial.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+	planetMaterial.bumpTexture.level = 2;
+	planetMaterial.specularColor = new BABYLON.Color3(0.6, 0.5, 0.6);
+	planetMaterial.specularPower = 256;
 
-	var planet = BABYLON.Mesh.CreateSphere('planet', 32, 64, scene);
+	var planet = BABYLON.Mesh.CreateSphere('planet', 24, 300, scene);
 	planet.material = planetMaterial;
-	planet.position = new BABYLON.Vector3(-150, -100, 200);
+	planet.position = new BABYLON.Vector3(-50, -300, 600);
 	//planet.applyDisplacementMap("textures/planet_1_d_displacement.jpg", 0, 1.5);
 
-	//var fireTexture = new BABYLON.FireProceduralTexture("fire", 256, scene);
-	//fireTexture.speed = {x: 0.1, y: 0.1};
+
+
+	var fireTexture = new BABYLON.FireProceduralTexture("fire", 256, scene);
+	fireTexture.fireColors = [
+		new BABYLON.Color3(1,0.1,0),
+		new BABYLON.Color3(1,0.4,0),
+		new BABYLON.Color3(1,0,0),
+		new BABYLON.Color3(1,0.5,0.4),
+		new BABYLON.Color3(1,0.1,0),
+		new BABYLON.Color3(1,0,0)
+	];
+	fireTexture.speed = {x: 0.1, y: 0.1};
 
 	var fresnelMaterial = new BABYLON.StandardMaterial('athmosphereMaterial', scene);
 
 	//fresnelMaterial.reflectionTexture = fireTexture;
-	fresnelMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-	fresnelMaterial.emissiveColor = new BABYLON.Color3(0.6, 0.4, 0.5);
-	fresnelMaterial.alpha = 1;
-	fresnelMaterial.specularPower = 16;
+	fresnelMaterial.diffuseTexture = fireTexture;
+	//fresnelMaterial.emissiveTexture = fireTexture;
+	fresnelMaterial.opacityTexture = fireTexture;
+
+	//fresnelMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+	fresnelMaterial.emissiveColor = new BABYLON.Color3(0, 0, 0.5);
+	//fresnelMaterial.specularColor = new BABYLON.Color3(0.4, 0.4, 0.2);
+
+	fresnelMaterial.alpha = 0;
+	fresnelMaterial.specularPower = 8;
 
 	// Fresnel
-	fresnelMaterial.reflectionFresnelParameters = new BABYLON.FresnelParameters();
-	fresnelMaterial.reflectionFresnelParameters.bias = 0.6;
+	//fresnelMaterial.emissiveFresnelParameters = new BABYLON.FresnelParameters();
+	//fresnelMaterial.emissiveFresnelParameters.bias = 0.6;
+	//fresnelMaterial.emissiveFresnelParameters.power = 1;
 
-	fresnelMaterial.emissiveFresnelParameters = new BABYLON.FresnelParameters();
-	fresnelMaterial.emissiveFresnelParameters.bias = 0.6;
-	fresnelMaterial.emissiveFresnelParameters.power = 4;
-	fresnelMaterial.emissiveFresnelParameters.leftColor = BABYLON.Color3.White();
-	fresnelMaterial.emissiveFresnelParameters.rightColor = BABYLON.Color3.Black();
+	fresnelMaterial.opacityFresnelParameters = new BABYLON.FresnelParameters();
+	fresnelMaterial.opacityFresnelParameters.bias = 0.6;
+	fresnelMaterial.opacityFresnelParameters.power = 4;
+	fresnelMaterial.opacityFresnelParameters.leftColor = BABYLON.Color3.White();
+	fresnelMaterial.opacityFresnelParameters.rightColor = BABYLON.Color3.Black();
 
-	var atmosphere = BABYLON.Mesh.CreateSphere('athmosphere', 32, 75, scene);
+	//fresnelMaterial.reflectionFresnelParameters = new BABYLON.FresnelParameters();
+	//fresnelMaterial.reflectionFresnelParameters.bias = 0.1;
+	//fresnelMaterial.reflectionFresnelParameters.power = 100;
+	//fresnelMaterial.reflectionFresnelParameters.leftColor = BABYLON.Color3.White();
+	//fresnelMaterial.reflectionFresnelParameters.rightColor = BABYLON.Color3.Black();
+
+	//fresnelMaterial.emissiveFresnelParameters = new BABYLON.FresnelParameters();
+	//fresnelMaterial.emissiveFresnelParameters.bias = 0.2;
+	//fresnelMaterial.emissiveFresnelParameters.power = 4;
+	//fresnelMaterial.emissiveFresnelParameters.leftColor = BABYLON.Color3.White();
+	//fresnelMaterial.emissiveFresnelParameters.rightColor = BABYLON.Color3.Black();
+
+	var atmosphere = BABYLON.Mesh.CreateSphere('athmosphere', 24, 330, scene);
 	atmosphere.position = planet.position;
 	atmosphere.material = fresnelMaterial;
-	atmosphere.visibility = 0.5;
 
 	scene.registerBeforeRender(function () {
-		atmosphere.rotation.z += 0.003;
-		atmosphere.rotation.x += 0.003;
-		planet.rotation.y += 0.001;
+		atmosphere.rotation.z += 0.002;
+		atmosphere.rotation.x += 0.002;
+		planet.rotation.y += 0.0002;
 	});
+}
+
+function createSpacecraftEngine(emitter, scene){
+	// Create a particle system
+	var particleSystem = new BABYLON.ParticleSystem("particles", 10000, scene);
+
+	//Texture of each particle
+	particleSystem.particleTexture = new BABYLON.Texture("textures/flare.png", scene);
+
+	// Where the particles come from
+	particleSystem.emitter = emitter; // the starting object, the emitter
+	particleSystem.minEmitBox = new BABYLON.Vector3(17, -1.3, 0); // Starting all from
+	particleSystem.maxEmitBox = new BABYLON.Vector3(17, -1.3, 0); // To...
+
+	// Colors of all particles
+	particleSystem.color1 = new BABYLON.Color4(0.1, 0.1, 1.0, 1.0);
+	particleSystem.color2 = new BABYLON.Color4(0.1, 0.1, 1.0, 1.0);
+	particleSystem.colorDead = new BABYLON.Color4(0, 0, 0.5, 0.0);
+
+	// Size of each particle (random between...
+	particleSystem.minSize = 0.5;
+	particleSystem.maxSize = 0.6;
+
+	// Life time of each particle (random between...
+	particleSystem.minLifeTime = 0.005;
+	particleSystem.maxLifeTime = 0.02;
+
+	// Emission rate
+	particleSystem.emitRate = 10000;
+
+	// Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
+	particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+
+	// Set the gravity of all particles
+	//particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
+
+	// Direction of each particle after it has been emitted
+	particleSystem.direction1 = new BABYLON.Vector3(5, 0, 0);
+	particleSystem.direction2 = new BABYLON.Vector3(-2, 0, 0);
+
+	// Angular speed, in radians
+	particleSystem.minAngularSpeed = 0;
+	particleSystem.maxAngularSpeed = Math.PI;
+
+	// Speed
+	particleSystem.minEmitPower = 150;
+	particleSystem.maxEmitPower = 200;
+	particleSystem.updateSpeed = 0.001;
+
+	// Start the particle system
+	particleSystem.start();
 }

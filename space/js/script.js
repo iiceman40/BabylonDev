@@ -33,12 +33,11 @@ var createScene = function (canvas) {
 	light.intensity = 0.3;
 
 	var fireTexture = new BABYLON.FireProceduralTexture("fire", 256, scene);
-	fireTexture.speed = {x: 0.001, y: 0.001};
+	fireTexture.speed = new BABYLON.Vector2(0.00001, 0.00001);
 	console.log(fireTexture.fireColors);
-	console.log(fireTexture.alphaThreshold);
 	fireTexture.fireColors = [
 		new BABYLON.Color3(1,0.1,0),
-		new BABYLON.Color3(1,0.4,0),
+		new BABYLON.Color3(1,0.1,0),
 		new BABYLON.Color3(1,0,0),
 		new BABYLON.Color3(1,0.5,0.4),
 		new BABYLON.Color3(1,0.1,0),
@@ -47,7 +46,7 @@ var createScene = function (canvas) {
 
 	// create sun - "God Rays" effect (volumetric light scattering)
 	var sunLight = new BABYLON.PointLight("Omni", new BABYLON.Vector3(20, 20, 100), scene);
-	var sun = BABYLON.Mesh.CreateSphere('sun', 16, 2000, scene);
+	var sun = BABYLON.Mesh.CreateSphere('sun', 16, 1500, scene);
 	sun.rotation.y = Math.PI;
 	sun.rotation.x = -Math.PI/8;
 	material = new BABYLON.StandardMaterial('sunMaterial', scene);
@@ -62,7 +61,7 @@ var createScene = function (canvas) {
 
 	godrays.mesh.scaling = new BABYLON.Vector3(2000, 2000, 2000);
 	*/
-	godrays.mesh.position = new BABYLON.Vector3(-3000, -3000, 3000);
+	godrays.mesh.position = new BABYLON.Vector3(-4500, -100, 4500);
 
 	sunLight.position = godrays.mesh.position;
 
@@ -368,7 +367,7 @@ function createStars(amount, scene){
 	particleSystem.particleTexture = new BABYLON.Texture("textures/star.png", scene);
 	// Where the particles come from
 	particleSystem.emitter = BABYLON.Vector3.Zero(); // the starting object, the emitter
-	particleSystem.minEmitBox = new BABYLON.Vector3(-1000, -800, -1000); // Starting all from
+	particleSystem.minEmitBox = new BABYLON.Vector3(-1000, -1000, -1000); // Starting all from
 	particleSystem.maxEmitBox = new BABYLON.Vector3(1000, -500, 1000); // To...
 	// Colors of all particles
 	particleSystem.color1 = new BABYLON.Color4(0.8, 0.8, 0.8, 0.8);
@@ -447,7 +446,7 @@ function createPlanets(scene) {
 
 	var planet = BABYLON.Mesh.CreateSphere('planet', 24, 300, scene);
 	planet.material = planetMaterial;
-	planet.position = new BABYLON.Vector3(-50, -300, 600);
+	planet.position = new BABYLON.Vector3(-50, -300, 300);
 	//planet.applyDisplacementMap("textures/planet_1_d_displacement.jpg", 0, 1.5);
 
 
@@ -483,7 +482,7 @@ function createPlanets(scene) {
 	//fresnelMaterial.emissiveFresnelParameters.power = 1;
 
 	fresnelMaterial.opacityFresnelParameters = new BABYLON.FresnelParameters();
-	fresnelMaterial.opacityFresnelParameters.bias = 0.6;
+	fresnelMaterial.opacityFresnelParameters.bias = 0.7;
 	fresnelMaterial.opacityFresnelParameters.power = 4;
 	fresnelMaterial.opacityFresnelParameters.leftColor = BABYLON.Color3.White();
 	fresnelMaterial.opacityFresnelParameters.rightColor = BABYLON.Color3.Black();

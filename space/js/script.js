@@ -34,7 +34,9 @@ var createScene = function (canvas) {
 
 	var fireTexture = new BABYLON.FireProceduralTexture("fire", 256, scene);
 	fireTexture.speed = new BABYLON.Vector2(0.00001, 0.00001);
-	console.log(fireTexture.fireColors);
+	//console.log(fireTexture.fireColors);
+	//console.log(fireTexture.alphaThreshold);
+	
 	fireTexture.fireColors = [
 		new BABYLON.Color3(1,0.1,0),
 		new BABYLON.Color3(1,0.1,0),
@@ -119,6 +121,7 @@ var createScene = function (canvas) {
 	});
 
 	// create asteroids
+	var currentTarget = null;
 	var asteroids = [];
 	BABYLON.SceneLoader.ImportMesh("Asteroid", "assets/", "asteroid.babylon", scene, function (newMeshes, particleSystems) {
 		var asteroid = newMeshes[0];
@@ -128,9 +131,20 @@ var createScene = function (canvas) {
 		asteroid.material.backFaceCulling = false;
 		asteroid.material.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 		asteroid.position.x = -10;
+		asteroid.isTargetable = true;
+
+		asteroid.customOutline = asteroid.clone('customAsteroidOutline');
+		asteroid.customOutline.isVisible = false;
+		asteroid.customOutline.scaling = new BABYLON.Vector3(1.1, 1.1, 1.1);
+		asteroid.customOutline.material = new BABYLON.StandardMaterial('outlineMaterial', scene);
+		asteroid.customOutline.material.diffuseColor = new BABYLON.Color3(1, 0, 0);
+		asteroid.customOutline.material.emissiveColor = new BABYLON.Color3(1, 0, 0);
+		asteroid.customOutline.material.specularColor = new BABYLON.Color3(0,0,0);
+		asteroid.customOutline.material.alpha = 0.7;
+
 
 		for(i=0; i<numberOfAsteroid; i++) {
-			var asteroidInstance = asteroid.createInstance();
+			var asteroidInstance = asteroid.createInstance('Asteroid-' + i);
 			asteroidInstance.position = new BABYLON.Vector3(
 				Math.round(Math.random() * 1000) - 500,
 				Math.round(Math.random() * 30) - 15,
@@ -138,43 +152,79 @@ var createScene = function (canvas) {
 			);
 			asteroidInstance.rotationSpeed = Math.random() * 0.03;
 			asteroidInstance.rotationDirection = Math.ceil(Math.random()*6);
+
+			asteroidInstance.isTargetable = true;
+
+			asteroidInstance.actionManager = new BABYLON.ActionManager(scene);
+			asteroidInstance.actionManager.registerAction(
+				new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function(e){
+					var mesh = e.meshUnderPointer;
+					asteroid.customOutline.position = mesh.position;
+					asteroid.customOutline.rotation = mesh.rotation;
+					asteroid.customOutline.isVisible = true;
+				})
+			);
+
+			asteroidInstance.actionManager.registerAction(
+				new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function(e){
+					var mesh = e.meshUnderPointer;
+					asteroid.customOutline.isVisible = false;
+				})
+			);
+
 			asteroids.push(asteroidInstance);
 		}
+
+		// TODO hide original asteroid
 	});
 
 	// create event listeners
 	var targetPoint = null;
-	var clientX = 0;
-	var clientY = 0;
 	window.addEventListener("mousedown", function (e) {
 
 		if (e.target.id == 'renderCanvas') {
-			clientX = e.clientX;
-			clientY = e.clientY;
+			var pickResult = scene.pick(scene.pointerX, scene.pointerY);
+
+			if(pickResult.pickedMesh.isTargetable || e.button == 0) {
+				camera.detachControl(canvas);
+			}
 		}
 
 	});
+
 	window.addEventListener("mouseup", function (e) {
 
-		if (e.target.id == 'renderCanvas'
-			&& Math.abs(clientX - e.clientX) < 10
-			&& Math.abs(clientY - e.clientY) < 10) {
+		if (e.target.id == 'renderCanvas' && e.button == 0) {
 
-			// We try to pick an object
-			var pickResult = scene.pick(scene.pointerX, scene.pointerY);
+			var pickResult;
+			pickResult = scene.pick(scene.pointerX, scene.pointerY, function(mesh){
+				return mesh.isTargetable;
+			});
 
-			if (pickResult.pickedPoint) {
-				targetPoint = pickResult.pickedPoint;
-				if(targetIndicator){
-					targetIndicator.dispose();
+			if (pickResult.hit) {
+
+				shootLaser(spacecraft, pickResult.pickedMesh, camera, scene);
+				ground.isVisible = true;
+
+			} else {
+
+				pickResult = scene.pick(scene.pointerX, scene.pointerY);
+				if (pickResult.pickedPoint) {
+					// set spacecraft target
+					targetPoint = pickResult.pickedPoint;
+					if (targetIndicator) {
+						targetIndicator.dispose();
+					}
+					targetIndicator = BABYLON.Mesh.CreateSphere('targetIndicator', 1, 0.7, scene);
+					targetIndicator.scaling.y = 0.01;
+					targetIndicator.material = new BABYLON.StandardMaterial('indicatiorMaterial', scene);
+					targetIndicator.material.emissiveColor = targetIndicatorColor;
+					targetIndicator.position = targetPoint.clone();
 				}
-				targetIndicator = BABYLON.Mesh.CreateSphere('targetIndicator', 1, 0.7, scene);
-				targetIndicator.scaling.y = 0.01;
-				targetIndicator.material = new BABYLON.StandardMaterial('indicatiorMaterial', scene);
-				targetIndicator.material.emissiveColor = targetIndicatorColor;
-				targetIndicator.position = targetPoint.clone();
-				targetIndicator.position.y = -0.7;
+
 			}
+
+			camera.attachControl(canvas, true);
 
 		}
 
@@ -185,6 +235,12 @@ var createScene = function (canvas) {
 		engine.resize();
 	});
 
+	var cursor = null;
+	var cursorMaterial = new BABYLON.StandardMaterial('cursorMaterial', scene);
+	cursorMaterial.emissiveColor = targetIndicatorColor;
+	cursor = BABYLON.Mesh.CreateSphere('targetIndicator', 1, 0.7, scene);
+	cursor.scaling.y = 0.01;
+	cursor.material = cursorMaterial;
 	scene.registerBeforeRender(function () {
 
 		// move spaceship
@@ -217,6 +273,14 @@ var createScene = function (canvas) {
 			if(direction >= 5 || direction == 3) {
 				asteroids[i].position.z += asteroids[i].rotationSpeed;
 			}
+		}
+
+		// move cursor
+		var pickInfo = scene.pick(scene.pointerX, scene.pointerY, function(mesh){
+			return mesh == ground;
+		});
+		if (pickInfo.hit) {
+			cursor.position = pickInfo.pickedPoint;
 		}
 
 	});
@@ -323,7 +387,7 @@ function moveForward(objectToMove, pointToMoveTo, scene) {
 		var z = Math.cos(angle);
 		var moveVector = new BABYLON.Vector3(x, 0, z);
 
-		var speed = Math.min(0.4, Math.sqrt(distanceToTargetPoint / 100));
+		var speed = Math.min(0.4, Math.sqrt(distanceToTargetPoint / 500));
 
 		moveVector = moveVector.normalize();
 		moveVector = moveVector.scale(speed);
@@ -335,8 +399,6 @@ function moveForward(objectToMove, pointToMoveTo, scene) {
 		}
 		var currentPosition = objectToMove.position.clone();
 		var targetPosition = pointToMoveTo.clone();
-		currentPosition.y -= 0.7;
-		targetPosition.y -= 0.7;
 		targetIndicatorLine = BABYLON.Mesh.CreateLines('targetIndicator', [
 			currentPosition,
 			targetPosition
@@ -354,6 +416,37 @@ function moveForward(objectToMove, pointToMoveTo, scene) {
 		pointToMoveTo = null;
 	}
 
+}
+
+/**
+ * @param spaceship
+ * @param target
+ * @param camera
+ * @param scene
+ */
+function shootLaser(spaceship, target, camera, scene){
+	var laserMaterial = new BABYLON.StandardMaterial('laserMaterial', scene);
+	laserMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0);
+	laserMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
+	laserMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+
+	var laser = BABYLON.Mesh.CreateBox('laser', 1, scene);
+	laser.material = laserMaterial;
+
+	var axis1 = (spaceship.position).subtract(target.position);
+	var axis2 = new BABYLON.Vector3(0, 1, 0); //camera.position;
+	var axis3 = BABYLON.Vector3.Cross(axis2, axis1);
+
+	laser.rotation = BABYLON.Vector3.RotationFromAxis(axis1, axis2, axis3);
+	laser.scaling.x = axis1.length();
+	laser.scaling.y = laser.scaling.z = 0.05;
+	laser.position = ((target.position).add(spaceship.position)).scale(0.5);
+
+	setTimeout(function(){
+		laser.dispose();
+	}, 200);
+
+	return laser;
 }
 
 /**
@@ -553,8 +646,8 @@ function createSpacecraftEngine(emitter, scene){
 	particleSystem.maxAngularSpeed = Math.PI;
 
 	// Speed
-	particleSystem.minEmitPower = 150;
-	particleSystem.maxEmitPower = 200;
+	particleSystem.minEmitPower = 10;
+	particleSystem.maxEmitPower = 50;
 	particleSystem.updateSpeed = 0.001;
 
 	// Start the particle system

@@ -167,7 +167,6 @@ var createScene = function (canvas) {
 
 			asteroidInstance.actionManager.registerAction(
 				new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function(e){
-					var mesh = e.meshUnderPointer;
 					asteroid.customOutline.isVisible = false;
 				})
 			);
@@ -179,7 +178,6 @@ var createScene = function (canvas) {
 	});
 
 	// create event listeners
-	var targetPoint = null;
 	window.addEventListener("mousedown", function (e) {
 
 		if (e.target.id == 'renderCanvas') {
@@ -192,6 +190,8 @@ var createScene = function (canvas) {
 
 	});
 
+	var targetToTurnTo = false;
+	var targetPoint = null;
 	window.addEventListener("mouseup", function (e) {
 
 		if (e.target.id == 'renderCanvas' && e.button == 0) {
@@ -203,8 +203,8 @@ var createScene = function (canvas) {
 
 			if (pickResult.hit) {
 
-				shootLaser(spacecraft, pickResult.pickedMesh, camera, scene);
-				ground.isVisible = true;
+				targetToTurnTo = pickResult.pickedPoint;
+				// TODO stop moving if shooting at target
 
 			} else {
 
@@ -243,14 +243,20 @@ var createScene = function (canvas) {
 	cursor.material = cursorMaterial;
 	scene.registerBeforeRender(function () {
 
+		// face target for shooting
+		if(targetToTurnTo){
+			var turnDone = facePoint(spacecraft, targetToTurnTo);
+			if(turnDone){
+				shootLaser(spacecraft, targetToTurnTo, scene);
+				targetToTurnTo = null;
+			}
+		}
+
 		// move spaceship
 		if (targetPoint) {
 			facePoint(spacecraft, targetPoint);
 			moveForward(spacecraft, targetPoint, scene);
 		}
-
-		// rotate sun
-		//godrays.mesh.rotation.z += 0.0003;
 
 		for(i=0; i<asteroids.length; i++) {
 			var direction = asteroids[i].rotationDirection;
@@ -266,7 +272,7 @@ var createScene = function (canvas) {
 				asteroids[i].rotation.z += asteroids[i].rotationSpeed;
 			}
 
-			// move asterioid slightly
+			// move asteroid slightly
 			if(direction >= 3 || direction == 1) {
 				asteroids[i].position.x += asteroids[i].rotationSpeed;
 			}
@@ -309,63 +315,113 @@ function facePoint(rotatingObject, pointToRotateTo) {
 	var distanceToTargetPoint = direction.length();
 
 	if(distanceToTargetPoint > 0.5) {
-		var pi = Math.PI;
 
-		var v1 = new BABYLON.Vector3(0, 0, 1);
-		var v2 = direction;
+		var axisVectorY = new BABYLON.Vector3(0, 0, 1);
+		var directionAxisForY = 'x';
+		var deltaY = calculateRotationDeltaForAxis(rotatingObject, 'y', axisVectorY, direction, directionAxisForY);
 
-		// caluculate the angel for the new direction
-		var angle = Math.acos(BABYLON.Vector3.Dot(v1, v2.normalize()));
+		var axisVectorZ = new BABYLON.Vector3(0, 1, 0);
+		var directionAxisForZ = 'z';
+		var deltaZ = calculateRotationDeltaForAxis(rotatingObject, 'z', axisVectorZ, direction, directionAxisForZ);
 
-		// decide it the angle has to be positive or negative
-		if (direction.x < 0) angle = angle * -1;
+		var turnAroundYAxisDone = applyRotationForAxis(rotatingObject, 'y', deltaY);
+		var turnAroundZAxisDone = applyRotationForAxis(rotatingObject, 'z', deltaZ);
 
-		// compensate initial rotation of imported spaceship mesh
-		angle += Math.PI / 2;
-
-		// calculate both angles in degrees
-		var playerRotation = rotatingObject.rotation.y;
-
-		// calculate the delta
-		var delta = playerRotation - angle;
-
-		// check what direction to turn to take the shortest turn
-		if (delta > pi) {
-			delta -= pi*2;
-		} else if (delta < -pi) {
-			delta += pi*2;
-		}
-
-		var absDelta = Math.abs(delta);
-		// rotate until the difference between the object angle and the target angle is no more than 3 degrees
-		if (absDelta > pi/50) {
-
-			var rotationSpeed = Math.max(0.2, Math.min(absDelta*absDelta, 1));
-
-			if (delta > 0) {
-				rotatingObject.rotation.y -= rotationSpeed * 0.1;
-				if (rotatingObject.rotation.y < -pi) {
-					rotatingObject.rotation.y = pi;
-				}
-			}
-			if (delta < 0) {
-				rotatingObject.rotation.y += rotationSpeed * 0.1;
-				if (rotatingObject.rotation.y > pi) {
-					rotatingObject.rotation.y = -pi;
-				}
-			}
-
-			// return true since the rotation is in progress
-			return true;
-
-		} else {
-
-			// return false since no rotation needed to be done
-			return false;
-
-		}
+		return (turnAroundYAxisDone && turnAroundZAxisDone) ? true : false;
 
 	}
+}
+
+function calculateRotationDeltaForAxis(rotatingObject, axis, axisVector, direction, directionAxis){
+	var axisVectorNormalized = axisVector.normalize();
+	var directionVectorNormalized = direction.normalize();
+
+	// calculate the angel for the new direction
+	var angle = Math.acos(BABYLON.Vector3.Dot(axisVectorNormalized, directionVectorNormalized));
+
+	if (directionAxis == 'x') {
+		// decide it the angle has to be positive or negative
+		if (direction[directionAxis] < 0) angle *= -1;
+		// compensate initial rotation of imported spaceship mesh
+		angle += Math.PI / 2;
+	} else {
+		angle -= Math.PI / 2;
+	}
+
+	// calculate both angles in degrees
+	var playerRotationOnAxis = rotatingObject.rotation[axis];
+	// calculate and return the delta
+	return playerRotationOnAxis - angle;
+}
+
+function applyRotationForAxis(rotatingObject, axis, delta){
+	var pi = Math.PI;
+
+	// check what direction to turn to take the shortest turn
+	if (delta > pi) {
+		delta -= pi*2;
+	} else if (delta < -pi) {
+		delta += pi*2;
+	}
+
+	var absDelta = Math.abs(delta);
+	// rotate until the difference between the object angle and the target angle is no more than 3 degrees
+	if (absDelta > pi/60) {
+
+		var rotationSpeed = Math.max(0.2, Math.min(absDelta*absDelta, 1));
+
+		if (delta > 0) {
+			rotatingObject.rotation[axis] -= rotationSpeed * 0.1;
+			if (rotatingObject.rotation[axis] < -pi) {
+				rotatingObject.rotation[axis] = pi;
+			}
+		}
+		if (delta < 0) {
+			rotatingObject.rotation[axis] += rotationSpeed * 0.1;
+			if (rotatingObject.rotation[axis] > pi) {
+				rotatingObject.rotation[axis] = -pi;
+			}
+		}
+
+		// turn not done yet
+		return false;
+
+	} else {
+
+		// turn done
+		return true;
+
+	}
+}
+
+/**
+ * @param rotatingObject
+ * @param pointToRotateTo
+ * @returns {boolean}
+ */
+function _facePoint(rotatingObject, pointToRotateTo) {
+	var axis1 = (rotatingObject.position).subtract(pointToRotateTo);
+	var axis2 = new BABYLON.Vector3(0, 1, 0);
+	var axis3 = BABYLON.Vector3.Cross(axis2, axis1);
+
+	//console.log('old rotation: ', rotatingObject.rotation);
+	var oldRotation = rotatingObject.rotation;
+	var newRotation = BABYLON.Vector3.RotationFromAxis(axis1, axis2, axis3);
+	//console.log('new rotation target: ', newRotation);
+
+	var rotationDifference = oldRotation.subtract(newRotation);
+	//console.log(oldRotation.subtract(newRotation));
+	//console.log(rotationDifference);
+
+	if(!isNaN(rotationDifference.x) && Math.abs(rotationDifference.y) > 0.01) {
+		console.log(rotationDifference.y);
+		var newRotationStep = new BABYLON.Vector3(0, newRotation.y/50, 0);
+
+		rotatingObject.rotation.y += newRotationStep.y;
+	}
+	//console.log('new rotation: ', rotatingObject.rotation);
+
+	return true;
 }
 
 /**
@@ -421,10 +477,9 @@ function moveForward(objectToMove, pointToMoveTo, scene) {
 /**
  * @param spaceship
  * @param target
- * @param camera
  * @param scene
  */
-function shootLaser(spaceship, target, camera, scene){
+function shootLaser(spaceship, targetPoint, scene){
 	var laserMaterial = new BABYLON.StandardMaterial('laserMaterial', scene);
 	laserMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0);
 	laserMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
@@ -433,14 +488,14 @@ function shootLaser(spaceship, target, camera, scene){
 	var laser = BABYLON.Mesh.CreateBox('laser', 1, scene);
 	laser.material = laserMaterial;
 
-	var axis1 = (spaceship.position).subtract(target.position);
-	var axis2 = new BABYLON.Vector3(0, 1, 0); //camera.position;
-	var axis3 = BABYLON.Vector3.Cross(axis2, axis1);
+	var axis1 = (spaceship.position).subtract(targetPoint);
+	var axis2 = BABYLON.Vector3.Cross(axis1, new BABYLON.Vector3(0, 1, 0));
+	var axis3 = BABYLON.Vector3.Cross(axis1, axis2);
 
 	laser.rotation = BABYLON.Vector3.RotationFromAxis(axis1, axis2, axis3);
 	laser.scaling.x = axis1.length();
 	laser.scaling.y = laser.scaling.z = 0.05;
-	laser.position = ((target.position).add(spaceship.position)).scale(0.5);
+	laser.position = ((targetPoint).add(spaceship.position)).scale(0.5);
 
 	setTimeout(function(){
 		laser.dispose();

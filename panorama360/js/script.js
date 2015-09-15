@@ -16,19 +16,27 @@ $(document).ready(function(){
 
 function createScene() {
 	var scene = new BABYLON.Scene(engine);
+	scene.clearColor = new BABYLON.Color3(0.9, 0.9, 0.9);
 
-	var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, -5, 0), scene);
+	var camera = new BABYLON.ArcRotateCamera("camera1", Math.PI/2, Math.PI/2-0.3, 150, new BABYLON.Vector3(0, 0, 0), scene);
 	camera.setTarget(BABYLON.Vector3.Zero());
 	camera.attachControl(canvas, true);
 
+	camera.lowerRadiusLimit = 10;
+	camera.upperRadiusLimit = 250;
+
 	var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
-	light.intensity = 2;
+	light.intensity = 1;
 
 	var sphere1 = BABYLON.Mesh.CreateSphere("sphere1", 32, 512, scene);
 
+	//var sphere2 = BABYLON.Mesh.CreateSphere("sphere1", 32, 5, scene);
+	//sphere2.position = new BABYLON.Vector3(0, 0, 10);
+
 	var material = new BABYLON.StandardMaterial("texture1", scene);
 	material.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-	material.diffuseTexture = new BABYLON.Texture("img/01.jpg", scene);
+	//material.emissiveColor = new BABYLON.Color3(0.3, 0.1, 0);
+	material.diffuseTexture = new BABYLON.Texture("img/_61U9543-Panorama_equi-2_small.jpg", scene);
 	material.diffuseTexture.wAng = -Math.PI/2;
 	material.diffuseTexture.vAng = Math.PI;
 	// material.diffuseTexture.uAng = Math.PI;
@@ -43,7 +51,7 @@ function createScene() {
 	//sphere1.infiniteDistance = true;
 
 	scene.registerBeforeRender(function(){
-		//texture.uOffset += 0.001;
+		material.diffuseTexture.vOffset += 0.00025;
 	});
 
 	return scene;

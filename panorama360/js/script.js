@@ -31,7 +31,7 @@ function createScene() {
 			image = "img/_61U9543-Panorama_equi-2_small.jpg";
 			break;
 		case 'quality3':
-			image = "img/_61U9543-Panorama_equi-2.jpg";
+			image = "img/_61U9543-Panorama_equi-2_large.jpg";
 			break;
 		default:
 			image = "img/_61U9543-Panorama_equi-2_small.jpg"

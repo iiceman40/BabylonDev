@@ -1,7 +1,5 @@
-$(window).ready(function(){
+$(document).ready(function(){
 	var GRAVITY = -0.4;
-	var noShader = (window.location.hash == '#noShader');
-	console.log('no shader selected: ', noShader, window.location.hash);
 
 	var canvas = document.getElementById("renderCanvas");
 	var scene, meshPlayer, cameraArcRotate = [];
@@ -17,14 +15,11 @@ $(window).ready(function(){
 	createScene();
 	//scene.debugLayer.show();
 
-	var mouseDownEvent = function (event) {
+	window.addEventListener("mousedown", function (event) {
 		tempMouseX = event.x;
 		tempMouseY = event.y;
-	};
-	window.addEventListener("mousedown", mouseDownEvent);
-	window.addEventListener("pointerdown", mouseDownEvent);
-
-	var mouseUpEvent = function (event) {
+	});
+	window.addEventListener("mouseup", function (event) {
 		if(Math.abs(tempMouseX - event.x) < 10 && Math.abs(tempMouseY - event.y) < 10) {
 			var pickResult = scene.pick(scene.pointerX, scene.pointerY);
 			if(pickResult) {
@@ -41,9 +36,7 @@ $(window).ready(function(){
 				path.color = new BABYLON.Color3(0, 0, 1);
 			}
 		}
-	};
-	window.addEventListener("mouseup", mouseUpEvent);
-	window.addEventListener("pointerup", mouseUpEvent);
+	});
 
 
 	function animateActor() {
@@ -181,8 +174,8 @@ $(window).ready(function(){
 
 		// Shadows
 		var shadowGenerator = new BABYLON.ShadowGenerator(4096, light);
-		shadowGenerator.useBlurVarianceShadowMap = true;
-		//shadowGenerator.usePoissonSampling = true;
+		shadowGenerator.useVarianceShadowMap = false;
+		shadowGenerator.usePoissonSampling = true;
 
 		// Camera third person
 		cameraArcRotate[0] = new BABYLON.ArcRotateCamera("CameraBaseRotate", -Math.PI/2, Math.PI/5, 25, new BABYLON.Vector3(0, 0, 0), scene);
@@ -205,7 +198,7 @@ $(window).ready(function(){
 		extraGround.checkCollisions = true;
 		extraGround.receiveShadows = true;
 
-		var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", "textures/ground_heightmap.png", 100, 100, 100, 0, 10, scene, false);
+		var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", "textures/heightMap.png", 100, 100, 100, 0, 10, scene, false);
 		var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
 		groundMaterial.diffuseTexture = new BABYLON.Texture("textures/ground.jpg", scene);
 		groundMaterial.diffuseTexture.uScale = 6;
@@ -222,7 +215,7 @@ $(window).ready(function(){
 		wall.position.y = 3;
 		wall.position.z = 20;
 		wall.checkCollisions = true;
-		wall.receiveShadows = false;
+		wall.receiveShadows = true;
 		shadowGenerator.getShadowMap().renderList.push(wall);
 
 		// Ramp
@@ -232,7 +225,7 @@ $(window).ready(function(){
 		ramp.position.z = -20;
 		ramp.rotation.z = Math.PI/7;
 		ramp.checkCollisions = true;
-		ramp.receiveShadows = false;
+		ramp.receiveShadows = true;
 		shadowGenerator.getShadowMap().renderList.push(ramp);
 
 		var rampLarge = BABYLON.Mesh.CreateBox("rampLarge", 10, scene);
@@ -242,7 +235,7 @@ $(window).ready(function(){
 		rampLarge.position.x = -20;
 		rampLarge.rotation.z = Math.PI/7;
 		rampLarge.checkCollisions = true;
-		rampLarge.receiveShadows = false;
+		rampLarge.receiveShadows = true;
 		shadowGenerator.getShadowMap().renderList.push(rampLarge);
 
 		var box = BABYLON.Mesh.CreateBox("box", 5, scene);
@@ -250,7 +243,7 @@ $(window).ready(function(){
 		box.position.z = -20;
 		box.position.x = 10;
 		box.checkCollisions = true;
-		box.receiveShadows = false;
+		box.receiveShadows = true;
 		shadowGenerator.getShadowMap().renderList.push(box);
 
 		// Skybox
@@ -267,7 +260,7 @@ $(window).ready(function(){
 		BABYLON.SceneLoader.ImportMesh("Body", "models/", "bobbin.babylon", scene, function (newMeshes, particleSystems) {
 			meshPlayer = newMeshes[0];
 			meshPlayer.position.y = 4;
-			meshPlayer.receiveShadows = false;
+			meshPlayer.receiveShadows = true;
 			shadowGenerator.getShadowMap().renderList.push(meshPlayer);
 
 			meshPlayer.checkCollisions = true;
@@ -276,30 +269,28 @@ $(window).ready(function(){
 			meshPlayer.applyGravity = true;
 
 			// Water
-			if(!noShader) {
-				BABYLON.Engine.ShadersRepository = "";
-				var waterMaterial = new WaterMaterial("water", scene, sun);
-				// refraction
-				waterMaterial.refractionTexture.renderList.push(extraGround);
-				waterMaterial.refractionTexture.renderList.push(ground);
-				waterMaterial.refractionTexture.renderList.push(skybox);
-				waterMaterial.refractionTexture.renderList.push(meshPlayer);
-				waterMaterial.refractionTexture.renderList.push(ramp);
-				waterMaterial.refractionTexture.renderList.push(rampLarge);
-				waterMaterial.refractionTexture.renderList.push(box);
-				// reflection
-				waterMaterial.reflectionTexture.renderList.push(extraGround);
-				waterMaterial.reflectionTexture.renderList.push(ground);
-				waterMaterial.reflectionTexture.renderList.push(skybox);
-				waterMaterial.reflectionTexture.renderList.push(meshPlayer);
-				waterMaterial.reflectionTexture.renderList.push(ramp);
-				waterMaterial.reflectionTexture.renderList.push(rampLarge);
-				waterMaterial.reflectionTexture.renderList.push(box);
+			BABYLON.Engine.ShadersRepository = "";
+			var waterMaterial = new WaterMaterial("water", scene, sun);
+			// refraction
+			waterMaterial.refractionTexture.renderList.push(extraGround);
+			waterMaterial.refractionTexture.renderList.push(ground);
+			waterMaterial.refractionTexture.renderList.push(skybox);
+			waterMaterial.refractionTexture.renderList.push(meshPlayer);
+			waterMaterial.refractionTexture.renderList.push(ramp);
+			waterMaterial.refractionTexture.renderList.push(rampLarge);
+			waterMaterial.refractionTexture.renderList.push(box);
+			// reflection
+			waterMaterial.reflectionTexture.renderList.push(extraGround);
+			waterMaterial.reflectionTexture.renderList.push(ground);
+			waterMaterial.reflectionTexture.renderList.push(skybox);
+			waterMaterial.reflectionTexture.renderList.push(meshPlayer);
+			waterMaterial.reflectionTexture.renderList.push(ramp);
+			waterMaterial.reflectionTexture.renderList.push(rampLarge);
+			waterMaterial.reflectionTexture.renderList.push(box);
 
-				var water = BABYLON.Mesh.CreateGround("water", 1000, 1000, 1, scene, false);
-				//water.visibility = 0.5;
-				water.material = waterMaterial;
-			}
+			var water = BABYLON.Mesh.CreateGround("water", 1000, 1000, 1, scene, false);
+			water.visibility = 0.5;
+			water.material = waterMaterial;
 
 		});
 

@@ -201,8 +201,8 @@ var Environment = function(scene){
 		self.ground = BABYLON.Mesh.CreateTiledGround("ground1", -500, -500, 500, 500, subdivisions, precision, scene);
 		self.ground.material = new BABYLON.StandardMaterial('mat', scene);
 		self.ground.material.specularColor = BABYLON.Color3.Black();
-		//self.ground.material.alpha = 0;
-		//self.ground.visibility = 0;
+		self.ground.material.alpha = 0;
+		self.ground.visibility = 0;
 	};
 
 	/**

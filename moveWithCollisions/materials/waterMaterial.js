@@ -13,8 +13,8 @@
 		this.bumpTexture.wrapU = BABYLON.Texture.MIRROR_ADDRESSMODE;
 		this.bumpTexture.wrapV = BABYLON.Texture.MIRROR_ADDRESSMODE;
 
-		this.reflectionTexture = new BABYLON.MirrorTexture("reflection", 512, scene, true);
-		this.refractionTexture = new BABYLON.RenderTargetTexture("refraction", 512, scene, true);
+		this.reflectionTexture = new BABYLON.MirrorTexture("reflection", 4096, scene, true);
+		this.refractionTexture = new BABYLON.RenderTargetTexture("refraction", 4096, scene, true);
 		this.reflectionTexture.mirrorPlane = new BABYLON.Plane(0, -1, 0, 0);
 
 		this.refractionTexture.onBeforeRender = function() {

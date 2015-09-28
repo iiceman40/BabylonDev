@@ -256,6 +256,7 @@ var Spacecraft = function(scene){
 		outerLaser.material = outerLaserMaterial;
 
 		var laserEmitterPosition = spacecraft.position;
+		console.log('test laser');
 		if(spacecraft.laserEmitter){
 			laserEmitterPosition = spacecraft.laserEmitter.getAbsolutePosition();
 		}
@@ -267,7 +268,7 @@ var Spacecraft = function(scene){
 		laser.rotation = BABYLON.Vector3.RotationFromAxis(axis1, axis2, axis3);
 		laser.scaling.x = axis1.length();
 		laser.scaling.y = laser.scaling.z = 0.04;
-		laser.position = target.position.add(laserEmitterPosition).scale(0.48);
+		laser.position = target.position.add(laserEmitterPosition).scale(0.5);
 
 		outerLaser.position = laser.position;
 		outerLaser.rotation = laser.rotation;

@@ -1,0 +1,50 @@
+{
+  "name": "babylonjs",
+  "description": "Babylon.js is a complete JavaScript framework for building 3D games with HTML 5 and WebGL",
+  "main": "babylon.2.2.js",
+  "homepage": "https://www.babylonjs.com",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/BabylonJS/Babylon.js.git"
+  },
+  "authors": [
+    "David Catuhe",
+    "David Rousset"
+  ],
+  "keywords": [
+    "3D",
+    "WebGL",
+    "WebAudio",
+    "Shaders",
+    "Realtime"
+  ],
+  "license": "Apache-2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "Babylon",
+    "Exporters",
+    "Loaders",
+    "Previous releases",
+    "Tools",
+    "gulpfile.js",
+    "package.json",
+    "babylon.2.1*.*",
+    "*.md",
+    "*.yml",
+    "cannon.js",
+    "Oimo.js",
+    "poly2tri.js"
+  ],
+  "version": "2.2.0",
+  "_release": "2.2.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v2.2.0",
+    "commit": "89c73a47c3f1a09f7eab2e17269cbeedf63cf8b5"
+  },
+  "_source": "git://github.com/BabylonJS/Babylon.js.git",
+  "_target": "~2.2.0",
+  "_originalSource": "babylonjs",
+  "_direct": true
+}

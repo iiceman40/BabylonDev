@@ -122,7 +122,7 @@ function processPeople(scene){
 		// count its neighbors
 		var position = emptyCells[j];
 		var neighborCountOfEmptySpot = countNeighbors(position);
-		console.log(neighborCountOfEmptySpot);
+		//console.log(neighborCountOfEmptySpot);
 		// check if the spot should be populated according to the rules
 		if(neighborCountOfEmptySpot >= rules[2] && neighborCountOfEmptySpot <= rules[3]){
 			// populate if condition is fulfilled

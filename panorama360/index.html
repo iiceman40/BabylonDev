@@ -1,22 +1,43 @@
 <!DOCTYPE html>
 <html>
-<head lang="en">
+<head lang="de">
 	<meta charset="UTF-8">
-	<title>Babylon Dev - View Ports</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
+	<title>360 Grad Panoramas</title>
+
+	<link rel="stylesheet" type="text/css" href="../libs/bootstrap/css/bootstrap.min.css"/>
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 
 	<!-- Libraries -->
 	<script src="../libs/jquery-2.1.1.min.js"></script>
+	<script src="../libs/bootstrap/js/bootstrap.min.js"></script>
 	<script src="../libs/hand.min.js"></script>
 	<script src="../libs/babylon.2.2-alpha.js"></script>
 
+	<script src="js/config.js"></script>
 	<script src="js/script.js"></script>
 </head>
 
 <body>
 <!-- Babylon -->
-<canvas id="renderCanvas"></canvas>
+<div id="canvas-wrapper">
+	<canvas id="renderCanvas"></canvas>
+	<div id="label"></div>
+	<div id="stillLoading"></div>
+	<div id="ui">
+		<button class="btn btn-default turnDown"><span class="glyphicon glyphicon-arrow-up"></span></button>
+		<button class="btn btn-default turnUp"><span class="glyphicon glyphicon-arrow-down"></span></button>
+		<button class="btn btn-default turnLeft"><span class="glyphicon glyphicon-arrow-left"></span></button>
+		<button class="btn btn-default turnRight"><span class="glyphicon glyphicon-arrow-right"></span></button>
+
+		<button class="btn btn-default zoomIn"><span class="glyphicon glyphicon-plus"></span></button>
+		<button class="btn btn-default zoomOut"><span class="glyphicon glyphicon-minus"></span></button>
+
+		<button class="btn btn-default toggleAutoRotate active"><span class="glyphicon glyphicon-repeat"></span></button>
+		<button class="btn btn-default toggleFullscreen"><span class="glyphicon glyphicon-fullscreen"></span></button>
+	</div>
+</div>
 </body>
 
 </html>

@@ -94,8 +94,13 @@ function processPeople(scene){
 	processedIndices = {};
 	var personCount = 0;
 
+	var startTime = new Date();
+	var currentTime = new Date();
+
 	// check for dying
 	// for all people
+
+	console.log(1, startTime.getTime() - currentTime.getTime());
 	for (var i = 0; i < scene.meshes.length; i++) {
 
 		if(scene.meshes[i].isPerson) {
@@ -116,6 +121,8 @@ function processPeople(scene){
 
 	}
 
+	currentTime = new Date();
+	console.log(2, startTime.getTime() - currentTime.getTime());
 	// check for newborn
 	// for all empty neighbor cells on the list
 	for(var j=0; j < emptyCells.length; j++){
@@ -130,6 +137,8 @@ function processPeople(scene){
 		}
 	}
 
+	currentTime = new Date();
+	console.log(3, startTime.getTime() - currentTime.getTime());
 	// remove dying cells
 	for(var k=0; k < dyingPeople.length; k++){
 		removePerson(dyingPeople[k], dyingMat);
@@ -145,6 +154,9 @@ function processPeople(scene){
 
 	$('.personCount').text(personCount);
 
+	currentTime = new Date();
+	console.log(4, startTime.getTime() - currentTime.getTime());
+
 }
 
 /**
@@ -157,18 +169,71 @@ function addPerson(position, scene){
 	person.position = position;
 	person.isPerson = true;
 	person.material = newbornMat;
+	person.visibility = 0;
 	var positionString = getNeighborPositionString(position);
 	occupiedCellsIndex[positionString] = true;
+
+	var birthAnimation = new BABYLON.Animation(
+		"dyingAnimation",
+		"visibility",
+		30,
+		BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+		BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+	);
+
+	// Animation keys
+	var keys = [];
+	keys.push({
+		frame: 0,
+		value: 0
+	});
+
+	keys.push({
+		frame: 30,
+		value: 1
+	});
+
+	// Adding keys to the animation object
+	birthAnimation.setKeys(keys);
+
+	// launch animation with callback
+	scene.beginDirectAnimation(person, [birthAnimation], 0, 30, false, 1);
+
 	return person;
 }
 
 function removePerson(person, dyingMat){
 	person.material = dyingMat;
-	setTimeout(function(){
+
+	var dyingAnimation = new BABYLON.Animation(
+		"dyingAnimation",
+		"visibility",
+		30,
+		BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+		BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+	);
+
+	// Animation keys
+	var keys = [];
+	keys.push({
+		frame: 0,
+		value: 1
+	});
+
+	keys.push({
+		frame: 30,
+		value: 0
+	});
+
+	// Adding keys to the animation object
+	dyingAnimation.setKeys(keys);
+
+	// launch animation with callback
+	scene.beginDirectAnimation(person, [dyingAnimation], 0, 30, false, 1, function () {
 		var positionString = getNeighborPositionString(person.position);
 		delete occupiedCellsIndex[positionString];
 		person.dispose();
-	}, 500)
+	});
 }
 
 /**

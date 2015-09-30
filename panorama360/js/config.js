@@ -2,7 +2,7 @@
 var zoomMax = 10;
 var zoomMin = 256;
 var zoomStepSize = 50;
-var zoomDuration = 500;
+var zoomDuration = 300;
 
 var cameraTurnStepSize = 0.2;
 var cameraTurnDuration = 500;

@@ -104,7 +104,7 @@ function createScene() {
 
 	// define what assets to load and what objects to add
 	var assetsManager = new BABYLON.AssetsManager(scene);
-	var initialTextureTask = assetsManager.addTextureTask("image task", selectedScene.image);
+	var initialTextureTask = assetsManager.addTextureTask("textureTask", selectedScene.image);
 
 	initialTextureTask.onSuccess = function(task) {
 		selectedScene.preloadedImage = task.texture;
@@ -131,17 +131,25 @@ function createScene() {
 		remainingAssetsManager = new BABYLON.AssetsManager(scene);
 		for(var j = 0; j < scenes.length; j++){
 			if(!scenes[j].preloadedImage) {
-				var newTask = remainingAssetsManager.addTextureTask('scene with array id ' + j + ' image task', scenes[j].image);
+
+				// create a new loading task for every texture needed
+				var newTask = remainingAssetsManager.addTextureTask('textureTaskForSceneWithId' + j, scenes[j].image);
 				newTask.sceneId = j;
+
 				newTask.onSuccess = function (task) {
+
+					// store preloaded image
 					scenes[task.sceneId].preloadedImage = task.texture;
 					//console.log('loading of scene with array id ' + task.sceneId + ' done', scenes[task.sceneId].preloadedImage);
+
 					// if the scene that just finished loading has already been selected, go there
-					var thisSceneTargetName = 'scene' + (parseInt(task.sceneId) + 1);
+					var thisSceneTargetName = getNameFromSceneId(task.sceneId);
 					if(targetToGoTo == thisSceneTargetName){
 						goToThisTarget(targetToGoTo, scene);
 					}
+
 				};
+
 			}
 		}
 		setTimeout(function(){
@@ -179,6 +187,14 @@ function createScene() {
 
 }
 
+
+
+/**
+ *
+ * @param doorObject
+ * @param target
+ * @param scene
+ */
 function setDoorActions(doorObject, target, scene){
 	doorObject.actionManager = new BABYLON.ActionManager(scene);
 	doorObject.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickUpTrigger, function () {
@@ -199,6 +215,11 @@ function setDoorActions(doorObject, target, scene){
 	}));
 }
 
+/**
+ *
+ * @param target
+ * @param scene
+ */
 function goToThisTarget(target, scene){
 	var path = 'http://' + window.location.hostname + window.location.pathname;
 	window.location.href = path + '#' + target;
@@ -213,9 +234,9 @@ function goToThisTarget(target, scene){
 		for(var i=scene.meshes.length-1; i>=0; i--){
 			scene.meshes[i].dispose();
 		}
-		// set new environment texture
+		// create new environment sphere
 		var environmentSphere = createEnvironmentSphere(selectedScene, scene);
-		// set new doors
+		// create new doors
 		createDoors(selectedScene.doors, environmentSphere, scene);
 		// set camera angle
 		if(selectedScene.hasOwnProperty('heightCorrectionAngle')) {
@@ -233,10 +254,28 @@ function goToThisTarget(target, scene){
 	}
 }
 
+/**
+ *
+ * @param name
+ * @returns {number}
+ */
 function getSceneIdFromName(name){
 	return parseInt(name.replace('scene', '')) - 1;
 }
 
+/**
+ *
+ * @param sceneId
+ * @returns {string}
+ */
+function getNameFromSceneId(sceneId){
+	return 'scene' + (parseInt(sceneId) + 1);
+}
+
+/**
+ *
+ * @param element
+ */
 function launchFullscreen(element) {
 	if(element.requestFullscreen) {
 		element.requestFullscreen();
@@ -248,6 +287,10 @@ function launchFullscreen(element) {
 		element.msRequestFullscreen();
 	}
 }
+
+/**
+ *
+ */
 function quitFullscreen() {
 	if (document.exitFullscreen) {
 		document.exitFullscreen();
@@ -307,6 +350,12 @@ function animateValue(object, property, targetValue, duration, stopAutoRotateDur
 	});
 }
 
+/**
+ *
+ * @param doors
+ * @param environmentSphere
+ * @param scene
+ */
 function createDoors(doors, environmentSphere, scene){
 	if(doors.length > 0) {
 
@@ -331,6 +380,12 @@ function createDoors(doors, environmentSphere, scene){
 	}
 }
 
+/**
+ *
+ * @param selectedScene
+ * @param scene
+ * @returns {*}
+ */
 function createEnvironmentSphere(selectedScene, scene){
 	environmentSphere = BABYLON.Mesh.CreateSphere("environmentSphere", 32, 1024, scene);
 

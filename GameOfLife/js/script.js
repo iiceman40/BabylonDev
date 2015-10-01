@@ -58,10 +58,21 @@ function createScene() {
 	// materials
 	livingMat = new BABYLON.StandardMaterial('living', scene);
 	livingMat.diffuseColor = livingColor;
+	livingMat.diffuseFresnelParameters = new BABYLON.FresnelParameters();
+	livingMat.diffuseFresnelParameters.leftColor = BABYLON.Color3.White();
+	livingMat.diffuseFresnelParameters.rightColor = new BABYLON.Color3(0,0,0.4);
+
 	newbornMat = new BABYLON.StandardMaterial('newborn', scene);
 	newbornMat.diffuseColor = newbornColor;
+	newbornMat.diffuseFresnelParameters = new BABYLON.FresnelParameters();
+	newbornMat.diffuseFresnelParameters.leftColor = BABYLON.Color3.White();
+	newbornMat.diffuseFresnelParameters.rightColor = new BABYLON.Color3(0,0.2,0);
+
 	dyingMat = new BABYLON.StandardMaterial('dying', scene);
 	dyingMat.diffuseColor = dyingColor;
+	dyingMat.diffuseFresnelParameters = new BABYLON.FresnelParameters();
+	dyingMat.diffuseFresnelParameters.leftColor = BABYLON.Color3.White();
+	dyingMat.diffuseFresnelParameters.rightColor = new BABYLON.Color3(0.2,0,0);
 
 	// create starting seed
 	addPerson(new BABYLON.Vector3(0, 0, 0), scene);
@@ -82,7 +93,7 @@ function createScene() {
 	// in a certain interval
 	//setInterval(function(){
 	//	processPeople(scene);
-	//}, 2000);
+	//}, 1000);
 
 	return scene;
 }
@@ -94,13 +105,8 @@ function processPeople(scene){
 	processedIndices = {};
 	var personCount = 0;
 
-	var startTime = new Date();
-	var currentTime = new Date();
-
 	// check for dying
 	// for all people
-
-	console.log(1, startTime.getTime() - currentTime.getTime());
 	for (var i = 0; i < scene.meshes.length; i++) {
 
 		if(scene.meshes[i].isPerson) {
@@ -121,8 +127,6 @@ function processPeople(scene){
 
 	}
 
-	currentTime = new Date();
-	console.log(2, startTime.getTime() - currentTime.getTime());
 	// check for newborn
 	// for all empty neighbor cells on the list
 	for(var j=0; j < emptyCells.length; j++){
@@ -137,8 +141,6 @@ function processPeople(scene){
 		}
 	}
 
-	currentTime = new Date();
-	console.log(3, startTime.getTime() - currentTime.getTime());
 	// remove dying cells
 	for(var k=0; k < dyingPeople.length; k++){
 		removePerson(dyingPeople[k], dyingMat);
@@ -146,6 +148,7 @@ function processPeople(scene){
 	dyingPeople = [];
 
 	// create newborn
+	console.log(newBornPositions.length);
 	for(var l=0; l <  newBornPositions.length; l++){
 		addPerson(newBornPositions[l], scene);
 		personCount++;
@@ -153,9 +156,6 @@ function processPeople(scene){
 	newBornPositions = [];
 
 	$('.personCount').text(personCount);
-
-	currentTime = new Date();
-	console.log(4, startTime.getTime() - currentTime.getTime());
 
 }
 
@@ -165,15 +165,16 @@ function processPeople(scene){
  * @param scene
  */
 function addPerson(position, scene){
-	var person = BABYLON.Mesh.CreateSphere("sphere1", 16, 1.3, scene);
+	var person = BABYLON.Mesh.CreateSphere("sphere1", 12, 1.3, scene);
+	person.material = newbornMat;
 	person.position = position;
 	person.isPerson = true;
-	person.material = newbornMat;
 	person.visibility = 0;
+
 	var positionString = getNeighborPositionString(position);
 	occupiedCellsIndex[positionString] = true;
 
-	var birthAnimation = new BABYLON.Animation(
+	var visibilityAnimation = new BABYLON.Animation(
 		"dyingAnimation",
 		"visibility",
 		30,
@@ -182,22 +183,45 @@ function addPerson(position, scene){
 	);
 
 	// Animation keys
-	var keys = [];
-	keys.push({
+	var keysVisibility = [];
+	keysVisibility.push({
 		frame: 0,
 		value: 0
 	});
 
-	keys.push({
-		frame: 30,
+	keysVisibility.push({
+		frame: 20,
 		value: 1
 	});
 
 	// Adding keys to the animation object
-	birthAnimation.setKeys(keys);
+	visibilityAnimation.setKeys(keysVisibility);
+
+	var scalingAnimation = new BABYLON.Animation(
+		"dyingAnimation",
+		"scaling",
+		30,
+		BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+		BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+	);
+
+	// Animation keys
+	var keysScaling = [];
+	keysScaling.push({
+		frame: 0,
+		value: new BABYLON.Vector3(0,0,0)
+	});
+
+	keysScaling.push({
+		frame: 30,
+		value: new BABYLON.Vector3(1,1,1)
+	});
+
+	// Adding keys to the animation object
+	scalingAnimation.setKeys(keysScaling);
 
 	// launch animation with callback
-	scene.beginDirectAnimation(person, [birthAnimation], 0, 30, false, 1);
+	scene.beginDirectAnimation(person, [visibilityAnimation, scalingAnimation], 0, 30, false, 1);
 
 	return person;
 }
@@ -205,7 +229,7 @@ function addPerson(position, scene){
 function removePerson(person, dyingMat){
 	person.material = dyingMat;
 
-	var dyingAnimation = new BABYLON.Animation(
+	var visibilityAnimation = new BABYLON.Animation(
 		"dyingAnimation",
 		"visibility",
 		30,
@@ -214,22 +238,45 @@ function removePerson(person, dyingMat){
 	);
 
 	// Animation keys
-	var keys = [];
-	keys.push({
-		frame: 0,
+	var keysVisibility = [];
+	keysVisibility.push({
+		frame: 10,
 		value: 1
 	});
 
-	keys.push({
+	keysVisibility.push({
 		frame: 30,
 		value: 0
 	});
 
 	// Adding keys to the animation object
-	dyingAnimation.setKeys(keys);
+	visibilityAnimation.setKeys(keysVisibility);
+
+	var scalingAnimation = new BABYLON.Animation(
+		"dyingAnimation",
+		"scaling",
+		30,
+		BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+		BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+	);
+
+	// Animation keys
+	var keysScaling = [];
+	keysScaling.push({
+		frame: 0,
+		value: new BABYLON.Vector3(1,1,1)
+	});
+
+	keysScaling.push({
+		frame: 30,
+		value: new BABYLON.Vector3(0,0,0)
+	});
+
+	// Adding keys to the animation object
+	scalingAnimation.setKeys(keysScaling);
 
 	// launch animation with callback
-	scene.beginDirectAnimation(person, [dyingAnimation], 0, 30, false, 1, function () {
+	scene.beginDirectAnimation(person, [visibilityAnimation, scalingAnimation], 0, 30, false, 1, function () {
 		var positionString = getNeighborPositionString(person.position);
 		delete occupiedCellsIndex[positionString];
 		person.dispose();

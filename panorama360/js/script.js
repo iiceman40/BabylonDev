@@ -110,7 +110,7 @@ function createScene() {
 		selectedScene.preloadedImage = task.texture;
 
 		// check for debug parameter
-		if(hashes[1] == 'debug' || hashes[2] == 'debug') {
+		if($.inArray('debug', hashes) != -1) {
 			scene.debugLayer.show();
 			// picking positions on sphere for creating new doors easily
 			window.addEventListener("click", function () {
@@ -124,38 +124,41 @@ function createScene() {
 
 		// create the environment sphere
 		var environmentSphere = createEnvironmentSphere(selectedScene, scene);
-		// create doors
-		createDoors(selectedScene.doors, environmentSphere, scene);
 
-		// start pre loading remaining textures
-		remainingAssetsManager = new BABYLON.AssetsManager(scene);
-		for(var j = 0; j < scenes.length; j++){
-			if(!scenes[j].preloadedImage) {
+		if($.inArray('nodoors', hashes) == -1) {
+			// create doors
+			createDoors(selectedScene.doors, environmentSphere, scene);
 
-				// create a new loading task for every texture needed
-				var newTask = remainingAssetsManager.addTextureTask('textureTaskForSceneWithId' + j, scenes[j].image);
-				newTask.sceneId = j;
+			// start pre loading remaining textures
+			remainingAssetsManager = new BABYLON.AssetsManager(scene);
+			for (var j = 0; j < scenes.length; j++) {
+				if (!scenes[j].preloadedImage) {
 
-				newTask.onSuccess = function (task) {
+					// create a new loading task for every texture needed
+					var newTask = remainingAssetsManager.addTextureTask('textureTaskForSceneWithId' + j, scenes[j].image);
+					newTask.sceneId = j;
 
-					// store preloaded image
-					scenes[task.sceneId].preloadedImage = task.texture;
-					//console.log('loading of scene with array id ' + task.sceneId + ' done', scenes[task.sceneId].preloadedImage);
+					newTask.onSuccess = function (task) {
 
-					// if the scene that just finished loading has already been selected, go there
-					var thisSceneTargetName = getNameFromSceneId(task.sceneId);
-					if(targetToGoTo == thisSceneTargetName){
-						goToThisTarget(targetToGoTo, scene);
-					}
+						// store preloaded image
+						scenes[task.sceneId].preloadedImage = task.texture;
+						//console.log('loading of scene with array id ' + task.sceneId + ' done', scenes[task.sceneId].preloadedImage);
 
-				};
+						// if the scene that just finished loading has already been selected, go there
+						var thisSceneTargetName = getNameFromSceneId(task.sceneId);
+						if (targetToGoTo == thisSceneTargetName) {
+							goToThisTarget(targetToGoTo, scene);
+						}
 
+					};
+
+				}
 			}
+			setTimeout(function () {
+				remainingAssetsManager.useDefaultLoadingScreen = false;
+				remainingAssetsManager.load();
+			}, 100);
 		}
-		setTimeout(function(){
-			remainingAssetsManager.useDefaultLoadingScreen = false;
-			remainingAssetsManager.load();
-		}, 100);
 
 	};
 

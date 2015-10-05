@@ -258,6 +258,7 @@ function createScene() {
 	var enemyMaterial = new BABYLON.StandardMaterial('exitMaterial', scene);
 	enemyMaterial.diffuseColor = new BABYLON.Color3(0, 1, 0);
 	enemyMaterial.emissiveColor = new BABYLON.Color3(0, 1, 0);
+	enemyMaterial.alpha = 0.5;
 
 	var enemy = BABYLON.Mesh.CreateSphere("enemy", 32, 3, scene, false);
 	enemy.material = enemyMaterial;

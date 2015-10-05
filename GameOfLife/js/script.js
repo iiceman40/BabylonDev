@@ -74,19 +74,19 @@ function createScene() {
 	dyingMat.diffuseFresnelParameters.leftColor = BABYLON.Color3.White();
 	dyingMat.diffuseFresnelParameters.rightColor = new BABYLON.Color3(0.2,0,0);
 
-	// TODO use isntances for living, dying and newborn people and animate them witht he help of their blueprint mesh?
+	// TODO use instances for living, dying and newborn people and animate them witht he help of their blueprint mesh?
 
 	// create starting seed
 	addPerson(new BABYLON.Vector3(0, 0, 0), scene);
 	addPerson(new BABYLON.Vector3(0, 1, 0), scene);
-	//addPerson(new BABYLON.Vector3(0, -1, 0), scene);
+	addPerson(new BABYLON.Vector3(0, -1, 0), scene);
 	addPerson(new BABYLON.Vector3(0, 0, 1), scene);
 	addPerson(new BABYLON.Vector3(0, 0, -1), scene);
-	//addPerson(new BABYLON.Vector3(1, 0, 0), scene);
-	//addPerson(new BABYLON.Vector3(-1, 0, 0), scene);
+	addPerson(new BABYLON.Vector3(1, 0, 0), scene);
+	addPerson(new BABYLON.Vector3(-1, 0, 0), scene);
 
-	//addPerson(new BABYLON.Vector3(-1, -1, 0), scene);
-	//addPerson(new BABYLON.Vector3(-1, -1, -1), scene);
+	addPerson(new BABYLON.Vector3(-1, -1, 0), scene);
+	addPerson(new BABYLON.Vector3(-1, -1, -1), scene);
 
 	addPerson(new BABYLON.Vector3(1, 1, 0), scene);
 	addPerson(new BABYLON.Vector3(-1, 1, 0), scene);

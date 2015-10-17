@@ -53,7 +53,7 @@ var Enemy = function(maze, player, scene){
 		value: originalPosition.y + 1.8
 	});
 	keysPostion.push({
-		frame: 50,
+		frame: 60,
 		value: originalPosition.y + 2
 	});
 	keysPostion.push({
@@ -70,27 +70,16 @@ var Enemy = function(maze, player, scene){
 
 
 	// enemy health bar
-	var healthBarMaterial = new BABYLON.StandardMaterial("hb1mat", scene);
-	healthBarMaterial.diffuseColor = BABYLON.Color3.Green();
-	healthBarMaterial.emissiveColor = BABYLON.Color3.Green();
-	healthBarMaterial.backFaceCulling = false;
-
-	var healthBarContainerMaterial = new BABYLON.StandardMaterial("hb2mat", scene);
-	healthBarContainerMaterial.diffuseColor = BABYLON.Color3.Blue();
-	healthBarContainerMaterial.backFaceCulling = false;
-
-	var healthBar = BABYLON.Mesh.CreatePlane("hb1", {width: 2, height: 0.5, subdivisions: 4}, scene);
-	var healthBarContainer = BABYLON.Mesh.CreatePlane("hb2", {width:2, height:.5, subdivisions:4}, scene);
-
-	healthBar.position = new BABYLON.Vector3(0, 0, -.01);
+	var healthBarContainer = BABYLON.MeshBuilder.CreatePlane("hb2", {width: 2, height: 0.5, subdivisions: 4}, scene);
 	healthBarContainer.position = new BABYLON.Vector3(0, 2, 0);
-
-	healthBar.parent = healthBarContainer;
 	healthBarContainer.parent = enemy;
-
-	healthBar.material = healthBarMaterial;
-	healthBarContainer.material = healthBarContainerMaterial;
+	healthBarContainer.material = new HealthBarContainerMaterial(scene);
 	healthBarContainer.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
+
+	var healthBar = BABYLON.MeshBuilder.CreatePlane("hb1", {width: 2, height: 0.5, subdivisions: 4}, scene);
+	healthBar.material = new HealthBarMaterialFull(scene);
+	healthBar.position = new BABYLON.Vector3(0, 0, -.01);
+	healthBar.parent = healthBarContainer;
 
 	var alive = true;
 	var healthPercentage = 100;
@@ -105,14 +94,10 @@ var Enemy = function(maze, player, scene){
 
 			if (healthBar.scaling.x < 0) {
 				alive = false;
-			}
-			else if (healthBar.scaling.x < .5) {
-				healthBarMaterial.diffuseColor = BABYLON.Color3.Yellow();
-				healthBarMaterial.emissiveColor = BABYLON.Color3.Yellow();
-			}
-			else if (healthBar.scaling.x < .3) {
-				healthBarMaterial.diffuseColor = BABYLON.Color3.Red();
-				healthBarMaterial.emissiveColor = BABYLON.Color3.Red();
+			} else if (healthPercentage <= 30) {
+				healthBar.material = new HealthBarMaterialCritical(scene);
+			} else if (healthPercentage <= 50) {
+				healthBar.material = new HealthBarMaterialDamaged(scene);
 			}
 
 		} else {
@@ -124,7 +109,6 @@ var Enemy = function(maze, player, scene){
 	enemy.actionManager = new BABYLON.ActionManager(scene);
 	enemy.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function (evt) {
 		var distance = player.position.subtract(enemy.position).length();
-		console.log(distance);
 
 		if(distance < 10) {
 			healthPercentage -= 10;

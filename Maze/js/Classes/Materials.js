@@ -37,3 +37,34 @@ var ExitMaterial = function(scene) {
 	exitMaterial.emissiveColor = new BABYLON.Color3(1, 0, 1);
 	return exitMaterial;
 };
+
+var HealthBarMaterialFull = function(scene) {
+	var healthBarMaterial = new BABYLON.StandardMaterial("hb1mat", scene);
+	healthBarMaterial.diffuseColor = BABYLON.Color3.Green();
+	healthBarMaterial.emissiveColor = BABYLON.Color3.Green();
+	healthBarMaterial.backFaceCulling = false;
+	return healthBarMaterial;
+};
+
+var HealthBarMaterialDamaged = function(scene) {
+	var healthBarMaterial = new BABYLON.StandardMaterial("hb1mat", scene);
+	healthBarMaterial.diffuseColor = BABYLON.Color3.Yellow();
+	healthBarMaterial.emissiveColor = BABYLON.Color3.Yellow();
+	healthBarMaterial.backFaceCulling = false;
+	return healthBarMaterial;
+};
+
+var HealthBarMaterialCritical = function(scene) {
+	var healthBarMaterial = new BABYLON.StandardMaterial("hb1mat", scene);
+	healthBarMaterial.diffuseColor = BABYLON.Color3.Red();
+	healthBarMaterial.emissiveColor = BABYLON.Color3.Red();
+	healthBarMaterial.backFaceCulling = false;
+	return healthBarMaterial;
+};
+
+var HealthBarContainerMaterial = function(scene) {
+	var healthBarContainerMaterial = new BABYLON.StandardMaterial("hb2mat", scene);
+	healthBarContainerMaterial.diffuseColor = BABYLON.Color3.Blue();
+	healthBarContainerMaterial.backFaceCulling = false;
+	return healthBarContainerMaterial;
+}

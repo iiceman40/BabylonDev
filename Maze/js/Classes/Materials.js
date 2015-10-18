@@ -21,9 +21,33 @@ var DoorMaterial = function(scene) {
 
 var ExitMaterial = function(scene) {
 	var exitMaterial = new BABYLON.StandardMaterial('exitMaterial', scene);
-	exitMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
-	exitMaterial.emissiveColor = new BABYLON.Color3(1, 0, 1);
+	exitMaterial.diffuseTexture = new BABYLON.Texture('img/panel_render.jpg', scene);
+	exitMaterial.diffuseTexture.uScale = 5;
+	exitMaterial.diffuseTexture.vScale = 5;
+	exitMaterial.bumpTexture = new BABYLON.Texture('img/panel_render_normal.png', scene);
+	exitMaterial.bumpTexture.uScale = 5;
+	exitMaterial.bumpTexture.vScale = 5;
+	exitMaterial.bumpTexture.level = 1;
+	exitMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
 	return exitMaterial;
+};
+
+var ExitPortalMaterial = function(scene) {
+	var exitMaterial = new BABYLON.StandardMaterial('exitMaterial', scene);
+	exitMaterial.bumpTexture = new BABYLON.Texture('img/circles_normal.png', scene);
+	exitMaterial.bumpTexture.level = 0.7;
+	exitMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
+	exitMaterial.emissiveColor = new BABYLON.Color3(0.3, 0.1, 0.3);
+	exitMaterial.specularColor = new BABYLON.Color3(1, 0.5, 1);
+	exitMaterial.alpha = 0.7;
+	return exitMaterial;
+};
+
+var EnemyMaterial = function(scene) {
+	var enemyMaterial = new BABYLON.StandardMaterial('enemyMaterial', scene);
+	enemyMaterial.diffuseColor = new BABYLON.Color3(0, 1, 0);
+	enemyMaterial.emissiveColor = new BABYLON.Color3(0, 0.7, 0);
+	return enemyMaterial
 };
 
 var HealthBarMaterialFull = function(scene) {

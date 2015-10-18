@@ -5,15 +5,20 @@
  * @constructor
  */
 var Enemy = function(maze, player, scene){
-	var enemyMaterial = new BABYLON.StandardMaterial('enemyMaterial', scene);
-	enemyMaterial.diffuseColor = new BABYLON.Color3(0, 1, 0);
-	enemyMaterial.emissiveColor = new BABYLON.Color3(0, 1, 0);
+
 
 	var enemy = BABYLON.Mesh.CreateSphere("enemy", 32, 3, scene, false);
-	enemy.material = enemyMaterial;
-	enemy.position = new BABYLON.Vector3(10 - maze.width * 20 / 2, 0, 10 - maze.height * 20 / 2);
+	enemy.material = new EnemyMaterial(scene);
+	enemy.position = new BABYLON.Vector3(10 - maze.width * 20 / 2, 10 - maze.height * 20 / 2, 10 - maze.depth * 20 / 2);
 	enemy.checkCollisions = true;
 	enemy.visibility = 0.7;
+
+	// LIGHT
+	var enemyLight = new BABYLON.PointLight("Omni0", new BABYLON.Vector3(0, 0, 0), scene);
+	enemyLight.diffuse = new BABYLON.Color3(0, 1, 0);
+	enemyLight.intensity = 0.5;
+	enemyLight.range = 10;
+	enemyLight.position = enemy.position;
 
 	// ANIMATIONS
 	var animationScaling = new BABYLON.Animation("scalingAnimation", "scaling", 100, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
@@ -104,6 +109,7 @@ var Enemy = function(maze, player, scene){
 		} else {
 			enemy.dispose();
 		}
+
 	});
 
 	// ATTACKING ENEMY ACTION

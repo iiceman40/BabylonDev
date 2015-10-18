@@ -1,6 +1,6 @@
 var MiniMap = function(width, height, player, scene){
 	// mini map camera
-	var mapCamera = new BABYLON.ArcRotateCamera("camera1", -Math.PI / 2, Math.PI / 5 * 2, 150, player.position, scene);
+	var mapCamera = new BABYLON.ArcRotateCamera("camera1", -Math.PI / 2, Math.PI / 5 * 2, 150, new BABYLON.Vector3(0,0,0), scene);
 
 	// viewport
 	var ration = $(document).width() / $(document).height();
@@ -24,6 +24,15 @@ var MiniMap = function(width, height, player, scene){
 	mapCamera.keysLeft = [];
 	mapCamera.keysRight = [];
 
+	// fix/hack for triggering the intersect event with the player on the mini map and the exit
+	scene.activeCameras.push(mapCamera);
+	setTimeout(function(){
+		var index = scene.activeCameras.indexOf(mapCamera);
+		if(index != -1){
+			scene.activeCameras.splice(index,1);
+		}
+	}, 0);
+
 	// Add the camera to the list of active cameras of the game
 	// show and hdie camera on key toggle
 	window.addEventListener("keydown", function(event){
@@ -46,16 +55,18 @@ var MiniMap = function(width, height, player, scene){
 	playerMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0);
 	playerMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
 
-	var playerOnMiniMap = BABYLON.Mesh.CreateCylinder("player", 5, 0, 4, 6, 1, scene, false);
+	var playerOnMiniMap = BABYLON.Mesh.CreateCylinder("player", 3, 0, 2, 6, 1, scene, false);
 	playerOnMiniMap.rotation.x = Math.PI / 2;
+	playerOnMiniMap.bakeCurrentTransformIntoVertices();
 	playerOnMiniMap.scaling.z = 1.5;
 	playerOnMiniMap.material = playerMaterial;
 	playerOnMiniMap.layerMask = 1;
 
 	// The sphere position will be displayed accordingly to the player position
 	playerOnMiniMap.registerBeforeRender(function() {
-		playerOnMiniMap.rotation.y = player.rotation.y;
-		playerOnMiniMap.position.x = player.position.x;
-		playerOnMiniMap.position.z = player.position.z;
+		playerOnMiniMap.rotation = player.rotation;
+		playerOnMiniMap.position = player.position;
 	});
+
+	return playerOnMiniMap;
 };

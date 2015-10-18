@@ -55,6 +55,7 @@ function createScene() {
 		scene.registerBeforeRender(function () {
 			if(!exitFound && exit.intersectsMesh(playerOnMiniMap, true)){
 				exitFound = true;
+				camera.detachControl(canvas);
 				alert('Exit reached!');
 			}
 		});
@@ -65,15 +66,15 @@ function createScene() {
 	var enemy = new Enemy(maze, player, scene);
 
 	// LIGHTS AND SHADOW
-	//var hemiLight = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(0, 1, 0), scene);
-	//hemiLight.intensity = 0.3;
+	var hemiLight = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(0, 1, 0), scene);
+	hemiLight.intensity = 0.05;
 
-	var light1 = new BABYLON.DirectionalLight("light1", new BABYLON.Vector3(0.3, -1, 0.1), scene);
-	light1.intensity = 0.1;
+	//var light1 = new BABYLON.DirectionalLight("light1", new BABYLON.Vector3(0.3, -1, 0.1), scene);
+	//light1.intensity = 0.1;
 
 	var playerLight1 = new BABYLON.SpotLight("Spot0", new BABYLON.Vector3(0, 0, 0), new BABYLON.Vector3(1, 0, 0), 1.3, 2, scene);
 	playerLight1.intensity = 0.5;
-	playerLight1.range = 25;
+	playerLight1.range = 35;
 
 	scene.registerBeforeRender(function () {
 		playerLight1.position = player.position;

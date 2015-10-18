@@ -1,10 +1,6 @@
 var MiniMap = function(width, height, player, scene){
 	// mini map camera
-	//var mapCamera = new BABYLON.FreeCamera("minimap", new BABYLON.Vector3(0,80,0), scene);
 	var mapCamera = new BABYLON.ArcRotateCamera("camera1", -Math.PI / 2, Math.PI / 5 * 2, 150, player.position, scene);
-	// Activate the orthographic projection
-	//mapCamera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
-	//mapCamera.rotation.y = 0;
 
 	// viewport
 	var ration = $(document).width() / $(document).height();
@@ -21,23 +17,28 @@ var MiniMap = function(width, height, player, scene){
 	);
 
 	mapCamera.layerMask = 1; // 001 in binary
+
+	// disable key control for mini map
 	mapCamera.keysUp = [];
 	mapCamera.keysDown = [];
 	mapCamera.keysLeft = [];
 	mapCamera.keysRight = [];
 
 	// Add the camera to the list of active cameras of the game
-	scene.activeCameras.push(mapCamera);
+	// show and hdie camera on key toggle
+	window.addEventListener("keydown", function(event){
+		if(event.keyCode == 77){
+			var index = scene.activeCameras.indexOf(mapCamera);
+			if(index == -1){
+				scene.activeCameras.push(mapCamera);
+			} else {
+				scene.activeCameras.splice(index,1);
+			}
+		}
+
+	});
 
 	mapCamera.attachControl(canvas, true);
-
-	// show correct area on mini map
-	/*
-	mapCamera.orthoLeft = -width * 10/2;
-	mapCamera.orthoRight = width * 10/2;
-	mapCamera.orthoTop =  height * 10/2;
-	mapCamera.orthoBottom = -height * 10/2;
-	*/
 
 	// player on mini map
 	var playerMaterial = new BABYLON.StandardMaterial('playerMaterial', scene);
@@ -50,6 +51,7 @@ var MiniMap = function(width, height, player, scene){
 	playerOnMiniMap.scaling.z = 1.5;
 	playerOnMiniMap.material = playerMaterial;
 	playerOnMiniMap.layerMask = 1;
+
 	// The sphere position will be displayed accordingly to the player position
 	playerOnMiniMap.registerBeforeRender(function() {
 		playerOnMiniMap.rotation.y = player.rotation.y;

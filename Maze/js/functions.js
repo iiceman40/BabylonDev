@@ -28,109 +28,153 @@ function drawMaze(maze, scene){
 
 	// materials
 	var wallMaterial = new WallMaterial(scene);
-	var groundMaterial = new GroundMaterial(maze, scene);
 
-	var connectorSize = 1;
+	var connectorDepth = 2;
+	var connectorWidth = 5;
+	var connectorHeight = 5;
 	var connectorOffset = 5;
 	var connectors = [];
 	var boxes = [];
+	var outerBoxes = [];
+	var tunnels = [];
+	var outerTunnels = [];
+
+	var outerTunnel = BABYLON.MeshBuilder.CreateBox('mazeConnectorOuter', {height: connectorHeight+2, width: connectorWidth+2, depth: 10}, scene);
+	var innerTunnel = BABYLON.MeshBuilder.CreateBox('mazeConnectorInner', {height: connectorHeight, width: connectorWidth, depth: 10}, scene);
+
+	var outerTunnelCSG = BABYLON.CSG.FromMesh(outerTunnel);
+	var innerTunnelCSG = BABYLON.CSG.FromMesh(innerTunnel);
+	var subTunnelCSG = outerTunnelCSG.subtract(innerTunnelCSG);
+	var tunnelBlueprint = subTunnelCSG.toMesh("csg", wallMaterial, scene);
+
+	outerTunnel.scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
+	outerTunnel.flipFaces();
+	outerTunnel.material = new BoxEdgeMaterial(scene);
+	outerTunnel.layerMask = 1;
+
+	innerTunnel.dispose();
+	//outerTunnel.dispose();
 
 	// display maze
 	for (y = 0; y < maze.height; y++) {
 		for (x = 0; x < maze.width; x++) {
 			var cell = maze.map[y][x];
 
-			var posX = (x - maze.width/2 + 0.5) * 10;
-			var posZ = (y - maze.height/2 + 0.5) * 10;
+			var posX = (x - maze.width/2 + 0.5) * 20;
+			var posZ = (y - maze.height/2 + 0.5) * 20;
 
-			var box = BABYLON.Mesh.CreateBox('mazeCell', 8, scene);
-			//box.scaling.y = 2;
+			var outerBox = BABYLON.Mesh.CreateBox('mazeCellOuter', 10, scene);
+			var innerBox = BABYLON.Mesh.CreateBox('mazeCellInner', 8, scene);
+
+			var outerBoxCSG = BABYLON.CSG.FromMesh(outerBox);
+			var innerBoxCSG = BABYLON.CSG.FromMesh(innerBox);
+			var subBoxCSG = outerBoxCSG.subtract(innerBoxCSG);
+			var box = subBoxCSG.toMesh("csg", wallMaterial, scene);
+
+			innerBox.dispose();
+			outerBox.scaling = new BABYLON.Vector3(1.05, 1.05, 1.05);
+			outerBox.position = new BABYLON.Vector3(posX, 0, posZ);
+			outerBox.flipFaces();
+			outerBox.material = new BoxEdgeMaterial(scene);
+			outerBox.layerMask = 1;
+			outerBoxes.push(outerBox);
+
+			//outerBox.dispose();
+
 			box.isVisible = false;
 			box.position.x = posX;
 			box.position.z = posZ;
-			//box.position.y = 1.5;
 			boxes.push(box);
 
 			// connectors
 			if(!cell.walls['N']){
-				var connectorN = BABYLON.Mesh.CreateBox('connector', connectorSize, scene);
+				var connectorN = BABYLON.Mesh.CreateBox('connector', 1, scene);
 				connectorN.position = new BABYLON.Vector3(posX, 0, posZ - connectorOffset);
-				connectorN.scaling.x = 5;
-				connectorN.scaling.y = 5;
-				connectorN.scaling.z = 2;
+				connectorN.scaling.x = connectorWidth;
+				connectorN.scaling.y = connectorHeight;
+				connectorN.scaling.z = connectorDepth;
 				connectors.push(connectorN);
+				var tunnelN = tunnelBlueprint.clone('tunnelN');
+				tunnelN.position = new BABYLON.Vector3(posX, 0, posZ - connectorOffset * 2);
+				tunnels.push(tunnelN);
+				var outerTunnelN = outerTunnel.clone();
+				outerTunnelN.position = tunnelN.position;
+				outerTunnels.push(outerTunnelN);
 			}
 			if(!cell.walls['S']){
-				var connectorS = BABYLON.Mesh.CreateBox('connector', connectorSize, scene);
+				var connectorS = BABYLON.Mesh.CreateBox('connector', 1, scene);
 				connectorS.position = new BABYLON.Vector3(posX, 0, posZ + connectorOffset);
-				connectorS.scaling.x = 5;
-				connectorS.scaling.y = 5;
-				connectorS.scaling.z = 2;
+				connectorS.scaling.x = connectorWidth;
+				connectorS.scaling.y = connectorHeight;
+				connectorS.scaling.z = connectorDepth;
 				connectors.push(connectorS);
 			}
 			if(!cell.walls['W']){
-				var connectorW = BABYLON.Mesh.CreateBox('connector', connectorSize, scene);
+				var connectorW = BABYLON.Mesh.CreateBox('connector', 1, scene);
 				connectorW.position = new BABYLON.Vector3(posX - connectorOffset, 0, posZ);
-				connectorW.scaling.x = 2;
-				connectorW.scaling.y = 5;
-				connectorW.scaling.z = 5;
+				connectorW.scaling.x = connectorDepth;
+				connectorW.scaling.y = connectorHeight;
+				connectorW.scaling.z = connectorWidth;
 				connectors.push(connectorW);
+				var tunnelW = tunnelBlueprint.clone('tunnelW');
+				tunnelW.position = new BABYLON.Vector3(posX - connectorOffset * 2, 0, posZ);
+				tunnelW.rotation.y = Math.PI/2;
+				tunnels.push(tunnelW);
+				var outerTunnelW = outerTunnel.clone();
+				outerTunnelW.rotation = tunnelW.rotation;
+				outerTunnelW.position = tunnelW.position;
+				outerTunnels.push(outerTunnelW);
 			}
 			if(!cell.walls['E']){
-				var connectorE = BABYLON.Mesh.CreateBox('connector', connectorSize, scene);
+				var connectorE = BABYLON.Mesh.CreateBox('connector', 1, scene);
 				connectorE.position = new BABYLON.Vector3(posX + connectorOffset, 0, posZ);
-				connectorE.scaling.x = 2;
-				connectorE.scaling.y = 5;
-				connectorE.scaling.z = 5;
+				connectorE.scaling.x = connectorDepth;
+				connectorE.scaling.y = connectorHeight;
+				connectorE.scaling.z = connectorWidth;
 				connectors.push(connectorE);
 			}
 		}
 	}
 
+	tunnelBlueprint.dispose();
+	outerTunnel.dispose();
+
 	// merge all connectors to a track mesh
 	var boxesMesh = BABYLON.Mesh.MergeMeshes(boxes, true);
-	boxesMesh.visibility = 0.3;
+	boxesMesh.name = boxesMesh.id = 'boxesMesh';
 
-	var outerBoxCSG = BABYLON.CSG.FromMesh(mazeOuterBox);
-	var carvedBoxesCSG = BABYLON.CSG.FromMesh(boxesMesh);
-	var subCSG = outerBoxCSG.subtract(carvedBoxesCSG);
-	var mazeMesh = subCSG.toMesh("csg", wallMaterial, scene);
-	mazeMesh.position = new BABYLON.Vector3(0, 0, 0);
-
-	mazeOuterBox.dispose();
-
-	var mazeMeshOuterBox = BABYLON.CSG.FromMesh(mazeMesh);
+	var mazeMeshOuterBox = BABYLON.CSG.FromMesh(boxesMesh);
 	var connectorsMesh = BABYLON.Mesh.MergeMeshes(connectors, true);
-	connectorsMesh.visibility = 0.3;
 	var carvedConnectorsCSG = BABYLON.CSG.FromMesh(connectorsMesh);
 	var subCSG2 = mazeMeshOuterBox.subtract(carvedConnectorsCSG);
-	var mazeMeshFinal = subCSG2.toMesh("csg", wallMaterial, scene);
-	mazeMeshFinal.checkCollisions = true;
+	var mazeMesh = subCSG2.toMesh("csg", wallMaterial, scene);
+	mazeMesh.checkCollisions = true;
 
-	mazeMesh.dispose();
+	boxesMesh.dispose();
+	connectorsMesh.dispose();
 
-	// show doors/connectors on mini map
-	/*
-	connectorsMesh.position.y = 55;
-	connectorsMesh.layerMask = 1;
-	connectorsMesh.visibility = 0.7;
-	connectorsMesh.material = new DoorMaterial(scene);
-	*/
+	var tunnelsMesh =  BABYLON.Mesh.MergeMeshes(tunnels, true);
+	tunnelsMesh.checkCollisions = true;
 
-	var ground = BABYLON.Mesh.CreateGround("ground1", maze.width * 10, maze.height * 10, 10, scene);
-	ground.material = groundMaterial;
-	ground.position.y = -2;
-	ground.checkCollisions = true;
-	ground.receiveShadows = true;
-	ground.layerMask = 2;
+	tunnelsMesh.layerMask = 2;
+	mazeMesh.layerMask = 2;
 
-	mazeMeshFinal.layerMask = 2;
+	var outerBoxesMesh = BABYLON.Mesh.MergeMeshes(outerBoxes, true);
+	var outerTunnelsMesh = BABYLON.Mesh.MergeMeshes(outerTunnels, true);
+	outerTunnelsMesh.layerMask = 1;
+	outerBoxesMesh.layerMask = 1;
 
-	return mazeMeshFinal;
+	drawMazeMap(mazeMesh, tunnelsMesh, scene);
+
+	return mazeMesh;
 }
 
-function drawMazeMap(mazeMesh, scene){
+function drawMazeMap(mazeMesh, tunnelsMesh, scene){
 	mazeMap = mazeMesh.clone();
 	mazeMap.layerMask = 1;
 	mazeMap.material = new MazeMapMaterial(scene);
+
+	tunnelsMap = tunnelsMesh.clone();
+	tunnelsMap.layerMask = 1;
+	tunnelsMap.material = new MazeMapMaterial(scene);
 }

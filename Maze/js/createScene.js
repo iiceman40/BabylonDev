@@ -8,8 +8,8 @@ function createScene() {
 	scene.workerCollisions = true;
 
 	// CAMERA
-	var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(5, 0, 5), scene);
-	camera.applyGravity = true;
+	var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(10 - width * 20 / 2, 0, -10 + height * 20 / 2), scene);
+	//camera.applyGravity = true;
 	camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
 	camera.checkCollisions = true;
 	camera.speed = 0.5;
@@ -18,6 +18,7 @@ function createScene() {
 
 	scene.activeCameras.push(camera);
 	scene.cameraToUseForPointers = camera;
+
 
 	// the camera acts as the player
 	var player = camera;
@@ -30,12 +31,11 @@ function createScene() {
 
 	// DRAW MAZE
 	var mazeMesh = drawMaze(maze, scene);
-	var mazeMap = drawMazeMap(mazeMesh, scene);
 
 	// PLACE EXIT
 	var exit = BABYLON.Mesh.CreateSphere("exit", 32, 5, scene, false);
 	exit.material = new ExitMaterial(scene);
-	exit.position = new BABYLON.Vector3(-5 + maze.width * 10 / 2, 0, 5 - maze.height * 10 / 2);
+	exit.position = new BABYLON.Vector3(-10 + maze.width * 20 / 2, 0, 10 - maze.height * 20 / 2);
 	exit.checkCollisions = true;
 	// TODO add exit functionality
 
@@ -49,15 +49,6 @@ function createScene() {
 
 	var light1 = new BABYLON.DirectionalLight("light1", new BABYLON.Vector3(0.3, -1, 0.1), scene);
 	light1.intensity = 0.7;
-
-	var shadowGenerator = new BABYLON.ShadowGenerator(1024, light1);
-	shadowGenerator.useBlurVarianceShadowMap = true;
-	shadowGenerator.blurScale = 1.5;
-	shadowGenerator.setTransparencyShadow(true);
-	//shadowGenerator.blurBoxOffset = 5;
-
-	shadowGenerator.getShadowMap().renderList.push(mazeMesh);
-	shadowGenerator.getShadowMap().renderList.push(enemy);
 
 	// DEBUG LAYER
 	if(window.location.hash == '#debug') {

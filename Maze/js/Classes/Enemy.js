@@ -11,7 +11,7 @@ var Enemy = function(maze, player, scene){
 
 	var enemy = BABYLON.Mesh.CreateSphere("enemy", 32, 3, scene, false);
 	enemy.material = enemyMaterial;
-	enemy.position = new BABYLON.Vector3(5 - maze.width * 10 / 2, 0, 5 - maze.height * 10 / 2);
+	enemy.position = new BABYLON.Vector3(10 - maze.width * 20 / 2, 0, 10 - maze.height * 20 / 2);
 	enemy.checkCollisions = true;
 	enemy.visibility = 0.7;
 

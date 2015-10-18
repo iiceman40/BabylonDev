@@ -39,7 +39,7 @@ var ExitMaterial = function(scene) {
 };
 
 var HealthBarMaterialFull = function(scene) {
-	var healthBarMaterial = new BABYLON.StandardMaterial("hb1mat", scene);
+	var healthBarMaterial = new BABYLON.StandardMaterial("healthBarFullMaterial", scene);
 	healthBarMaterial.diffuseColor = BABYLON.Color3.Green();
 	healthBarMaterial.emissiveColor = BABYLON.Color3.Green();
 	healthBarMaterial.backFaceCulling = false;
@@ -47,7 +47,7 @@ var HealthBarMaterialFull = function(scene) {
 };
 
 var HealthBarMaterialDamaged = function(scene) {
-	var healthBarMaterial = new BABYLON.StandardMaterial("hb1mat", scene);
+	var healthBarMaterial = new BABYLON.StandardMaterial("healthBarDamagedMaterial", scene);
 	healthBarMaterial.diffuseColor = BABYLON.Color3.Yellow();
 	healthBarMaterial.emissiveColor = BABYLON.Color3.Yellow();
 	healthBarMaterial.backFaceCulling = false;
@@ -55,7 +55,7 @@ var HealthBarMaterialDamaged = function(scene) {
 };
 
 var HealthBarMaterialCritical = function(scene) {
-	var healthBarMaterial = new BABYLON.StandardMaterial("hb1mat", scene);
+	var healthBarMaterial = new BABYLON.StandardMaterial("healthBarCriticalMaterial", scene);
 	healthBarMaterial.diffuseColor = BABYLON.Color3.Red();
 	healthBarMaterial.emissiveColor = BABYLON.Color3.Red();
 	healthBarMaterial.backFaceCulling = false;
@@ -63,8 +63,31 @@ var HealthBarMaterialCritical = function(scene) {
 };
 
 var HealthBarContainerMaterial = function(scene) {
-	var healthBarContainerMaterial = new BABYLON.StandardMaterial("hb2mat", scene);
+	var healthBarContainerMaterial = new BABYLON.StandardMaterial("healthBarContainerMaterial", scene);
 	healthBarContainerMaterial.diffuseColor = BABYLON.Color3.Blue();
 	healthBarContainerMaterial.backFaceCulling = false;
 	return healthBarContainerMaterial;
-}
+};
+
+var MazeMapMaterial = function(scene) {
+	// xray material
+	var xray_mat = new BABYLON.StandardMaterial("xray", scene);
+	xray_mat.emissiveColor = new BABYLON.Color3(1, 1, 1);
+	xray_mat.alpha = 0.3;
+	var fresnel_params = new BABYLON.FresnelParameters();
+	fresnel_params.isEnabled = true;
+	fresnel_params.leftColor = new BABYLON.Color3(0.5, 0.6, 1);
+	fresnel_params.rightColor = new BABYLON.Color3(0, 0, 0);
+	fresnel_params.power = 2;
+	fresnel_params.bias = 0.1;
+	var fresnel_params2 = new BABYLON.FresnelParameters();
+	fresnel_params2.isEnabled = true;
+	fresnel_params2.leftColor = new BABYLON.Color3(1, 1, 1);
+	fresnel_params2.rightColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+	fresnel_params2.power = 2;
+	fresnel_params2.bias = 0.5;
+	xray_mat.emissiveFresnelParameters = fresnel_params;
+	xray_mat.opacityFresnelParameters = fresnel_params2;
+
+	return xray_mat;
+};

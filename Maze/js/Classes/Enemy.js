@@ -11,10 +11,11 @@ var Enemy = function(maze, player, scene){
 
 	var enemy = BABYLON.Mesh.CreateSphere("enemy", 32, 3, scene, false);
 	enemy.material = enemyMaterial;
-	enemy.position = new BABYLON.Vector3(5 - maze.width * 10 / 2, 49, 5 - maze.height * 10 / 2);
+	enemy.position = new BABYLON.Vector3(5 - maze.width * 10 / 2, 0, 5 - maze.height * 10 / 2);
 	enemy.checkCollisions = true;
 	enemy.visibility = 0.7;
 
+	// ANIMATIONS
 	var animationScaling = new BABYLON.Animation("scalingAnimation", "scaling", 100, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
 	// Animation keys
 	var keysScaling = [];
@@ -69,7 +70,7 @@ var Enemy = function(maze, player, scene){
 	scene.beginAnimation(enemy, 0, 100, true);
 
 
-	// enemy health bar
+	// HEALTH BAR
 	var healthBarContainer = BABYLON.MeshBuilder.CreatePlane("hb2", {width: 2, height: 0.5, subdivisions: 4}, scene);
 	healthBarContainer.position = new BABYLON.Vector3(0, 2, 0);
 	healthBarContainer.parent = enemy;
@@ -105,7 +106,7 @@ var Enemy = function(maze, player, scene){
 		}
 	});
 
-	// melee attack action
+	// ATTACKING ENEMY ACTION
 	enemy.actionManager = new BABYLON.ActionManager(scene);
 	enemy.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function (evt) {
 		var distance = player.position.subtract(enemy.position).length();

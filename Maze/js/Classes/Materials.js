@@ -37,7 +37,7 @@ var ExitPortalMaterial = function(scene) {
 	exitMaterial.bumpTexture = new BABYLON.Texture('img/circles_normal.png', scene);
 	exitMaterial.bumpTexture.level = 0.7;
 	exitMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
-	exitMaterial.emissiveColor = new BABYLON.Color3(0.3, 0.1, 0.3);
+	exitMaterial.emissiveColor = new BABYLON.Color3(0.8, 0.1, 0.8);
 	exitMaterial.specularColor = new BABYLON.Color3(1, 0.5, 1);
 	exitMaterial.alpha = 0.7;
 	return exitMaterial;

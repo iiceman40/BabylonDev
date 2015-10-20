@@ -61,12 +61,14 @@ function drawMaze(maze, scene){
 			for (var z = 0; z < maze.depth; z++) {
 				var cell = maze.map[y][x][z];
 
-				var posX = (x - maze.width / 2 + 0.5) * 20;
-				var posY = (y - maze.height / 2 + 0.5) * 20;
-				var posZ = (z - maze.depth / 2 + 0.5) * 20;
+				var cellPos = getCellPosition(x,y,z,maze,spacing);
 
-				var outerBox = BABYLON.Mesh.CreateBox('mazeCellOuter', 10, scene);
-				var innerBox = BABYLON.Mesh.CreateBox('mazeCellInner', 8, scene);
+				var posX = cellPos.x;
+				var posY = cellPos.y;
+				var posZ = cellPos.z;
+
+				var outerBox = BABYLON.Mesh.CreateBox('mazeCellOuter', cellSize, scene);
+				var innerBox = BABYLON.Mesh.CreateBox('mazeCellInner', cellSize - wallThickness, scene);
 
 				var outerBoxCSG = BABYLON.CSG.FromMesh(outerBox);
 				var innerBoxCSG = BABYLON.CSG.FromMesh(innerBox);
@@ -180,6 +182,7 @@ function drawMaze(maze, scene){
 	var mazeMesh = subCSG2.toMesh("csg", wallMaterial, scene);
 	mazeMesh.checkCollisions = true;
 	mazeMesh.name = "mazeCellsMesh";
+	mazeMesh.receiveShadows = true;
 	mazeMesh.layerMask = 2;
 
 	boxesMesh.dispose();
@@ -213,4 +216,88 @@ function drawMazeMap(mazeMesh, tunnelsMesh, scene){
 	tunnelsMap.layerMask = 1;
 	tunnelsMap.material = new MazeMapMaterial(scene);
 	tunnelsMap.name = 'tunnelsMapMesh';
+}
+
+function getCellPosition(gridX, gridY, gridZ, maze, spacing){
+	var posX = (gridX - maze.width / 2 + 0.5) * spacing;
+	var posY = (gridY - maze.height / 2 + 0.5) * spacing;
+	var posZ = (gridZ - maze.depth / 2 + 0.5) * spacing;
+
+	return new BABYLON.Vector3(posX, posY, posZ);
+}
+
+function wrapText(text, x, y, font, color, clearColor, invertY, update, dynamicTexture) {
+	if (update === void 0) { update = true; }
+	var size = dynamicTexture.getSize();
+	if (clearColor) {
+		dynamicTexture._context.fillStyle = clearColor;
+		dynamicTexture._context.fillRect(0, 0, size.width, size.height);
+	}
+	dynamicTexture._context.font = font;
+	if (x === null) {
+		var textSize = dynamicTexture._context.measureText(text);
+		x = (size.width - textSize.width) / 2;
+	}
+	dynamicTexture._context.fillStyle = color;
+
+	//dynamicTexture._context.fillText(text, x, y);
+	var words = text.split(' ');
+	var line = '';
+	var lineHeight = 50;
+	var maxWidth = size.width - 10;
+
+	for(var n = 0; n < words.length; n++) {
+		var testLine = line;
+		if(words[n] == '<br />' || words[n] == '<br/>') {
+			y += lineHeight;
+		} else {
+			testLine = line + words[n] + ' ';
+		}
+		var metrics = dynamicTexture._context.measureText(testLine);
+		var testWidth = metrics.width;
+		if (testWidth > maxWidth && n > 0) {
+			dynamicTexture._context.fillText(line, x, y);
+			line = words[n] + ' ';
+			y += lineHeight;
+		}
+		else {
+			line = testLine;
+		}
+	}
+	dynamicTexture._context.fillText(line, x, y);
+
+	if (update) {
+		dynamicTexture.update(invertY);
+	}
+}
+
+function initPointerLock(canvas, camera) {
+	// On click event, request pointer lock
+	canvas.addEventListener("click", function(evt) {
+		canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
+		if (canvas.requestPointerLock) {
+			canvas.requestPointerLock();
+		}
+	}, false);
+
+	// Event listener when the pointerlock is updated (or removed by pressing ESC for example).
+	var pointerlockchange = function (event) {
+		var controlEnabled = (
+		document.mozPointerLockElement === canvas
+		|| document.webkitPointerLockElement === canvas
+		|| document.msPointerLockElement === canvas
+		|| document.pointerLockElement === canvas);
+		// If the user is already locked
+		if (!controlEnabled) {
+			camera.detachControl(canvas);
+		} else {
+			camera.attachControl(canvas);
+		}
+	};
+
+	// Attach events to the document
+	document.addEventListener("pointerlockchange", pointerlockchange, false);
+	document.addEventListener("mspointerlockchange", pointerlockchange, false);
+	document.addEventListener("mozpointerlockchange", pointerlockchange, false);
+	document.addEventListener("webkitpointerlockchange", pointerlockchange, false);
 }

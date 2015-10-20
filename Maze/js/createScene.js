@@ -7,7 +7,7 @@ function createScene() {
 	scene.workerCollisions = true;
 
 	// CAMERA
-	var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(10 - width * 20 / 2, -10 + height * 20 / 2, -10 + depth * 20 / 2), scene);
+	var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 0, 0), scene);
 	//camera.applyGravity = true;
 	camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
 	camera.checkCollisions = true;
@@ -18,7 +18,8 @@ function createScene() {
 	scene.activeCameras.push(camera);
 	scene.cameraToUseForPointers = camera;
 
-	var cameraOffsetY = 0.5;
+	// fix for missing camera ellipsoid offset
+	var cameraOffsetY = 0.6;
 	camera._collideWithWorld = function (velocity) {
 		var globalPosition;
 		if (this.parent) {
@@ -40,51 +41,21 @@ function createScene() {
 	};
 
 
-	// the camera acts as the player
-	var player = camera;
-
-	// CREATE MINI MAP
-	var playerOnMiniMap = new MiniMap(100, 56, player, scene);
-
 	// CREATE MAZE
 	var maze = new Maze(width, height, depth, startingPoint);
 
 	// DRAW MAZE
 	var mazeMesh = drawMaze(maze, scene);
 
+	// the camera acts as the player
+	var player = camera;
+	player.position = getCellPosition(width - 1, height - 1, 0, maze, spacing);
+
+	// CREATE MINI MAP
+	var playerOnMiniMap = new MiniMap(100, 100, player, scene);
+
 	// PLACE EXIT
-	var exit = BABYLON.Mesh.CreateTorus("exit", 3, 0.5, 64, scene, false);
-	exit.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
-	exit.material = new ExitMaterial(scene);
-	exit.rotation.x = Math.PI/2;
-	exit.position = new BABYLON.Vector3(-10 + maze.width * 20 / 2, 10 - maze.height * 20 / 2, 10 - maze.depth * 20 / 2);
-
-	var exitPortal = BABYLON.MeshBuilder.CreateDisc("exitPortal", {radius: 1.5, tessellation: 32}, scene);
-	exitPortal.rotation.x = Math.PI/2;
-	exitPortal.bakeCurrentTransformIntoVertices();
-	exitPortal.material = new ExitPortalMaterial(scene);
-	exitPortal.parent = exit;
-
-	var exitLight = new BABYLON.PointLight("Omni0", new BABYLON.Vector3(0, 0, 0), scene);
-	exitLight.diffuse = new BABYLON.Color3(0.5, 0, 0.5);
-	exitLight.intensity = 0.8;
-	exitLight.range = 15;
-	exitLight.position = exit.position;
-
-	var exitFound = false;
-	setTimeout(function(){
-		scene.registerBeforeRender(function () {
-			if(!exitFound && exit.intersectsMesh(playerOnMiniMap, true)){
-				exitFound = true;
-				camera.detachControl(canvas);
-				alert('Exit reached!');
-			}
-		});
-	}, 100);
-
-	// ADD ENEMIES
-	// TODO enemy movement - chase player? dodge?
-	var enemy = new Enemy(maze, player, scene);
+	var exit = new Exit(new BABYLON.Vector3(width - 1, 0, depth - 1), maze, playerOnMiniMap, camera, scene);
 
 	// LIGHTS AND SHADOW
 	var hemiLight = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(0, 1, 0), scene);
@@ -98,9 +69,51 @@ function createScene() {
 	playerLight1.range = 35;
 
 	scene.registerBeforeRender(function () {
-		playerLight1.position = player.position;
+		playerLight1.position = player.position.clone();
+		playerLight1.position.y += 1;
 		playerLight1.direction = player.getTarget().subtract(player.position);
+		playerLight1.direction.y -= 0.2;
 	});
+
+	var shadowGenerator = new BABYLON.ShadowGenerator(1024, playerLight1);
+	shadowGenerator.useBlurVarianceShadowMap = true;
+
+	// MAP TERMINALS
+	var numberOfRooms = width * height * depth;
+	var numberOfTerminals = Math.floor(numberOfRooms/4);
+
+	var sounds = new Sounds(scene);
+
+	var terminal = new Terminal(new BABYLON.Vector3(width - 1, height - 1, 0), maze, player, sounds, shadowGenerator, scene);
+
+	initPointerLock(canvas, camera);
+
+	window.addEventListener("mousedown", function (evt) {
+		// left click to fire
+		if (evt.button === 0) {
+			sounds.laser.play();
+		}
+
+		return false;
+	});
+
+	$('body').on('contextmenu', 'canvas', function(e){ return false; });
+
+
+	// pick a random room
+	// place terminal
+	// save position in placedTerminals
+	// pick another room
+	// check distance to all other terminals
+	// if distance is big enough, place new terminal
+	// top when number of terminal is reached (placedTerminals.length)
+
+	console.log('number of rooms: ', numberOfRooms);
+	console.log('number of terminals: ', numberOfTerminals);
+
+	// ADD ENEMIES
+	// TODO enemy movement - chase player? dodge?
+	var enemy = new Enemy(maze, player, scene);
 
 	// DEBUG LAYER
 	if(window.location.hash == '#debug') {

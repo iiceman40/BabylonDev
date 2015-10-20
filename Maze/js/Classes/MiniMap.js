@@ -5,7 +5,7 @@ var MiniMap = function(width, height, player, scene){
 	// viewport
 	var ration = $(document).width() / $(document).height();
 	var xstart = 1 - width/100;
-	var ystart = 1 - height/100 * ration;
+	var ystart = 1 - height/100;
 	var viewportWidth = 1 - xstart;
 	var viewportHeight = 1 - ystart;
 
@@ -40,8 +40,10 @@ var MiniMap = function(width, height, player, scene){
 			var index = scene.activeCameras.indexOf(mapCamera);
 			if(index == -1){
 				scene.activeCameras.push(mapCamera);
+				mapCamera.attachControl(canvas, true);
 			} else {
-				scene.activeCameras.splice(index,1);
+				scene.activeCameras.splice(index, 1);
+				mapCamera.detachControl(canvas);
 			}
 		}
 

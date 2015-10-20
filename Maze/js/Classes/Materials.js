@@ -110,3 +110,20 @@ var BoxEdgeMaterial = function(scene) {
 	boxEdgeMaterial.emissiveColor = BABYLON.Color3.Black();
 	return boxEdgeMaterial;
 };
+
+var TerminalScreenMaterial = function(scene) {
+	var screenTexture = new BABYLON.DynamicTexture("screenTexture", 512, scene, true);
+	var screenMaterial = new BABYLON.StandardMaterial("screenMaterial", scene);
+	screenMaterial.diffuseTexture = screenTexture;
+	screenMaterial.emissiveTexture = screenTexture;
+	screenMaterial.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+	return screenMaterial;
+};
+
+var TerminalCaseMaterial = function(scene) {
+	var caseMaterial = new BABYLON.StandardMaterial("terminalCaseMaterial", scene);
+	caseMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+	caseMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+	caseMaterial.emissiveColor = new BABYLON.Color3(0, 0.01, 0);
+	return caseMaterial
+};

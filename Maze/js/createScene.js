@@ -18,6 +18,27 @@ function createScene() {
 	scene.activeCameras.push(camera);
 	scene.cameraToUseForPointers = camera;
 
+	var cameraOffsetY = 0.5;
+	camera._collideWithWorld = function (velocity) {
+		var globalPosition;
+		if (this.parent) {
+			globalPosition = BABYLON.Vector3.TransformCoordinates(this.position, this.parent.getWorldMatrix());
+		}
+		else {
+			globalPosition = this.position;
+		}
+		globalPosition.subtractFromFloatsToRef(0, this.ellipsoid.y - cameraOffsetY, 0, this._oldPosition);
+		this._collider.radius = this.ellipsoid;
+		//no need for clone, as long as gravity is not on.
+		var actualVelocity = velocity;
+		//add gravity to the velocity to prevent the dual-collision checking
+		if (this.applyGravity) {
+			//this prevents mending with cameraDirection, a global variable of the free camera class.
+			actualVelocity = velocity.add(this.getScene().gravity);
+		}
+		this.getScene().collisionCoordinator.getNewPosition(this._oldPosition, actualVelocity, this._collider, 3, null, this._onCollisionPositionChange, this.uniqueId);
+	};
+
 
 	// the camera acts as the player
 	var player = camera;

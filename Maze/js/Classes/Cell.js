@@ -11,5 +11,6 @@ var Cell = function (position) {
 		DOWN: true
 	};
 	this.doors = [];
+	this.hasTerminal = false;
 
 };

@@ -1,10 +1,13 @@
-var Terminal = function (position, maze, player, sounds, shadowGenerator, scene) {
+var Terminal = function (position, maze, player, miniMap, availableMessages, shadowGenerator, scene) {
 	var self = this;
 
-	// TODO select random message
-	var message = 'newRank';
+	this.activeMessageText = '';
+	this.isPlayingMessage = false;
+	//this.message = new Message("You have a new, worse rank. <br/> <br/> Congratulations. <br/> <br/> To everyone above you.", sounds[soundId]);
+	var messageId = Math.floor(Math.random() * availableMessages.length);
+	console.log(messageId, availableMessages.length);
+	this.message = availableMessages[messageId];
 
-	this.message = new Message("You have a new, worse rank. <br/> Congratulations. <br/> To everyone above you.", sounds[message]);
 
 	var terminalCase = BABYLON.MeshBuilder.CreateBox('terminalCase', {size: 0.6, depth: 0.3}, scene);
 	terminalCase.material = new TerminalCaseMaterial(scene);
@@ -13,57 +16,88 @@ var Terminal = function (position, maze, player, sounds, shadowGenerator, scene)
 	var terminalScreen = BABYLON.MeshBuilder.CreateBox('terminalScreen', {size: 0.5, depth: 0.32}, scene);
 	terminalScreen.material = new TerminalScreenMaterial(scene);
 	terminalScreen.parent = terminalCase;
+	terminalScreen.terminal = this;
 
 
-	// interaction event listener
-	window.addEventListener("mousedown", function (evt) {
-		// right click to interact with terminal
-		if (evt.button === 2) {
-			var ray = new BABYLON.Ray(player.position, player.getTarget().subtract(player.position));
-			var pickingInfo = scene.pickWithRay(ray, function(mesh){
-				return mesh.name == 'terminalScreen';
-			});
+	this.activateTerminal = function(){
+		miniMap.showMiniMap();
 
-			if(pickingInfo.hit) {
-
-				var message = 'newRank';
-				var sound = sounds[message];
-				sound.attachToMesh(terminalCase);
-				if(!sound.isPlaying) {
-					sound.play();
-				}
-
-				// update screen text
-				wrapText(self.message.text, 20, 60, "bold 40px Lucida Console", "green", "#19321C", true, true, pickingInfo.pickedMesh.material.diffuseTexture);
-			}
+		var message = 'newRank';
+		console.log(this.message);
+		var sound = this.message.sound;
+		if(sound) {
+			sound.attachToMesh(terminalCase);
+			//if(!sound.isPlaying) {
+				//sound.play();
+			//}
+		}
+		if(!this.isPlayingMessage) {
+			this.isPlayingMessage = true;
+			speakPart(self.message.text.split('<br/> <br/>'), 0, this);
+			console.log('done');
+			this.isPlayingMessage = false;
 		}
 
-		return false;
-	});
+		// update screen text
+		if(self.activeMessageText.length == 0){
+			var typingInterval = setInterval(function(){
+				self.activeMessageText = self.message.text.substr(0,self.activeMessageText.length + 2);
+				if(self.activeMessageText.length == self.message.text.length){
+					clearInterval(typingInterval);
+				}
+			}, 150);
+		}
+	};
 
 	var blink = false;
 	setInterval(function(){
-		var message = self.message.text;
-		if(blink){
-			message += ' |'
-		}
 		blink = !blink;
-		// text, x, y, font, color, clearColor, invertY, update, dynamicTexture
-		wrapText(message, 20, 60, "bold 40px Lucida Console", "green", "#19321C", true, true, terminalScreen.material.diffuseTexture);
 	}, 200);
 
+	setInterval(function() {
+		var message = self.activeMessageText;
+		if(blink){
+			message += '|'
+		}
+		// text, x, y, font, color, clearColor, invertY, update, dynamicTexture
+		wrapText(message, 20, 60, "bold 40px Lucida Console", "green", "#19321C", true, true, terminalScreen.material.diffuseTexture);
+	}, 100);
 
-	// add terminal to first room
-	/* FIXME
-	var cell = [maze.map[position.y][position.x][position.z]];
+
+	// add terminal to room
+	var cell = maze.map[position.y][position.x][position.z];
 	for(var i=0; i < cell.directions.length; i++){
 		var direction = cell.directions[i];
-		var wall = cell.walls['direction'];
-		// TODO check if wall exists and if so place terminal there
-		// TODO handle if no wall was available
+		var wallExists = cell.walls[direction];
+		// check if wall exists and if so place terminal there
+		console.log(direction, wallExists);
+		if(wallExists){
+			terminalCase.position = getCellPosition(position.x, position.y, position.z, maze, spacing);
+			if(direction == 'S') {
+				console.log('placing terminal at south wall');
+				terminalCase.position.z += (cellSize - wallThickness) / 2 - 0.15;
+				break;
+			}
+			if(direction == 'N') {
+				console.log('placing terminal at north wall');
+				terminalCase.position.z -= (cellSize - wallThickness) / 2 - 0.15;
+				terminalCase.rotation.y = Math.PI;
+				break;
+			}
+			if(direction == 'E') {
+				console.log('placing terminal at east wall');
+				terminalCase.position.x += (cellSize - wallThickness) / 2 - 0.15;
+				terminalCase.rotation.y = Math.PI/2;
+				break;
+			}
+			if(direction == 'W') {
+				console.log('placing terminal at west wall');
+				terminalCase.position.x -= (cellSize - wallThickness) / 2 - 0.15;
+				terminalCase.rotation.y = -Math.PI/2;
+				break;
+			}
+		}
+		// TODO handle if no wall was available??
 	}
-	*/
-	terminalCase.position = getCellPosition(position.y, position.x, position.z, maze, spacing);
-	terminalCase.position.z += (cellSize - wallThickness) / 2 - 0.15;
 
 };

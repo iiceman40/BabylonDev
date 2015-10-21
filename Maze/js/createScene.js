@@ -52,10 +52,10 @@ function createScene() {
 	player.position = getCellPosition(width - 1, height - 1, 0, maze, spacing);
 
 	// CREATE MINI MAP
-	var playerOnMiniMap = new MiniMap(100, 100, player, scene);
+	var miniMap = new MiniMap(100, 100, player, scene);
 
 	// PLACE EXIT
-	var exit = new Exit(new BABYLON.Vector3(width - 1, 0, depth - 1), maze, playerOnMiniMap, camera, scene);
+	var exit = new Exit(new BABYLON.Vector3(width - 1, 0, depth - 1), maze, miniMap.playerOnMiniMap, camera, scene);
 
 	// LIGHTS AND SHADOW
 	var hemiLight = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(0, 1, 0), scene);
@@ -78,16 +78,62 @@ function createScene() {
 	var shadowGenerator = new BABYLON.ShadowGenerator(1024, playerLight1);
 	shadowGenerator.useBlurVarianceShadowMap = true;
 
+	// INIT SOUNDS
+	var sounds = new Sounds(scene);
+
+	// Messages
+	var availableMessages = [
+		new Message("You are doing really great. <br/> <br/> Fun fact: <br/> <br/> A lot of people don't undestand sarcasm!", sounds['newRank']),
+		new Message("Hey, what's up?", null)
+	];
+
 	// MAP TERMINALS
 	var numberOfRooms = width * height * depth;
 	var numberOfTerminals = Math.floor(numberOfRooms/4);
 
-	var sounds = new Sounds(scene);
+	// add a terminal to the first room
+	new Terminal(new BABYLON.Vector3(width - 1, height - 1, 0), maze, player, miniMap, availableMessages, shadowGenerator, scene);
+	var placedTerminals = 1;
 
-	var terminal = new Terminal(new BABYLON.Vector3(width - 1, height - 1, 0), maze, player, sounds, shadowGenerator, scene);
+	while(numberOfTerminals - placedTerminals > 0){
+		var x = Math.floor(Math.random() * width);
+		var y = Math.floor(Math.random() * height);
+		var z = Math.floor(Math.random() * depth);
+
+		console.log(x, y, z);
+		if(!maze.map[y][x][z].hasTerminal){
+			new Terminal(new BABYLON.Vector3(x, y, z), maze, player, miniMap, availableMessages, shadowGenerator, scene);
+			placedTerminals++;
+		}
+
+	}
 
 	initPointerLock(canvas, camera);
 
+	// EVENT LISTENERS
+	// terminal interaction event listener
+	window.addEventListener("mouseup", function (evt) {
+		// right click to interact with terminal
+		if (evt.button === 2) {
+			var ray = new BABYLON.Ray(player.position, player.getTarget().subtract(player.position));
+			var pickingInfo = scene.pickWithRay(ray, function(mesh){
+				return mesh.name == 'terminalScreen';
+			});
+
+			if(pickingInfo.hit && !miniMap.isVisible) {
+				var terminal = pickingInfo.pickedMesh.terminal;
+				terminal.activateTerminal();
+				terminal.isActive = true;
+			} else {
+				miniMap.hideMiniMap();
+			}
+
+		}
+
+		return false;
+	});
+
+	// shooting
 	window.addEventListener("mousedown", function (evt) {
 		// left click to fire
 		if (evt.button === 0) {

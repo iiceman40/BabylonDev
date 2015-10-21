@@ -1,6 +1,10 @@
 var MiniMap = function(width, height, player, scene){
+	var self = this;
+
 	// mini map camera
-	var mapCamera = new BABYLON.ArcRotateCamera("camera1", -Math.PI / 2, Math.PI / 5 * 2, 150, new BABYLON.Vector3(0,0,0), scene);
+	this.mapCamera = new BABYLON.ArcRotateCamera("camera1", -Math.PI / 2, Math.PI / 5 * 2, 150, new BABYLON.Vector3(0,0,0), scene);
+
+	this.isVisible = false;
 
 	// viewport
 	var ration = $(document).width() / $(document).height();
@@ -9,47 +13,62 @@ var MiniMap = function(width, height, player, scene){
 	var viewportWidth = 1 - xstart;
 	var viewportHeight = 1 - ystart;
 
-	mapCamera.viewport = new BABYLON.Viewport(
+	this.mapCamera.viewport = new BABYLON.Viewport(
 		xstart,
 		ystart,
 		viewportWidth,
 		viewportHeight
 	);
 
-	mapCamera.layerMask = 1; // 001 in binary
+	this.mapCamera.layerMask = 1; // 001 in binary
 
 	// disable key control for mini map
-	mapCamera.keysUp = [];
-	mapCamera.keysDown = [];
-	mapCamera.keysLeft = [];
-	mapCamera.keysRight = [];
+	this.mapCamera.keysUp = [];
+	this.mapCamera.keysDown = [];
+	this.mapCamera.keysLeft = [];
+	this.mapCamera.keysRight = [];
 
 	// fix/hack for triggering the intersect event with the player on the mini map and the exit
-	scene.activeCameras.push(mapCamera);
+	scene.activeCameras.push(this.mapCamera);
 	setTimeout(function(){
-		var index = scene.activeCameras.indexOf(mapCamera);
+		var index = scene.activeCameras.indexOf(self.mapCamera);
 		if(index != -1){
 			scene.activeCameras.splice(index,1);
 		}
 	}, 0);
 
 	// Add the camera to the list of active cameras of the game
-	// show and hdie camera on key toggle
+	// show and hide camera on key toggle
 	window.addEventListener("keydown", function(event){
 		if(event.keyCode == 77){
-			var index = scene.activeCameras.indexOf(mapCamera);
+			var index = scene.activeCameras.indexOf(self.mapCamera);
 			if(index == -1){
-				scene.activeCameras.push(mapCamera);
-				mapCamera.attachControl(canvas, true);
+				self.showMiniMap();
 			} else {
-				scene.activeCameras.splice(index, 1);
-				mapCamera.detachControl(canvas);
+				self.hideMiniMap(index);
 			}
 		}
 
 	});
 
-	mapCamera.attachControl(canvas, true);
+	this.showMiniMap = function(){
+		$('.hud').fadeOut(200);
+		scene.activeCameras.push(self.mapCamera);
+		$('.closeMapHint').fadeIn(1000);
+		self.mapCamera.attachControl(canvas, true);
+		this.isVisible = true;
+	};
+
+	this.hideMiniMap = function(mapCameraIndex){
+		if(typeof mapCameraIndex == 'undefined'){
+			mapCameraIndex = scene.activeCameras.indexOf(self.mapCamera);
+		}
+		scene.activeCameras.splice(mapCameraIndex, 1);
+		self.mapCamera.detachControl(canvas);
+		$('.hud').fadeIn(200);
+		$('.closeMapHint').fadeOut(200);
+		this.isVisible = false;
+	};
 
 	// player on mini map
 	var playerMaterial = new BABYLON.StandardMaterial('playerMaterial', scene);
@@ -57,18 +76,18 @@ var MiniMap = function(width, height, player, scene){
 	playerMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0);
 	playerMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
 
-	var playerOnMiniMap = BABYLON.Mesh.CreateCylinder("player", 3, 0, 2, 6, 1, scene, false);
-	playerOnMiniMap.rotation.x = Math.PI / 2;
-	playerOnMiniMap.bakeCurrentTransformIntoVertices();
-	playerOnMiniMap.scaling.z = 1.5;
-	playerOnMiniMap.material = playerMaterial;
-	playerOnMiniMap.layerMask = 1;
+	this.playerOnMiniMap = BABYLON.Mesh.CreateCylinder("player", 3, 0, 2, 6, 1, scene, false);
+	this.playerOnMiniMap.rotation.x = Math.PI / 2;
+	this.playerOnMiniMap.bakeCurrentTransformIntoVertices();
+	this.playerOnMiniMap.scaling.z = 1.5;
+	this.playerOnMiniMap.material = playerMaterial;
+	this.playerOnMiniMap.layerMask = 1;
 
 	// The sphere position will be displayed accordingly to the player position
-	playerOnMiniMap.registerBeforeRender(function() {
-		playerOnMiniMap.rotation = player.rotation;
-		playerOnMiniMap.position = player.position;
+	this.playerOnMiniMap.registerBeforeRender(function() {
+		self.playerOnMiniMap.rotation = player.rotation;
+		self.playerOnMiniMap.position = player.position;
 	});
 
-	return playerOnMiniMap;
+	return this;
 };

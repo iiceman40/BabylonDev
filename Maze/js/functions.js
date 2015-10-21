@@ -248,19 +248,25 @@ function wrapText(text, x, y, font, color, clearColor, invertY, update, dynamicT
 
 	for(var n = 0; n < words.length; n++) {
 		var testLine = line;
-		if(words[n] == '<br />' || words[n] == '<br/>') {
-			y += lineHeight;
-		} else {
+		var isBreak = words[n] == '<br/>';
+
+		if(!isBreak) {
 			testLine = line + words[n] + ' ';
 		}
+
 		var metrics = dynamicTexture._context.measureText(testLine);
 		var testWidth = metrics.width;
-		if (testWidth > maxWidth && n > 0) {
+
+		if ((testWidth > maxWidth && n > 0) || isBreak) {
 			dynamicTexture._context.fillText(line, x, y);
-			line = words[n] + ' ';
+
+			if(isBreak){
+				line = '';
+			} else {
+				line = words[n] + ' ';
+			}
 			y += lineHeight;
-		}
-		else {
+		} else {
 			line = testLine;
 		}
 	}
@@ -300,4 +306,25 @@ function initPointerLock(canvas, camera) {
 	document.addEventListener("mspointerlockchange", pointerlockchange, false);
 	document.addEventListener("mozpointerlockchange", pointerlockchange, false);
 	document.addEventListener("webkitpointerlockchange", pointerlockchange, false);
+}
+
+function speakPart(textArray, part, terminal){
+
+	terminal.isPlayingMessage = true;
+
+	var html = $('<p>' + textArray[part] + '</p>');
+	var utterance = new SpeechSynthesisUtterance(html.text());
+	utterance.lang = 'en-US';
+	utterance.rate = 0.7;
+	utterance.pitch = 0.8;
+
+	utterance.onend = function(event) {
+		if(part < textArray.length-1) {
+			speakPart(textArray, part + 1, terminal)
+		} else {
+			terminal.isPlayingMessage = false;
+		}
+	};
+
+	window.speechSynthesis.speak(utterance);
 }

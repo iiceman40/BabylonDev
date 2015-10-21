@@ -26,3 +26,15 @@ html, body, canvas {
 	right: 0;
 	pointer-events: none;
 }
+
+.closeMapHint {
+	position: absolute;
+	top: 30px;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	font-family: 'Lucida Console', sans-serif;
+	color: green;
+	display: none;
+	text-shadow: 1px 1px 1px black;
+}

@@ -76,7 +76,8 @@ function createScene() {
 	});
 
 	var shadowGenerator = new BABYLON.ShadowGenerator(1024, playerLight1);
-	shadowGenerator.useBlurVarianceShadowMap = true;
+	shadowGenerator.usePoissonSampling = true;
+	shadowGenerator.setDarkness(0.3);
 
 	// INIT SOUNDS
 	var sounds = new Sounds(scene);
@@ -124,7 +125,7 @@ function createScene() {
 				var terminal = pickingInfo.pickedMesh.terminal;
 				terminal.activateTerminal();
 				terminal.isActive = true;
-			} else {
+			} else if(miniMap.isVisible){
 				miniMap.hideMiniMap();
 			}
 

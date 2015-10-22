@@ -53,8 +53,8 @@ var MiniMap = function(width, height, player, scene){
 
 	this.showMiniMap = function(){
 		$('.hud').fadeOut(200);
-		scene.activeCameras.push(self.mapCamera);
 		$('.closeMapHint').fadeIn(1000);
+		scene.activeCameras.push(self.mapCamera);
 		self.mapCamera.attachControl(canvas, true);
 		this.isVisible = true;
 	};

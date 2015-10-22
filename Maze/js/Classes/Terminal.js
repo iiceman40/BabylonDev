@@ -34,7 +34,6 @@ var Terminal = function (position, maze, player, miniMap, availableMessages, sha
 		if(!this.isPlayingMessage) {
 			this.isPlayingMessage = true;
 			speakPart(self.message.text.split('<br/> <br/>'), 0, this);
-			console.log('done');
 			this.isPlayingMessage = false;
 		}
 

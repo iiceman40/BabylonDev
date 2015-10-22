@@ -7,7 +7,7 @@ var Sounds = function (scene) {
 	this.laser.setVolume(0.2);
 
 	this.engine = new BABYLON.Sound("bridgeSound", "sounds/bridgeAmbience.wav", scene, null, { loop: true, autoplay: true });
-	this.engine.setVolume(0.6);
+	this.engine.setVolume(2);
 
 	return this;
 };

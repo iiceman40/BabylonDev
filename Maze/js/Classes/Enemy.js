@@ -1,15 +1,16 @@
 /**
  * @param maze
  * @param player
+ * @param positionCoordinates
  * @param scene {BABYLON.Scene}
  * @constructor
  */
-var Enemy = function(maze, player, scene){
+var Enemy = function(maze, player, positionCoordinates, mazeMesh, scene){
 
 
 	var enemy = BABYLON.Mesh.CreateSphere("enemy", 32, 3, scene, false);
 	enemy.material = new EnemyMaterial(scene);
-	enemy.position = new BABYLON.Vector3(10 - maze.width * 20 / 2, 10 - maze.height * 20 / 2, 10 - maze.depth * 20 / 2);
+	enemy.position = getCellPosition(positionCoordinates.x, positionCoordinates.y, positionCoordinates.z, maze, spacing);
 	enemy.checkCollisions = true;
 	enemy.visibility = 0.7;
 
@@ -19,6 +20,7 @@ var Enemy = function(maze, player, scene){
 	enemyLight.intensity = 0.5;
 	enemyLight.range = 10;
 	enemyLight.position = enemy.position;
+	enemyLight.includedOnlyMeshes = [mazeMesh];
 
 	// ANIMATIONS
 	var animationScaling = new BABYLON.Animation("scalingAnimation", "scaling", 100, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
@@ -108,6 +110,7 @@ var Enemy = function(maze, player, scene){
 
 		} else {
 			enemy.dispose();
+			enemyLight.dispose();
 		}
 
 	});

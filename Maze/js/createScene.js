@@ -39,6 +39,7 @@ function createScene() {
 		}
 		this.getScene().collisionCoordinator.getNewPosition(this._oldPosition, actualVelocity, this._collider, 3, null, this._onCollisionPositionChange, this.uniqueId);
 	};
+	console.log(camera);
 
 
 	// CREATE MAZE
@@ -49,13 +50,17 @@ function createScene() {
 
 	// the camera acts as the player
 	var player = camera;
+	player.keysUp.push(87);
+	player.keysDown.push(83);
+	player.keysLeft.push(65);
+	player.keysRight.push(68);
 	player.position = getCellPosition(width - 1, height - 1, 0, maze, spacing);
 
 	// CREATE MINI MAP
 	var miniMap = new MiniMap(100, 100, player, scene);
 
 	// PLACE EXIT
-	var exit = new Exit(new BABYLON.Vector3(width - 1, 0, depth - 1), maze, miniMap.playerOnMiniMap, camera, scene);
+	var exit = new Exit(new BABYLON.Vector3(width - 1, 0, depth - 1), maze, miniMap.playerOnMiniMap, mazeMesh, camera, scene);
 
 	// LIGHTS AND SHADOW
 	var hemiLight = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(0, 1, 0), scene);
@@ -69,6 +74,7 @@ function createScene() {
 	playerLight1.range = 35;
 
 	scene.registerBeforeRender(function () {
+		//console.log(camera);
 		playerLight1.position = player.position.clone();
 		playerLight1.position.y += 1;
 		playerLight1.direction = player.getTarget().subtract(player.position);
@@ -81,10 +87,11 @@ function createScene() {
 
 	// INIT SOUNDS
 	var sounds = new Sounds(scene);
+	// TODO check if all are ready to play?
 
 	// Messages
 	var availableMessages = [
-		new Message("You are doing really great. <br/> <br/> Fun fact: <br/> <br/> A lot of people don't undestand sarcasm!", sounds['newRank']),
+		new Message("You are doing really great. <br/> <br/> Fun fact: <br/> <br/> A lot of people don't undestand sarcasm!", null),
 		new Message("Hey, what's up?", null)
 	];
 
@@ -101,13 +108,13 @@ function createScene() {
 		var y = Math.floor(Math.random() * height);
 		var z = Math.floor(Math.random() * depth);
 
-		console.log(x, y, z);
 		if(!maze.map[y][x][z].hasTerminal){
 			new Terminal(new BABYLON.Vector3(x, y, z), maze, player, miniMap, availableMessages, shadowGenerator, scene);
 			placedTerminals++;
 		}
 
 	}
+	console.log('number of rooms: ', numberOfRooms, 'number of terminals: ', numberOfTerminals);
 
 	initPointerLock(canvas, camera);
 
@@ -116,7 +123,7 @@ function createScene() {
 	window.addEventListener("mouseup", function (evt) {
 		// right click to interact with terminal
 		if (evt.button === 2) {
-			var ray = new BABYLON.Ray(player.position, player.getTarget().subtract(player.position));
+			var ray = new BABYLON.Ray(player.position, player.getTarget().subtract(player.position), 5);
 			var pickingInfo = scene.pickWithRay(ray, function(mesh){
 				return mesh.name == 'terminalScreen';
 			});
@@ -134,33 +141,81 @@ function createScene() {
 		return false;
 	});
 
-	// shooting
-	window.addEventListener("mousedown", function (evt) {
-		// left click to fire
-		if (evt.button === 0) {
-			sounds.laser.play();
-		}
+	// ADD ENEMIES
+	// TODO enemy movement - chase player? dodge?
+	var enemies = [];
+	enemies.push(new Enemy(maze, player, new BABYLON.Vector3(width - 1, 0, depth - 1), mazeMesh, scene));
 
-		return false;
+	// SHOOTING
+	var bullets = [];
+	var bulletMaterial = new BulletMaterial(scene);
+	var bulletMaterialOutside = new BulletMaterialOutside(scene);
+	var currentCannon = 1;
+
+	// init cannons
+	var cannonLeft = new Cannon(new BABYLON.Vector3(-0.3, -0.3, 0), player, scene);
+	var cannonRight = new Cannon(new BABYLON.Vector3(0.3, -0.3, 0), player, scene);
+
+	var cannonLight = new BABYLON.PointLight("Omni0", new BABYLON.Vector3(1, 10, 1), scene);
+	cannonLight.diffuse = new BABYLON.Color3(1,0,0);
+	cannonLight.specular = new BABYLON.Color3(1,0,0);
+	cannonLight.position = player.position;
+	cannonLight.includedOnlyMeshes = [cannonLeft, cannonRight];
+	cannonLight.intensity = 1;
+	//cannonLight.range = 6;
+	cannonLight.setEnabled(false);
+
+	var keepShooting = false;
+	var cannonReady = true;
+	window.addEventListener("mousedown", function (evt) {
+		// left click to start fire
+		if (evt.button === 0 && !miniMap.isVisible) {
+			keepShooting = true;
+		}
+	});
+	window.addEventListener("mouseup", function (evt) {
+		keepShooting = false;
 	});
 
 	$('body').on('contextmenu', 'canvas', function(e){ return false; });
 
 
-	// pick a random room
-	// place terminal
-	// save position in placedTerminals
-	// pick another room
-	// check distance to all other terminals
-	// if distance is big enough, place new terminal
-	// top when number of terminal is reached (placedTerminals.length)
+	// before render
+	scene.registerBeforeRender(function(){
+		if(keepShooting && cannonReady) {
+			cannonReady = false;
+			// fire laser bullet from player in the direction the player is currently looking
+			var newBullet = new Bullet(bulletMaterial, bulletMaterialOutside, player, scene);
+			cannonLight.setEnabled(true);
+			if (currentCannon == 1) {
+				newBullet.position = cannonLeft.outputEnd.absolutePosition.clone();
+				currentCannon = 2;
+				cannonLight.position = cannonLeft.outputEnd.absolutePosition.clone();
+			} else {
+				newBullet.position = cannonRight.outputEnd.absolutePosition.clone();
+				currentCannon = 1;
+				cannonLight.position = cannonRight.outputEnd.absolutePosition.clone();
+			}
+			bullets.push(newBullet);
+			sounds.laser.play();
 
-	console.log('number of rooms: ', numberOfRooms);
-	console.log('number of terminals: ', numberOfTerminals);
+			setTimeout(function(){
+				cannonReady = true;
+				cannonLight.setEnabled(false);
+			}, 200);
+		}
 
-	// ADD ENEMIES
-	// TODO enemy movement - chase player? dodge?
-	var enemy = new Enemy(maze, player, scene);
+		for(var i=0; i<bullets.length; i++){
+			var bullet = bullets[i];
+			bullet.position = bullet.position.clone().add(bullet.direction.scale(2));
+			// TODO dispose on hit our out of range
+			if(bullet.position.length() > width * spacing + height * spacing + depth * spacing){
+				bullet.outside.dispose();
+				bullet.dispose();
+			}
+		}
+	});
+
 
 	// DEBUG LAYER
 	if(window.location.hash == '#debug') {

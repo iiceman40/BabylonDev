@@ -1,4 +1,4 @@
-var Exit = function (exitCoordinates, maze, playerOnMiniMap, camera, scene) {
+var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, camera, scene) {
 	var exit = BABYLON.Mesh.CreateTorus("exit", 3, 0.5, 64, scene, false);
 	exit.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
 	exit.material = new ExitMaterial(scene);
@@ -16,6 +16,7 @@ var Exit = function (exitCoordinates, maze, playerOnMiniMap, camera, scene) {
 	exitLight.intensity = 0.8;
 	exitLight.range = 15;
 	exitLight.position = exit.position;
+	exitLight.includedOnlyMeshes = [mazeMesh];
 
 	var exitFound = false;
 	setTimeout(function(){

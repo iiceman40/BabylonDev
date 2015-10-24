@@ -125,5 +125,21 @@ var TerminalCaseMaterial = function(scene) {
 	caseMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 	caseMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
 	caseMaterial.emissiveColor = new BABYLON.Color3(0, 0.01, 0);
-	return caseMaterial
+	return caseMaterial;
+};
+
+var BulletMaterial = function(scene) {
+	var bulletMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
+	bulletMaterial.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2);
+	bulletMaterial.specularColor = new BABYLON.Color3(0.5, 0.1, 0.1);
+	bulletMaterial.emissiveColor = new BABYLON.Color3(1, 0.01, 0);
+	return bulletMaterial;
+};
+var BulletMaterialOutside = function(scene) {
+	var bulletMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
+	bulletMaterial.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2);
+	bulletMaterial.specularColor = new BABYLON.Color3(0.5, 0.1, 0.1);
+	bulletMaterial.emissiveColor = new BABYLON.Color3(1, 0.5, 0.5);
+	bulletMaterial.alpha = 0.9;
+	return bulletMaterial;
 };

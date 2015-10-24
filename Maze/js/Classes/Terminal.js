@@ -5,7 +5,6 @@ var Terminal = function (position, maze, player, miniMap, availableMessages, sha
 	this.isPlayingMessage = false;
 	//this.message = new Message("You have a new, worse rank. <br/> <br/> Congratulations. <br/> <br/> To everyone above you.", sounds[soundId]);
 	var messageId = Math.floor(Math.random() * availableMessages.length);
-	console.log(messageId, availableMessages.length);
 	this.message = availableMessages[messageId];
 
 
@@ -23,7 +22,6 @@ var Terminal = function (position, maze, player, miniMap, availableMessages, sha
 		miniMap.showMiniMap();
 
 		var message = 'newRank';
-		console.log(this.message);
 		var sound = this.message.sound;
 		if(sound) {
 			sound.attachToMesh(terminalCase);
@@ -69,28 +67,23 @@ var Terminal = function (position, maze, player, miniMap, availableMessages, sha
 		var direction = cell.directions[i];
 		var wallExists = cell.walls[direction];
 		// check if wall exists and if so place terminal there
-		console.log(direction, wallExists);
 		if(wallExists){
 			terminalCase.position = getCellPosition(position.x, position.y, position.z, maze, spacing);
 			if(direction == 'S') {
-				console.log('placing terminal at south wall');
 				terminalCase.position.z += (cellSize - wallThickness) / 2 - 0.15;
 				break;
 			}
 			if(direction == 'N') {
-				console.log('placing terminal at north wall');
 				terminalCase.position.z -= (cellSize - wallThickness) / 2 - 0.15;
 				terminalCase.rotation.y = Math.PI;
 				break;
 			}
 			if(direction == 'E') {
-				console.log('placing terminal at east wall');
 				terminalCase.position.x += (cellSize - wallThickness) / 2 - 0.15;
 				terminalCase.rotation.y = Math.PI/2;
 				break;
 			}
 			if(direction == 'W') {
-				console.log('placing terminal at west wall');
 				terminalCase.position.x -= (cellSize - wallThickness) / 2 - 0.15;
 				terminalCase.rotation.y = -Math.PI/2;
 				break;

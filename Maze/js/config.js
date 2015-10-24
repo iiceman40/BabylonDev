@@ -1,9 +1,9 @@
 /**
  * MAZE VARIABLES
  */
-var width = 3;
-var height = 3;
-var depth = 3;
+var width = 2;
+var height = 2;
+var depth = 2;
 var startingPoint = new BABYLON.Vector3(0, 0, 0);
 
 var cellSize = 10;

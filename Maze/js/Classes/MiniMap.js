@@ -28,6 +28,13 @@ var MiniMap = function(width, height, player, scene){
 	this.mapCamera.keysLeft = [];
 	this.mapCamera.keysRight = [];
 
+	this.playerKeys = {
+		up: player.keysUp,
+		down: player.keysDown,
+		left: player.keysLeft,
+		right: player.keysRight
+	};
+
 	// fix/hack for triggering the intersect event with the player on the mini map and the exit
 	scene.activeCameras.push(this.mapCamera);
 	setTimeout(function(){
@@ -39,6 +46,7 @@ var MiniMap = function(width, height, player, scene){
 
 	// Add the camera to the list of active cameras of the game
 	// show and hide camera on key toggle
+	/*
 	window.addEventListener("keydown", function(event){
 		if(event.keyCode == 77){
 			var index = scene.activeCameras.indexOf(self.mapCamera);
@@ -48,14 +56,18 @@ var MiniMap = function(width, height, player, scene){
 				self.hideMiniMap(index);
 			}
 		}
-
 	});
+	*/
 
 	this.showMiniMap = function(){
 		$('.hud').fadeOut(200);
 		$('.closeMapHint').fadeIn(1000);
 		scene.activeCameras.push(self.mapCamera);
 		self.mapCamera.attachControl(canvas, true);
+		player.keysUp = [];
+		player.keysDown = [];
+		player.keysLeft = [];
+		player.keysRight = [];
 		this.isVisible = true;
 	};
 
@@ -65,6 +77,10 @@ var MiniMap = function(width, height, player, scene){
 		}
 		scene.activeCameras.splice(mapCameraIndex, 1);
 		self.mapCamera.detachControl(canvas);
+		player.keysUp = this.playerKeys.up;
+		player.keysDown = this.playerKeys.down;
+		player.keysLeft = this.playerKeys.left;
+		player.keysRight = this.playerKeys.right;
 		$('.hud').fadeIn(200);
 		$('.closeMapHint').fadeOut(200);
 		this.isVisible = false;

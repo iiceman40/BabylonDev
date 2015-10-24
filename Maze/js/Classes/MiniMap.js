@@ -1,15 +1,15 @@
-var MiniMap = function(width, height, player, scene){
+var MiniMap = function(miniMapWidth, miniMapHeight, maze, player, scene){
 	var self = this;
 
 	// mini map camera
-	this.mapCamera = new BABYLON.ArcRotateCamera("camera1", -Math.PI / 2, Math.PI / 5 * 2, 150, new BABYLON.Vector3(0,0,0), scene);
+	this.mapCamera = new BABYLON.ArcRotateCamera("camera1", -Math.PI / 2, Math.PI / 5 * 2, Math.max(maze.width, maze.height, maze.depth) * 50, new BABYLON.Vector3(0,0,0), scene);
 
 	this.isVisible = false;
 
 	// viewport
 	var ration = $(document).width() / $(document).height();
-	var xstart = 1 - width/100;
-	var ystart = 1 - height/100;
+	var xstart = 1 - miniMapWidth/100;
+	var ystart = 1 - miniMapHeight/100;
 	var viewportWidth = 1 - xstart;
 	var viewportHeight = 1 - ystart;
 

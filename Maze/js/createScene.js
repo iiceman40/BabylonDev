@@ -57,7 +57,7 @@ function createScene() {
 	player.position = getCellPosition(width - 1, height - 1, 0, maze, spacing);
 
 	// CREATE MINI MAP
-	var miniMap = new MiniMap(100, 100, player, scene);
+	var miniMap = new MiniMap(100, 100, maze, player, scene);
 
 	// PLACE EXIT
 	var exit = new Exit(new BABYLON.Vector3(width - 1, 0, depth - 1), maze, miniMap.playerOnMiniMap, mazeMesh, camera, scene);

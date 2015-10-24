@@ -180,18 +180,21 @@ function drawMaze(maze, scene){
 	var carvedConnectorsCSG = BABYLON.CSG.FromMesh(connectorsMesh);
 	var subCSG2 = mazeMeshOuterBox.subtract(carvedConnectorsCSG);
 	var mazeMesh = subCSG2.toMesh("csg", wallMaterial, scene);
-	mazeMesh.checkCollisions = true;
-	mazeMesh.name = "mazeCellsMesh";
-	mazeMesh.receiveShadows = true;
-	mazeMesh.layerMask = 2;
 
 	boxesMesh.dispose();
 	connectorsMesh.dispose();
 
 	var tunnelsMesh =  BABYLON.Mesh.MergeMeshes(tunnels, true);
-	tunnelsMesh.name = 'tunnelsMesh';
-	tunnelsMesh.checkCollisions = true;
-	tunnelsMesh.layerMask = 2;
+
+	var finalMazeMesh = BABYLON.Mesh.MergeMeshes([mazeMesh, tunnelsMesh], true);
+	finalMazeMesh.checkCollisions = true;
+	finalMazeMesh.name = "mazeCellsMesh";
+	finalMazeMesh.receiveShadows = true;
+	finalMazeMesh.layerMask = 2;
+	finalMazeMesh.material = wallMaterial;
+
+	tunnelsMesh.dispose();
+	mazeMesh.dispose();
 
 	var outerTunnelsMesh = BABYLON.Mesh.MergeMeshes(outerTunnels, true);
 	outerTunnelsMesh.name = 'outerTunnelMesh';
@@ -201,21 +204,16 @@ function drawMaze(maze, scene){
 	outerBoxesMesh.layerMask = 1;
 	outerBoxesMesh.name = 'outerBoxesMesh';
 
-	drawMazeMap(mazeMesh, tunnelsMesh, scene);
+	drawMazeMap(finalMazeMesh, scene);
 
 	return mazeMesh;
 }
 
-function drawMazeMap(mazeMesh, tunnelsMesh, scene){
+function drawMazeMap(mazeMesh, scene){
 	mazeMap = mazeMesh.clone();
 	mazeMap.layerMask = 1;
 	mazeMap.material = new MazeMapMaterial(scene);
 	mazeMap.name = 'mazeMapMesh';
-
-	tunnelsMap = tunnelsMesh.clone();
-	tunnelsMap.layerMask = 1;
-	tunnelsMap.material = new MazeMapMaterial(scene);
-	tunnelsMap.name = 'tunnelsMapMesh';
 }
 
 function getCellPosition(gridX, gridY, gridZ, maze, spacing){

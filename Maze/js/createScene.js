@@ -39,7 +39,6 @@ function createScene() {
 		}
 		this.getScene().collisionCoordinator.getNewPosition(this._oldPosition, actualVelocity, this._collider, 3, null, this._onCollisionPositionChange, this.uniqueId);
 	};
-	console.log(camera);
 
 
 	// CREATE MAZE
@@ -58,9 +57,10 @@ function createScene() {
 
 	// CREATE MINI MAP
 	var miniMap = new MiniMap(100, 100, maze, player, scene);
+	player.onMiniMap = miniMap.playerOnMiniMap;
 
 	// PLACE EXIT
-	var exit = new Exit(new BABYLON.Vector3(width - 1, 0, depth - 1), maze, miniMap.playerOnMiniMap, mazeMesh, camera, scene);
+	var exit = new Exit(new BABYLON.Vector3(0, 0, depth - 1), maze, miniMap.playerOnMiniMap, mazeMesh, camera, scene);
 
 	// LIGHTS AND SHADOW
 	var hemiLight = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(0, 1, 0), scene);
@@ -141,13 +141,16 @@ function createScene() {
 		return false;
 	});
 
+	// COCKPIT HUD
+
+
 	// ADD ENEMIES
 	// TODO enemy movement - chase player? dodge?
 	var enemies = [];
-	enemies.push(new Enemy(maze, player, new BABYLON.Vector3(width - 1, 0, depth - 1), mazeMesh, scene));
+	enemies.push(new Enemy(maze, player, new BABYLON.Vector3(width - 1, 0, depth - 1), mazeMesh, sounds, scene));
 
 	// SHOOTING
-	var bullets = [];
+	player.bullets = [];
 	var bulletMaterial = new BulletMaterial(scene);
 	var bulletMaterialOutside = new BulletMaterialOutside(scene);
 	var currentCannon = 1;
@@ -156,15 +159,16 @@ function createScene() {
 	var cannonLeft = new Cannon(new BABYLON.Vector3(-0.3, -0.3, 0), player, scene);
 	var cannonRight = new Cannon(new BABYLON.Vector3(0.3, -0.3, 0), player, scene);
 
+	// shooting light effect
 	var cannonLight = new BABYLON.PointLight("Omni0", new BABYLON.Vector3(1, 10, 1), scene);
 	cannonLight.diffuse = new BABYLON.Color3(1,0,0);
 	cannonLight.specular = new BABYLON.Color3(1,0,0);
 	cannonLight.position = player.position;
 	cannonLight.includedOnlyMeshes = [cannonLeft, cannonRight];
-	cannonLight.intensity = 1;
-	//cannonLight.range = 6;
+	cannonLight.intensity = 2;
 	cannonLight.setEnabled(false);
 
+	// mouse events for shooting
 	var keepShooting = false;
 	var cannonReady = true;
 	window.addEventListener("mousedown", function (evt) {
@@ -179,13 +183,20 @@ function createScene() {
 
 	$('body').on('contextmenu', 'canvas', function(e){ return false; });
 
+	// define decal options
+	var decalMaterial = new BABYLON.StandardMaterial("decalMat", scene);
+	decalMaterial.diffuseTexture = new BABYLON.Texture("img/bullet_hole.png", scene);
+	decalMaterial.diffuseTexture.hasAlpha = true;
+	decalSize = new BABYLON.Vector3(0.5, 0.5, 0.5);
 
-	// before render
+	var hits = [];
+
+	// REGISTER BEFORE RENDER FOR SHOOTING
 	scene.registerBeforeRender(function(){
 		if(keepShooting && cannonReady) {
 			cannonReady = false;
 			// fire laser bullet from player in the direction the player is currently looking
-			var newBullet = new Bullet(bulletMaterial, bulletMaterialOutside, player, scene);
+			var newBullet = new Bullet(bulletMaterial, bulletMaterialOutside, player, player.getTarget(), scene);
 			cannonLight.setEnabled(true);
 			if (currentCannon == 1) {
 				newBullet.position = cannonLeft.outputEnd.absolutePosition.clone();
@@ -196,7 +207,7 @@ function createScene() {
 				currentCannon = 1;
 				cannonLight.position = cannonRight.outputEnd.absolutePosition.clone();
 			}
-			bullets.push(newBullet);
+			player.bullets.push(newBullet);
 			sounds.laser.play();
 
 			setTimeout(function(){
@@ -205,15 +216,58 @@ function createScene() {
 			}, 200);
 		}
 
-		for(var i=0; i<bullets.length; i++){
-			var bullet = bullets[i];
-			bullet.position = bullet.position.clone().add(bullet.direction.scale(2));
-			// TODO dispose on hit our out of range
-			if(bullet.position.length() > width * spacing + height * spacing + depth * spacing){
-				bullet.outside.dispose();
-				bullet.dispose();
+		for(var i=0; i<player.bullets.length; i++){
+			var bullet = player.bullets[i];
+			if(bullet) {
+				// check for all hit
+				var ray = new BABYLON.Ray(bullet.position.clone(), bullet.direction.clone(), 1);
+				var pickingInfo = scene.pickWithRay(ray, function(mesh){
+					return mesh == mazeMesh;
+				});
+
+				// decals
+				if(pickingInfo.hit){
+					if(hits.length > 15){
+						hits[0].dispose();
+						hits.splice(0,1);
+					}
+					console.log('hit a wall');
+					var newDecal = BABYLON.MeshBuilder.CreateDecal("decal", mazeMesh, {
+						position: pickingInfo.pickedPoint,
+						normal: pickingInfo.getNormal(true),
+						size: decalSize
+					}, scene);
+					newDecal.material = decalMaterial;
+					hits.push(newDecal);
+				}
+
+				// dispose on out of range or wall hit
+				bullet.position = bullet.position.clone().add(bullet.direction.clone().scale(1));
+				if (bullet.position.length() > width * spacing + height * spacing + depth * spacing || pickingInfo.hit) {
+					player.bullets[i] = null;
+					bullet.outside.dispose();
+					bullet.dispose();
+				}
+
+				// ATTACKING ENEMY ACTION
+				for(var j=0; j<enemies.length; j++){
+					var enemy = enemies[j];
+					if(enemy.alive && bullet && bullet.intersectsMesh(enemy, true)){
+						player.bullets[i] = null;
+						bullet.outside.dispose();
+						bullet.dispose();
+						enemy.healthPercentage -= 10;
+						console.log(enemy.healthPercentage);
+						if (enemy.healthPercentage <= 0) {
+							enemy.healthPercentage = 0;
+							enemy.die();
+						}
+					}
+				}
 			}
 		}
+
+		// TODO remove disposed bullets from array
 	});
 
 

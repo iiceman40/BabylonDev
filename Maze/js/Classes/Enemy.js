@@ -2,13 +2,14 @@
  * @param maze
  * @param player
  * @param positionCoordinates
+ * @param mazeMesh
  * @param scene {BABYLON.Scene}
  * @constructor
  */
-var Enemy = function(maze, player, positionCoordinates, mazeMesh, scene){
+var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene){
 
 
-	var enemy = BABYLON.Mesh.CreateSphere("enemy", 32, 3, scene, false);
+	var enemy = BABYLON.Mesh.CreateSphere("enemy", 32, 2, scene, false);
 	enemy.material = new EnemyMaterial(scene);
 	enemy.position = getCellPosition(positionCoordinates.x, positionCoordinates.y, positionCoordinates.z, maze, spacing);
 	enemy.checkCollisions = true;
@@ -89,33 +90,32 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, scene){
 	healthBar.position = new BABYLON.Vector3(0, 0, -.01);
 	healthBar.parent = healthBarContainer;
 
-	var alive = true;
-	var healthPercentage = 100;
+	enemy.alive = true;
+	enemy.healthPercentage = 100;
 
 	scene.registerBeforeRender(function () {
 
-		if (alive) {
+		if (enemy.alive) {
 
 			// Re-calculate health bar length.
-			healthBar.scaling.x = healthPercentage / 100;
-			healthBar.position.x =  (1 - (healthPercentage / 100)) * -1;
+			healthBar.scaling.x = enemy.healthPercentage / 100;
+			healthBar.position.x =  (1 - (enemy.healthPercentage / 100)) * -1;
 
 			if (healthBar.scaling.x < 0) {
-				alive = false;
-			} else if (healthPercentage <= 30) {
+				enemy.die();
+			} else if (enemy.healthPercentage <= 30) {
 				healthBar.material = new HealthBarMaterialCritical(scene);
-			} else if (healthPercentage <= 50) {
+			} else if (enemy.healthPercentage <= 50) {
 				healthBar.material = new HealthBarMaterialDamaged(scene);
 			}
 
 		} else {
-			enemy.dispose();
-			enemyLight.dispose();
+
 		}
 
 	});
 
-	// ATTACKING ENEMY ACTION
+	/*
 	enemy.actionManager = new BABYLON.ActionManager(scene);
 	enemy.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function (evt) {
 		var distance = player.position.subtract(enemy.position).length();
@@ -128,6 +128,98 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, scene){
 			}
 		}
 	}));
+	*/
+
+	enemy.die = function(){
+		enemy.alive = false;
+		enemyLight.dispose();
+		enemy.dispose();
+	};
+
+	enemy.bullets = [];
+
+	var bulletMaterial = new BulletMaterial(scene);
+	var bulletMaterialOutside = new BulletMaterialOutside(scene);
+
+	var decalMaterial = new BABYLON.StandardMaterial("decalMat", scene);
+	decalMaterial.diffuseTexture = new BABYLON.Texture("img/bullet_hole.png", scene);
+	decalMaterial.diffuseTexture.hasAlpha = true;
+	decalSize = new BABYLON.Vector3(0.5, 0.5, 0.5);
+
+	var hits = [];
+
+	enemy.playerIsInRange = false;
+	enemy.cannonReady = true;
+
+	var lines = null;
+	setInterval(function(){
+		if(enemy.alive) {
+			var direction = player.onMiniMap.position.clone().subtract(enemy.position.clone());
+			var ray = new BABYLON.Ray(enemy.position.clone(), direction);
+			var pickingInfo = scene.pickWithRay(ray, function (mesh) {
+				return mesh == mazeMesh || mesh == player.onMiniMap;
+			});
+
+			if(lines) {
+				lines.dispose();
+			}
+			/*
+			lines = BABYLON.MeshBuilder.CreateLines('lines', {
+				points: [enemy.position.clone(), enemy.position.clone().add(direction)]
+			}, scene);
+			*/
+
+			if (pickingInfo.hit && pickingInfo.pickedMesh.name == 'player') {
+				console.log('player spotted');
+				enemy.playerIsInRange = true;
+			} else {
+				if(enemy.playerIsInRange){
+					console.log('lost sight of player');
+				}
+				enemy.playerIsInRange = false;
+			}
+		}
+	}, 1000);
+
+	scene.registerBeforeRender(function(){
+
+
+		if(enemy.alive && enemy.playerIsInRange && enemy.cannonReady) {
+			// fire laser bullet from player in the direction the player is currently looking
+			var newBullet = new Bullet(bulletMaterial, bulletMaterialOutside, enemy, player.position, scene);
+			newBullet.position = enemy.absolutePosition.clone();
+			newBullet.lookAt(player.position);
+			enemy.bullets.push(newBullet);
+			sounds.laser.play();
+			enemy.cannonReady = false;
+
+			setTimeout(function(){
+				enemy.cannonReady = true;
+			}, 700);
+		}
+
+		for(var i=0; i<enemy.bullets.length; i++){
+			var bullet = enemy.bullets[i];
+			if(bullet) {
+
+				// dispose on out of range or wall hit
+				bullet.position = bullet.position.clone().add(bullet.direction.clone().scale(1));
+				if (bullet.position.length() > width * spacing + height * spacing + depth * spacing) {
+					enemy.bullets[i] = null;
+					bullet.outside.dispose();
+					bullet.dispose();
+				}
+
+				// CHECK IF PLAY GOT HIT
+				if(bullet.position.subtract(player.position).length() < 0.5){
+					console.log('player got hit');
+				}
+
+			}
+		}
+
+		// TODO remove disposed bullets from array
+	});
 
 	return enemy;
 };

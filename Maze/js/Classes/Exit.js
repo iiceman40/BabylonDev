@@ -15,8 +15,23 @@ var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, camera, s
 	exitLight.diffuse = new BABYLON.Color3(0.5, 0, 0.5);
 	exitLight.intensity = 0.8;
 	exitLight.range = 15;
-	exitLight.position = exit.position;
-	exitLight.includedOnlyMeshes = [mazeMesh];
+	exitLight.parent = exit;
+	exitLight.includedOnlyMeshes = [mazeMesh,exit, exitPortal];
+
+	var animationLight = new BABYLON.Animation("exitLightPosition", "position.y", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+	// Animation keys
+	var keys = [
+		{frame: 0, value: 0.5},
+		{frame: 50, value: 2.5},
+		{frame: 100, value: 0.5}
+	];
+	//Adding keys to the animation object
+	animationLight.setKeys(keys);
+	//Then add the animation object to box1
+	exitLight.animations.push(animationLight);
+
+	//Finally, launch animations on box1, from key 0 to key 100 with loop activated
+	scene.beginAnimation(exitLight, 0, 100, true);
 
 	var exitFound = false;
 	setTimeout(function(){

@@ -128,6 +128,13 @@ var TerminalCaseMaterial = function(scene) {
 	return caseMaterial;
 };
 
+var CannonMaterial = function(scene) {
+	var cannonMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
+	cannonMaterial.diffuseColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+	//cannonMaterial.emissiveColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+	return cannonMaterial;
+};
+
 var BulletMaterial = function(scene) {
 	var bulletMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
 	bulletMaterial.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2);

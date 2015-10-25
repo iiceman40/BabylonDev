@@ -206,7 +206,7 @@ function drawMaze(maze, scene){
 
 	drawMazeMap(finalMazeMesh, scene);
 
-	return mazeMesh;
+	return finalMazeMesh;
 }
 
 function drawMazeMap(mazeMesh, scene){

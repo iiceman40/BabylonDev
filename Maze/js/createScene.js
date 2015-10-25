@@ -142,7 +142,17 @@ function createScene() {
 	});
 
 	// COCKPIT HUD
+	var energyBar = BABYLON.MeshBuilder.CreateBox('energyBar', {size: 0.05, width: 0.5}, scene);
+	energyBar.parent = camera;
+	energyBar.position = new BABYLON.Vector3(0, -0.35, 1);
+	energyBar.renderingGroupId = 2;
+	energyBar.material = new EnergyBarMaterial(scene);
 
+	var energyBarLight = new BABYLON.PointLight("energyBarLight", new BABYLON.Vector3(1, 10, 1), scene);
+	energyBarLight.diffuse = new BABYLON.Color3(1,0,0);
+	energyBarLight.specular = new BABYLON.Color3(1,0,0);
+	energyBarLight.parent = player;
+	energyBarLight.includedOnlyMeshes = [energyBar];
 
 	// ADD ENEMIES
 	// TODO enemy movement - chase player? dodge?
@@ -156,11 +166,12 @@ function createScene() {
 	var currentCannon = 1;
 
 	// init cannons
-	var cannonLeft = new Cannon(new BABYLON.Vector3(-0.3, -0.3, 0), player, scene);
-	var cannonRight = new Cannon(new BABYLON.Vector3(0.3, -0.3, 0), player, scene);
+	var cannonMaterial = new CannonMaterial(scene);
+	var cannonLeft = new Cannon(new BABYLON.Vector3(-0.3, -0.3, 0), player, cannonMaterial, scene);
+	var cannonRight = new Cannon(new BABYLON.Vector3(0.3, -0.3, 0), player, cannonMaterial, scene);
 
 	// shooting light effect
-	var cannonLight = new BABYLON.PointLight("Omni0", new BABYLON.Vector3(1, 10, 1), scene);
+	var cannonLight = new BABYLON.PointLight("cannonLight", new BABYLON.Vector3(1, 10, 1), scene);
 	cannonLight.diffuse = new BABYLON.Color3(1,0,0);
 	cannonLight.specular = new BABYLON.Color3(1,0,0);
 	cannonLight.position = player.position;

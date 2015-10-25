@@ -142,6 +142,7 @@ var BulletMaterial = function(scene) {
 	bulletMaterial.emissiveColor = new BABYLON.Color3(1, 0.01, 0);
 	return bulletMaterial;
 };
+
 var BulletMaterialOutside = function(scene) {
 	var bulletMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
 	bulletMaterial.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2);
@@ -149,4 +150,12 @@ var BulletMaterialOutside = function(scene) {
 	bulletMaterial.emissiveColor = new BABYLON.Color3(1, 0.5, 0.5);
 	bulletMaterial.alpha = 0.9;
 	return bulletMaterial;
+};
+
+var EnergyBarMaterial = function(scene) {
+	var energyBarMaterial = new BABYLON.StandardMaterial("energyBarMaterial", scene);
+	energyBarMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.2, 1);
+	energyBarMaterial.specularColor = new BABYLON.Color3(0.5, 0.1, 1);
+	energyBarMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.1, 1);
+	return energyBarMaterial;
 };

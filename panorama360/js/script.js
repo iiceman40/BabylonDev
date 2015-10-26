@@ -395,9 +395,11 @@ function createEnvironmentSphere(selectedScene, scene){
 	var material = new BABYLON.StandardMaterial("environmentMaterial", scene);
 	material.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 	material.diffuseTexture = selectedScene.preloadedImage;
-	material.diffuseTexture.wAng = -Math.PI/2;
-	material.diffuseTexture.vAng = Math.PI;
+	material.diffuseTexture.wAng = Math.PI;
+	//material.diffuseTexture.vAng = Math.PI;
 	material.diffuseTexture.level = 1.4;
+	material.diffuseTexture.uScale = 1;
+	material.diffuseTexture.vScale = 1;
 	material.backFaceCulling = false;
 
 	// assign material to environment sphere

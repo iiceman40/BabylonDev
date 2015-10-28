@@ -12,5 +12,7 @@ var Cell = function (position) {
 	};
 	this.doors = [];
 	this.hasTerminal = false;
+	this.hasEnemy = false;
+	this.hasExit = false;
 
 };

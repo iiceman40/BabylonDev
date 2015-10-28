@@ -326,3 +326,7 @@ function speakPart(textArray, part, terminal){
 
 	window.speechSynthesis.speak(utterance);
 }
+
+function updateBar(bar, value){
+	bar.scaling.x = value/100;
+}

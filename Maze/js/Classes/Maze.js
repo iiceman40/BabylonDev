@@ -5,6 +5,8 @@ var Maze = function(width, height, depth, startingPoint) {
 	this.height = height;
 	this.depth = depth;
 	this.startingPoint = startingPoint;
+
+	this.numberOfRooms = width * height * depth;
 	this.map = [];
 
 	// METHODS

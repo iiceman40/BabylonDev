@@ -4,6 +4,7 @@ var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, camera, s
 	exit.material = new ExitMaterial(scene);
 	exit.rotation.x = Math.PI/2;
 	exit.position = getCellPosition(exitCoordinates.x, exitCoordinates.y, exitCoordinates.z, maze, spacing);
+	maze.map[exitCoordinates.x][exitCoordinates.y][exitCoordinates.z].hasExit = true;
 
 	var exitPortal = BABYLON.MeshBuilder.CreateDisc("exitPortal", {radius: 1.5, tessellation: 32}, scene);
 	exitPortal.rotation.x = Math.PI/2;
@@ -39,7 +40,9 @@ var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, camera, s
 			if(!exitFound && exit.intersectsMesh(playerOnMiniMap, true)){
 				exitFound = true;
 				camera.detachControl(canvas);
-				alert('Exit reached!');
+				//alert('Exit reached!');
+				scene.dispose();
+				createScene();
 			}
 		});
 	}, 100);

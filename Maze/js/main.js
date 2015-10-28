@@ -6,7 +6,9 @@ $(document).ready(function () {
 	engine = new BABYLON.Engine(canvas, true);
 	scene = createScene();
 	engine.runRenderLoop(function () {
-		scene.render();
+		if(scene && scene.activeCamera) {
+			scene.render();
+		}
 	});
 
 	window.addEventListener("resize", function () {

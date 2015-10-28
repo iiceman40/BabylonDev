@@ -4,6 +4,7 @@ var Cannon = function (offset, player, material, scene) {
 	cannon.parent = player;
 	cannon.position = offset;
 	cannon.material = material;
+	cannon.layerMask = 2;
 
 	cannon.outputEnd = BABYLON.MeshBuilder.CreateBox('cannonLeftOutput',{size: 0.15}, scene);
 	cannon.outputEnd.position.y = 1.5;

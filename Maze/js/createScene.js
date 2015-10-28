@@ -92,12 +92,12 @@ function createScene() {
 	// Messages
 	var availableMessages = [
 		new Message("You are doing really great. <br/> <br/> Fun fact: <br/> <br/> A lot of people don't undestand sarcasm!", null),
-		new Message("Hey, what's up?", null)
+		new Message("Hey, what's up, buttercup?", null),
+		new Message("Get out of my head!", null)
 	];
 
 	// MAP TERMINALS
-	var numberOfRooms = width * height * depth;
-	var numberOfTerminals = Math.floor(numberOfRooms/4);
+	var numberOfTerminals = Math.floor(maze.numberOfRooms/4);
 
 	// add a terminal to the first room
 	new Terminal(new BABYLON.Vector3(width - 1, height - 1, 0), maze, player, miniMap, availableMessages, shadowGenerator, scene);
@@ -114,7 +114,7 @@ function createScene() {
 		}
 
 	}
-	console.log('number of rooms: ', numberOfRooms, 'number of terminals: ', numberOfTerminals);
+	console.log('number of rooms: ', maze.numberOfRooms, 'number of terminals: ', numberOfTerminals);
 
 	initPointerLock(canvas, camera);
 
@@ -142,22 +142,66 @@ function createScene() {
 	});
 
 	// COCKPIT HUD
-	var energyBar = BABYLON.MeshBuilder.CreateBox('energyBar', {size: 0.05, width: 0.5}, scene);
-	energyBar.parent = camera;
-	energyBar.position = new BABYLON.Vector3(0, -0.35, 1);
-	energyBar.renderingGroupId = 2;
-	energyBar.material = new EnergyBarMaterial(scene);
+	player.energyLevel = 100;
+	player.health = 100;
 
-	var energyBarLight = new BABYLON.PointLight("energyBarLight", new BABYLON.Vector3(1, 10, 1), scene);
-	energyBarLight.diffuse = new BABYLON.Color3(1,0,0);
-	energyBarLight.specular = new BABYLON.Color3(1,0,0);
-	energyBarLight.parent = player;
-	energyBarLight.includedOnlyMeshes = [energyBar];
+	player.energyBar = BABYLON.MeshBuilder.CreateBox('energyBar', {size: 0.02, width: 0.45}, scene);
+	player.energyBar.parent = camera;
+	player.energyBar.position = new BABYLON.Vector3(0, -0.37, 1);
+	player.energyBar.renderingGroupId = 2;
+	player.energyBar.material = new EnergyBarMaterial(scene);
+
+	player.healthBar = BABYLON.MeshBuilder.CreateBox('energyBar', {size: 0.02, width: 0.45}, scene);
+	player.healthBar.parent = camera;
+	player.healthBar.position = new BABYLON.Vector3(0, -0.4, 1);
+	player.healthBar.renderingGroupId = 2;
+	player.healthBar.material = new HealthBarMaterial(scene);
+
+	// recharge bars
+	setInterval(function(){
+		player.energyLevel += 2;
+		if(player.energyLevel > 100){
+			player.energyLevel = 100;
+		}
+		updateBar(player.energyBar, player.energyLevel);
+	}, 100);
+	/*
+	setInterval(function(){
+		player.health += 1;
+		if(player.health > 100){
+			player.health = 100;
+		}
+		updateBar(player.healthBar, player.health);
+	}, 300);
+	*/
+
+	var statusBarsLight = new BABYLON.PointLight("energyBarLight", new BABYLON.Vector3(1, 10, 1), scene);
+	statusBarsLight.diffuse = new BABYLON.Color3(1,1,1);
+	statusBarsLight.specular = new BABYLON.Color3(1,1,1);
+	statusBarsLight.parent = player;
+	statusBarsLight.includedOnlyMeshes = [player.energyBar, player.healthBar];
 
 	// ADD ENEMIES
 	// TODO enemy movement - chase player? dodge?
 	var enemies = [];
-	enemies.push(new Enemy(maze, player, new BABYLON.Vector3(width - 1, 0, depth - 1), mazeMesh, sounds, scene));
+	var numberOfEnemies = Math.floor(maze.numberOfRooms/4);
+
+	// add a terminal to the first room
+	var spawnedEnemies = 0;
+
+	while(numberOfEnemies - spawnedEnemies > 0){
+		x = Math.floor(Math.random() * width);
+		y = Math.floor(Math.random() * height);
+		z = Math.floor(Math.random() * depth);
+
+		if(!maze.map[y][x][z].hasEnemy && !maze.map[y][x][z].hasExit){
+			maze.map[y][x][z].hasEnemy = true;
+			enemies.push(new Enemy(maze, player, new BABYLON.Vector3(x, y, z), mazeMesh, sounds, scene));
+			spawnedEnemies++;
+		}
+
+	}
+	console.log('number of rooms: ', maze.numberOfRooms, 'number of terminals: ', numberOfEnemies);
 
 	// SHOOTING
 	player.bullets = [];
@@ -194,18 +238,15 @@ function createScene() {
 
 	$('body').on('contextmenu', 'canvas', function(e){ return false; });
 
-	// define decal options
-	var decalMaterial = new BABYLON.StandardMaterial("decalMat", scene);
-	decalMaterial.diffuseTexture = new BABYLON.Texture("img/bullet_hole.png", scene);
-	decalMaterial.diffuseTexture.hasAlpha = true;
-	decalSize = new BABYLON.Vector3(0.5, 0.5, 0.5);
-
-	var hits = [];
-
 	// REGISTER BEFORE RENDER FOR SHOOTING
 	scene.registerBeforeRender(function(){
-		if(keepShooting && cannonReady) {
+		if(keepShooting && cannonReady && player.energyLevel >= 10) {
 			cannonReady = false;
+			player.energyLevel -= 10;
+			if(player.energyLevel <= 0){
+				player.energyLevel = 1;
+			}
+			updateBar(player.energyBar, player.energyLevel);
 			// fire laser bullet from player in the direction the player is currently looking
 			var newBullet = new Bullet(bulletMaterial, bulletMaterialOutside, player, player.getTarget(), scene);
 			cannonLight.setEnabled(true);
@@ -227,58 +268,44 @@ function createScene() {
 			}, 200);
 		}
 
-		for(var i=0; i<player.bullets.length; i++){
+		for(var i=player.bullets.length-1; i>=0; i--){
 			var bullet = player.bullets[i];
 			if(bullet) {
 				// check for all hit
-				var ray = new BABYLON.Ray(bullet.position.clone(), bullet.direction.clone(), 1);
-				var pickingInfo = scene.pickWithRay(ray, function(mesh){
+				var ray = new BABYLON.Ray(bullet.position.clone(), bullet.direction.clone().scale(0.5), 1);
+				var pickInfo = scene.pickWithRay(ray, function(mesh){
 					return mesh == mazeMesh;
 				});
 
-				// decals
-				if(pickingInfo.hit){
-					if(hits.length > 15){
-						hits[0].dispose();
-						hits.splice(0,1);
-					}
-					console.log('hit a wall');
-					var newDecal = BABYLON.MeshBuilder.CreateDecal("decal", mazeMesh, {
-						position: pickingInfo.pickedPoint,
-						normal: pickingInfo.getNormal(true),
-						size: decalSize
-					}, scene);
-					newDecal.material = decalMaterial;
-					hits.push(newDecal);
-				}
-
 				// dispose on out of range or wall hit
+				var disposeBullet = false;
 				bullet.position = bullet.position.clone().add(bullet.direction.clone().scale(1));
-				if (bullet.position.length() > width * spacing + height * spacing + depth * spacing || pickingInfo.hit) {
-					player.bullets[i] = null;
-					bullet.outside.dispose();
-					bullet.dispose();
+				if (bullet.position.length() > width * spacing + height * spacing + depth * spacing || pickInfo.hit) {
+					disposeBullet = true;
 				}
 
 				// ATTACKING ENEMY ACTION
 				for(var j=0; j<enemies.length; j++){
 					var enemy = enemies[j];
 					if(enemy.alive && bullet && bullet.intersectsMesh(enemy, true)){
-						player.bullets[i] = null;
-						bullet.outside.dispose();
-						bullet.dispose();
+						disposeBullet = true;
 						enemy.healthPercentage -= 10;
-						console.log(enemy.healthPercentage);
 						if (enemy.healthPercentage <= 0) {
 							enemy.healthPercentage = 0;
 							enemy.die();
 						}
 					}
 				}
+
+				if(disposeBullet){
+					player.bullets[i] = null;
+					bullet.outside.dispose();
+					bullet.dispose();
+					player.bullets.splice(i,1);
+				}
 			}
 		}
 
-		// TODO remove disposed bullets from array
 	});
 
 

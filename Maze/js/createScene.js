@@ -1,5 +1,6 @@
 function createScene() {
 	var enemies = [];
+	// TODO create a Game Class to store all information needed and just hand the Game Object to important functions
 
 	// SCENE SETUP
 	var scene = new BABYLON.Scene(engine);

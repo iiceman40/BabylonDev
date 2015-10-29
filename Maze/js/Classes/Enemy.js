@@ -81,36 +81,14 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 	enemy.alive = true;
 	enemy.healthPercentage = 10;
 
-	scene.registerBeforeRender(function () {
-
-		if (enemy.alive) {
-
-			// Re-calculate health bar length.
-			healthBar.scaling.x = enemy.healthPercentage / 100;
-			healthBar.position.x =  (1 - (enemy.healthPercentage / 100)) * -1;
-
-			if (healthBar.scaling.x < 0) {
-				enemy.die();
-			} else if (enemy.healthPercentage <= 30) {
-				healthBar.material = new HealthBarMaterialCritical(scene);
-			} else if (enemy.healthPercentage <= 50) {
-				healthBar.material = new HealthBarMaterialDamaged(scene);
-			}
-
-		} else {
-
-		}
-
-	});
-
 	enemy.die = function(){
 		// SPS creation
 		var tetra = BABYLON.MeshBuilder.CreatePolyhedron("tetra", {size: 0.5}, scene);
 		var box = BABYLON.MeshBuilder.CreateBox("box", { size: 0.5 }, scene);
-		var SPS = new BABYLON.SolidParticleSystem('SPS', scene);
-		SPS.addShape(tetra, 50);
-		SPS.addShape(box, 50);
-		var mesh = SPS.buildMesh();
+		enemy.SPS = new BABYLON.SolidParticleSystem('SPS', scene);
+		enemy.SPS.addShape(tetra, 50);
+		enemy.SPS.addShape(box, 50);
+		var mesh = enemy.SPS.buildMesh();
 		mesh.material = enemy.material;
 		mesh.position = enemy.position;
 		tetra.dispose();  // free memory
@@ -121,7 +99,7 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 		var gravity = -0.002;
 
 		// init
-		SPS.initParticles = function() {
+		enemy.SPS.initParticles = function() {
 			// just recycle everything
 			for (var p = 0; p < this.nbParticles; p++) {
 				this.recycleParticle(this.particles[p]);
@@ -129,7 +107,7 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 		};
 
 		// recycle
-		SPS.recycleParticle = function(particle) {
+		enemy.SPS.recycleParticle = function(particle) {
 			// Set particle new velocity, scale and rotation
 			// As this function is called for each particle, we don't allocate new
 			// memory by using "new BABYLON.Vector3()" but we set directly the
@@ -154,7 +132,7 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 		};
 
 		// update : will be called by setParticles()
-		SPS.updateParticle = function(particle) {
+		enemy.SPS.updateParticle = function(particle) {
 			// some physics here
 			//if (particle.position.y < 0) {
 			//	this.recycleParticle(particle);
@@ -171,20 +149,13 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 
 
 		// init all particle values and set them once to apply textures, colors, etc
-		SPS.initParticles();
-		SPS.setParticles();
+		enemy.SPS.initParticles();
+		enemy.SPS.setParticles();
 
 		setTimeout(function(){
-			SPS.dispose();
-			SPS = null;
+			enemy.SPS.dispose();
+			enemy.SPS = null;
 		}, 2000);
-
-		scene.registerBeforeRender(function() {
-			if(SPS) {
-				SPS.setParticles();
-				SPS.mesh.rotation.y += 0.001;
-			}
-		});
 
 		enemy.alive = false;
 		enemy.dispose();
@@ -238,6 +209,27 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 
 	scene.registerBeforeRender(function(){
 
+		// update enemy health
+		if (enemy.alive) {
+			// Re-calculate health bar length.
+			healthBar.scaling.x = enemy.healthPercentage / 100;
+			healthBar.position.x =  (1 - (enemy.healthPercentage / 100)) * -1;
+			if (healthBar.scaling.x < 0) {
+				enemy.die();
+			} else if (enemy.healthPercentage <= 30) {
+				healthBar.material = new HealthBarMaterialCritical(scene);
+			} else if (enemy.healthPercentage <= 50) {
+				healthBar.material = new HealthBarMaterialDamaged(scene);
+			}
+		}
+
+		// update solid particle animation
+		if(enemy.SPS) {
+			enemy.SPS.setParticles();
+			enemy.SPS.mesh.rotation.y += 0.001;
+		}
+
+		// attack player if in sight
 		if(enemy.alive && enemy.playerIsInRange && enemy.cannonReady) {
 			// fire laser bullet from player in the direction the player is currently looking
 			var newBullet = new Bullet(bulletMaterial, bulletMaterialOutside, enemy, player.position, scene);
@@ -252,6 +244,7 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 			}, 700);
 		}
 
+		// update bullets
 		for(var i=0; i<enemy.bullets.length; i++){
 			var bullet = enemy.bullets[i];
 			if(bullet) {
@@ -269,6 +262,7 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 					console.log('player got hit');
 					player.health -= 10;
 					if(player.health <= 0){
+						// TODO add modal to let player write an entry in the hall of fame list and show him a level code
 						alert('You got destroyed!');
 					}
 					updateBar(player.healthBar, player.health);
@@ -277,7 +271,7 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 			}
 		}
 
-		// TODO remove disposed bullets from array
+		// TODO remove disposed bullets from array like it's done in the player class
 	});
 
 	return enemy;

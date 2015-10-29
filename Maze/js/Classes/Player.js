@@ -1,11 +1,17 @@
 var Player = function (mazeMesh, position, sounds, enemies, scene) {
 	var player = new BABYLON.FreeCamera("playerFreeCamera", new BABYLON.Vector3(0, 0, 0), scene);
+	player.attachControl(canvas, true);
+
+	var gizmo = BABYLON.Mesh.CreateBox('gizmo', 0.01, scene);
+	gizmo.parent = player;
+	gizmo.isVisible = false;
+	gizmo.position.z = 1;
 
 	player.ellipsoid = new BABYLON.Vector3(1, 1, 1);
 	player.checkCollisions = true;
-	player.speed = 0.5;
+	player.speed = 0.4;
 	player.layerMask = 2; // 010 in binary
-	player.attachControl(canvas, true);
+	player.angularSensibility = 2000;
 
 	scene.activeCameras.push(player);
 	scene.cameraToUseForPointers = player;
@@ -42,13 +48,6 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 	player.flashlight = new BABYLON.SpotLight("Spot0", new BABYLON.Vector3(0, 0, 0), new BABYLON.Vector3(1, 0, 0), 1.8, 2, scene);
 	player.flashlight.intensity = 0.5;
 	player.flashlight.range = 35;
-
-	scene.registerBeforeRender(function () {
-		player.flashlight.position = player.position.clone();
-		player.flashlight.position.y += 1;
-		player.flashlight.direction = player.getTarget().subtract(player.position);
-		player.flashlight.direction.y -= 0.2;
-	});
 
 	// COCKPIT HUD
 	player.energyLevel = 100;
@@ -131,12 +130,12 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 			var pickingInfo = scene.pickWithRay(ray, function(mesh){
 				return mesh.name == 'terminalScreen';
 			});
-			if(pickingInfo.hit && !miniMap.isVisible) {
+			if(pickingInfo.hit && !player.miniMap.isVisible) {
 				var terminal = pickingInfo.pickedMesh.terminal;
 				terminal.activateTerminal();
 				terminal.isActive = true;
-			} else if(miniMap.isVisible){
-				miniMap.hideMiniMap();
+			} else if(player.miniMap.isVisible){
+				player.miniMap.hideMiniMap();
 			}
 		}
 		return false;
@@ -144,6 +143,14 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 
 	// REGISTER BEFORE RENDER FOR SHOOTING
 	scene.registerBeforeRender(function () {
+
+		// sync flashlight
+		player.flashlight.position = player.position.clone();
+		player.flashlight.position.y += 1;
+		player.flashlight.direction = player.getTarget().subtract(player.position);
+		player.flashlight.direction.y -= 0.2;
+
+		// shooting
 		if (player.keepShooting && player.cannonReady && player.energyLevel >= 10) {
 			player.cannonReady = false;
 			player.energyLevel -= 10;
@@ -152,7 +159,7 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 			}
 			updateBar(player.energyBar, player.energyLevel);
 			// fire laser bullet from player in the direction the player is currently looking
-			var newBullet = new Bullet(bulletMaterial, bulletMaterialOutside, player, player.getTarget(), scene);
+			var newBullet = new Bullet(bulletMaterial, bulletMaterialOutside, player, gizmo.absolutePosition, scene);
 			cannonLight.setEnabled(true);
 			if (currentCannon == 1) {
 				newBullet.position = cannonLeft.outputEnd.absolutePosition.clone();
@@ -172,6 +179,7 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 			}, 200);
 		}
 
+		// update bullets
 		for (var i = player.bullets.length - 1; i >= 0; i--) {
 			var bullet = player.bullets[i];
 			if (bullet) {
@@ -183,7 +191,7 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 
 				// dispose on out of range or wall hit
 				var disposeBullet = false;
-				bullet.position = bullet.position.clone().add(bullet.direction.clone().scale(1));
+				bullet.position = bullet.position.clone().add(bullet.direction.clone().scale(bullet.speed));
 				if (bullet.position.length() > width * spacing + height * spacing + depth * spacing || pickInfo.hit) {
 					disposeBullet = true;
 				}

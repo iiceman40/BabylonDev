@@ -356,6 +356,7 @@ function initEnemies(enemies, maze, player, mazeMesh, sounds, scene){
 		var x = Math.floor(Math.random() * maze.width);
 		var y = Math.floor(Math.random() * maze.height);
 		var z = Math.floor(Math.random() * maze.depth);
+		// TODO add condition for not spawning enmies in the starting room or right next to it
 		if(!maze.map[y][x][z].hasEnemy && !maze.map[y][x][z].hasExit){
 			maze.map[y][x][z].hasEnemy = true;
 			enemies.push(new Enemy(maze, player, new BABYLON.Vector3(x, y, z), mazeMesh, sounds, scene));

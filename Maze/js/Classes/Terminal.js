@@ -54,6 +54,9 @@ var Terminal = function (position, maze, player, miniMap, availableMessages, sha
 	setInterval(function() {
 		var message = self.activeMessageText;
 		if(blink){
+			if(self.activeMessageText.length == self.message.text.length){
+				message += ' <br/> ';
+			}
 			message += '|'
 		}
 		// text, x, y, font, color, clearColor, invertY, update, dynamicTexture

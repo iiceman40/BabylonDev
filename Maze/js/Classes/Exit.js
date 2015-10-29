@@ -42,10 +42,16 @@ var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, camera, s
 				//camera.detachControl(canvas);
 				engine.stopRenderLoop();
 				//alert('Exit reached!');
-				scene.dispose();
-				scene = createScene();
-				engine.runRenderLoop(function () {
-					scene.render();
+				setTimeout(function(){
+					scene.dispose();
+					var sizes = [width, height, depth];
+					console.log(sizes.indexOf(Math.max.apply(Math, sizes)));
+					// TODO find a good way to increase map size
+					width = width + 1;
+					scene = createScene();
+					engine.runRenderLoop(function () {
+						scene.render();
+					});
 				});
 			}
 		});

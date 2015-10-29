@@ -1,6 +1,7 @@
 var Bullet = function (bulletMaterial1, bulletMaterial2, shooter, target, scene) {
 	var bullet = BABYLON.MeshBuilder.CreateSphere('bullet'+Math.floor(Math.random()*1000), {diameter: 0.08}, scene);
-	bullet.direction = target.subtract(shooter.position).normalize();
+	bullet.speed = 1;
+	bullet.direction = target.clone().subtract(shooter.position.clone()).normalize();
 	//bullet.direction.y += 0.003;
 	bullet.scaling.z = 30;
 	bullet.rotation = shooter.rotation.clone();

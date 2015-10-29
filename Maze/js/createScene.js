@@ -21,7 +21,14 @@ function createScene() {
 	var availableMessages = [
 		new Message("You are doing really great. <br/> <br/> Fun fact: <br/> <br/> A lot of people don't undestand sarcasm!", null),
 		new Message("Hey, what's up, buttercup?", null),
-		new Message("Get out of my head!", null)
+		new Message("Hello! This is the part where I kill you.", null),
+		new Message("Are you still there?", null),
+		new Message("Get out of my head!", null),
+		new Message("Oh... It's you.", null),
+		new Message("If at first you don't succeed, fail 5 more times.", null),
+		new Message("Okay. Look. We both said a lot of things that you're going to regret. But I think we can put our differences behind us. For science. You monster.", null),
+		new Message("Well done. In fact, you did so well, I'm going to note this on your file, in the commendations section. Oh, there's lots of room here. 'Did.... well. ... Enough.'", null),
+		new Message("Oh, you are kidding me.", null)
 	];
 
 	// CAMERA/PLAYER

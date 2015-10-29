@@ -8,7 +8,7 @@
  * @constructor
  */
 var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene){
-
+	// TODO enemy movement - chase player? dodge?
 
 	var enemy = BABYLON.Mesh.CreateSphere("enemy", 32, 2, scene, false);
 	enemy.material = new EnemyMaterial(scene);
@@ -30,8 +30,6 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 	enemyLight.parent = enemy;
 	enemyLight.includedOnlyMeshes = [enemy];
 	enemyLight.position.z = -3;
-
-
 
 	// ANIMATIONS
 	var originalPosition = enemy.position.clone();
@@ -81,7 +79,7 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 	healthBar.parent = healthBarContainer;
 
 	enemy.alive = true;
-	enemy.healthPercentage = 100;
+	enemy.healthPercentage = 10;
 
 	scene.registerBeforeRender(function () {
 
@@ -106,6 +104,88 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 	});
 
 	enemy.die = function(){
+		// SPS creation
+		var tetra = BABYLON.MeshBuilder.CreatePolyhedron("tetra", {size: 0.5}, scene);
+		var box = BABYLON.MeshBuilder.CreateBox("box", { size: 0.5 }, scene);
+		var SPS = new BABYLON.SolidParticleSystem('SPS', scene);
+		SPS.addShape(tetra, 50);
+		SPS.addShape(box, 50);
+		var mesh = SPS.buildMesh();
+		mesh.material = enemy.material;
+		mesh.position = enemy.position;
+		tetra.dispose();  // free memory
+		box.dispose();
+
+		// SPS behavior definition
+		var speed = .1;
+		var gravity = -0.002;
+
+		// init
+		SPS.initParticles = function() {
+			// just recycle everything
+			for (var p = 0; p < this.nbParticles; p++) {
+				this.recycleParticle(this.particles[p]);
+			}
+		};
+
+		// recycle
+		SPS.recycleParticle = function(particle) {
+			// Set particle new velocity, scale and rotation
+			// As this function is called for each particle, we don't allocate new
+			// memory by using "new BABYLON.Vector3()" but we set directly the
+			// x, y, z particle properties instead
+			particle.position.x = 0;
+			particle.position.y = 0;
+			particle.position.z = 0;
+			particle.velocity.x = (Math.random() - 0.5) * speed;
+			particle.velocity.y = Math.random() * speed;
+			particle.velocity.z = (Math.random() - 0.5) * speed;
+			var scale = Math.random() * 0.5;
+			particle.scale.x = scale;
+			particle.scale.y = scale;
+			particle.scale.z = scale;
+			particle.rotation.x = Math.random() * .5;
+			particle.rotation.y = Math.random() * .5;
+			particle.rotation.z = Math.random() * .5;
+			//particle.color.r = Math.random() * 0.6 + 0.5;
+			//particle.color.g = Math.random() * 0.6 + 0.5;
+			//particle.color.b = Math.random() * 0.6 + 0.5;
+			//particle.color.a = Math.random() * 0.6 + 0.5;
+		};
+
+		// update : will be called by setParticles()
+		SPS.updateParticle = function(particle) {
+			// some physics here
+			//if (particle.position.y < 0) {
+			//	this.recycleParticle(particle);
+			//}
+			particle.velocity.y += gravity;                         // apply gravity to y
+			(particle.position).addInPlace(particle.velocity);      // update particle new position
+			particle.position.y += speed / 2;
+
+			var sign = (particle.idx % 2 == 0) ? 1 : -1;            // rotation sign and new value
+			particle.rotation.z += 0.1 * sign;
+			particle.rotation.x += 0.05 * sign;
+			particle.rotation.y += 0.008 * sign;
+		};
+
+
+		// init all particle values and set them once to apply textures, colors, etc
+		SPS.initParticles();
+		SPS.setParticles();
+
+		setTimeout(function(){
+			SPS.dispose();
+			SPS = null;
+		}, 2000);
+
+		scene.registerBeforeRender(function() {
+			if(SPS) {
+				SPS.setParticles();
+				SPS.mesh.rotation.y += 0.001;
+			}
+		});
+
 		enemy.alive = false;
 		enemy.dispose();
 	};
@@ -128,10 +208,11 @@ var Enemy = function(maze, player, positionCoordinates, mazeMesh, sounds, scene)
 	var lines = null;
 	setInterval(function(){
 		if(enemy.alive) {
-			var direction = player.onMiniMap.position.clone().subtract(enemy.position.clone());
+			var playerOnMiniMap = player.miniMap.playerOnMiniMap;
+			var direction = playerOnMiniMap.position.clone().subtract(enemy.position.clone());
 			var ray = new BABYLON.Ray(enemy.position.clone(), direction);
 			var pickingInfo = scene.pickWithRay(ray, function (mesh) {
-				return mesh == mazeMesh || mesh == player.onMiniMap;
+				return mesh == mazeMesh || mesh == playerOnMiniMap;
 			});
 
 			if(lines) {

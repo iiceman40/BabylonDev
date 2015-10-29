@@ -330,3 +330,36 @@ function speakPart(textArray, part, terminal){
 function updateBar(bar, value){
 	bar.scaling.x = value/100;
 }
+
+function initTerminals(maze, player, miniMap, availableMessages, shadowGenerator, scene){
+	var numberOfTerminals = Math.floor(maze.numberOfRooms/4);
+	// add a terminal to the first room
+	new Terminal(new BABYLON.Vector3(width - 1, height - 1, 0), maze, player, miniMap, availableMessages, shadowGenerator, scene);
+	var placedTerminals = 1;
+
+	while(numberOfTerminals - placedTerminals > 0){
+		var x = Math.floor(Math.random() * width);
+		var y = Math.floor(Math.random() * height);
+		var z = Math.floor(Math.random() * depth);
+		if(!maze.map[y][x][z].hasTerminal){
+			new Terminal(new BABYLON.Vector3(x, y, z), maze, player, miniMap, availableMessages, shadowGenerator, scene);
+			placedTerminals++;
+		}
+	}
+}
+
+function initEnemies(enemies, maze, player, mazeMesh, sounds, scene){
+	var numberOfEnemies = Math.floor(maze.numberOfRooms/4);
+	var spawnedEnemies = 0;
+
+	while(numberOfEnemies - spawnedEnemies > 0){
+		var x = Math.floor(Math.random() * maze.width);
+		var y = Math.floor(Math.random() * maze.height);
+		var z = Math.floor(Math.random() * maze.depth);
+		if(!maze.map[y][x][z].hasEnemy && !maze.map[y][x][z].hasExit){
+			maze.map[y][x][z].hasEnemy = true;
+			enemies.push(new Enemy(maze, player, new BABYLON.Vector3(x, y, z), mazeMesh, sounds, scene));
+			spawnedEnemies++;
+		}
+	}
+}

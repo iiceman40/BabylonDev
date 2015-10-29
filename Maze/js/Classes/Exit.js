@@ -39,10 +39,14 @@ var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, camera, s
 		scene.registerBeforeRender(function () {
 			if(!exitFound && exit.intersectsMesh(playerOnMiniMap, true)){
 				exitFound = true;
-				camera.detachControl(canvas);
+				//camera.detachControl(canvas);
+				engine.stopRenderLoop();
 				//alert('Exit reached!');
 				scene.dispose();
-				createScene();
+				scene = createScene();
+				engine.runRenderLoop(function () {
+					scene.render();
+				});
 			}
 		});
 	}, 100);

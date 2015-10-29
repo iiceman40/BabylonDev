@@ -17,14 +17,14 @@ function shuffleArray(array) {
 	return array;
 }
 
-function drawMaze(maze, scene){
+function drawMaze(maze, scene) {
 	// create maze representation
 	/*
-	var mazeOuterBox = BABYLON.Mesh.CreateBox('mazeOuterBox', 1, scene);
-	mazeOuterBox.scaling.x = (maze.width + 1) * 10;
-	mazeOuterBox.scaling.z = (maze.height + 1) * 10;
-	mazeOuterBox.scaling.y = 10;
-	*/
+	 var mazeOuterBox = BABYLON.Mesh.CreateBox('mazeOuterBox', 1, scene);
+	 mazeOuterBox.scaling.x = (maze.width + 1) * 10;
+	 mazeOuterBox.scaling.z = (maze.height + 1) * 10;
+	 mazeOuterBox.scaling.y = 10;
+	 */
 
 	// materials
 	var wallMaterial = new WallMaterial(scene);
@@ -39,8 +39,16 @@ function drawMaze(maze, scene){
 	var tunnels = [];
 	var outerTunnels = [];
 
-	var outerTunnel = BABYLON.MeshBuilder.CreateBox('mazeConnectorOuter', {height: connectorHeight+2, width: connectorWidth+2, depth: 10}, scene);
-	var innerTunnel = BABYLON.MeshBuilder.CreateBox('mazeConnectorInner', {height: connectorHeight, width: connectorWidth, depth: 10}, scene);
+	var outerTunnel = BABYLON.MeshBuilder.CreateBox('mazeConnectorOuter', {
+		height: connectorHeight + 2,
+		width: connectorWidth + 2,
+		depth: 10
+	}, scene);
+	var innerTunnel = BABYLON.MeshBuilder.CreateBox('mazeConnectorInner', {
+		height: connectorHeight,
+		width: connectorWidth,
+		depth: 10
+	}, scene);
 
 	var outerTunnelCSG = BABYLON.CSG.FromMesh(outerTunnel);
 	var innerTunnelCSG = BABYLON.CSG.FromMesh(innerTunnel);
@@ -61,7 +69,7 @@ function drawMaze(maze, scene){
 			for (var z = 0; z < maze.depth; z++) {
 				var cell = maze.map[y][x][z];
 
-				var cellPos = getCellPosition(x,y,z,maze,spacing);
+				var cellPos = getCellPosition(x, y, z, maze, spacing);
 
 				var posX = cellPos.x;
 				var posY = cellPos.y;
@@ -184,7 +192,7 @@ function drawMaze(maze, scene){
 	boxesMesh.dispose();
 	connectorsMesh.dispose();
 
-	var tunnelsMesh =  BABYLON.Mesh.MergeMeshes(tunnels, true);
+	var tunnelsMesh = BABYLON.Mesh.MergeMeshes(tunnels, true);
 
 	var finalMazeMesh = BABYLON.Mesh.MergeMeshes([mazeMesh, tunnelsMesh], true);
 	finalMazeMesh.checkCollisions = true;
@@ -209,14 +217,14 @@ function drawMaze(maze, scene){
 	return finalMazeMesh;
 }
 
-function drawMazeMap(mazeMesh, scene){
+function drawMazeMap(mazeMesh, scene) {
 	mazeMap = mazeMesh.clone();
 	mazeMap.layerMask = 1;
 	mazeMap.material = new MazeMapMaterial(scene);
 	mazeMap.name = 'mazeMapMesh';
 }
 
-function getCellPosition(gridX, gridY, gridZ, maze, spacing){
+function getCellPosition(gridX, gridY, gridZ, maze, spacing) {
 	var posX = (gridX - maze.width / 2 + 0.5) * spacing;
 	var posY = (gridY - maze.height / 2 + 0.5) * spacing;
 	var posZ = (gridZ - maze.depth / 2 + 0.5) * spacing;
@@ -225,7 +233,9 @@ function getCellPosition(gridX, gridY, gridZ, maze, spacing){
 }
 
 function wrapText(text, x, y, font, color, clearColor, invertY, update, dynamicTexture) {
-	if (update === void 0) { update = true; }
+	if (update === void 0) {
+		update = true;
+	}
 	var size = dynamicTexture.getSize();
 	if (clearColor) {
 		dynamicTexture._context.fillStyle = clearColor;
@@ -244,11 +254,11 @@ function wrapText(text, x, y, font, color, clearColor, invertY, update, dynamicT
 	var lineHeight = 50;
 	var maxWidth = size.width - 10;
 
-	for(var n = 0; n < words.length; n++) {
+	for (var n = 0; n < words.length; n++) {
 		var testLine = line;
 		var isBreak = words[n] == '<br/>';
 
-		if(!isBreak) {
+		if (!isBreak) {
 			testLine = line + words[n] + ' ';
 		}
 
@@ -258,7 +268,7 @@ function wrapText(text, x, y, font, color, clearColor, invertY, update, dynamicT
 		if ((testWidth > maxWidth && n > 0) || isBreak) {
 			dynamicTexture._context.fillText(line, x, y);
 
-			if(isBreak){
+			if (isBreak) {
 				line = '';
 			} else {
 				line = words[n] + ' ';
@@ -277,7 +287,7 @@ function wrapText(text, x, y, font, color, clearColor, invertY, update, dynamicT
 
 function initPointerLock(canvas, camera) {
 	// On click event, request pointer lock
-	canvas.addEventListener("click", function(evt) {
+	canvas.addEventListener("click", function (evt) {
 		canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
 		if (canvas.requestPointerLock) {
 			canvas.requestPointerLock();
@@ -306,7 +316,7 @@ function initPointerLock(canvas, camera) {
 	document.addEventListener("webkitpointerlockchange", pointerlockchange, false);
 }
 
-function speakPart(textArray, part, terminal){
+function speakPart(textArray, part, terminal) {
 
 	terminal.isPlayingMessage = true;
 
@@ -316,8 +326,8 @@ function speakPart(textArray, part, terminal){
 	utterance.rate = 0.7;
 	utterance.pitch = 0.8;
 
-	utterance.onend = function(event) {
-		if(part < textArray.length-1) {
+	utterance.onend = function (event) {
+		if (part < textArray.length - 1) {
 			speakPart(textArray, part + 1, terminal)
 		} else {
 			terminal.isPlayingMessage = false;
@@ -327,37 +337,37 @@ function speakPart(textArray, part, terminal){
 	window.speechSynthesis.speak(utterance);
 }
 
-function updateBar(bar, value){
-	bar.scaling.x = value/100;
+function updateBar(bar, value) {
+	bar.scaling.x = value / 100;
 }
 
-function initTerminals(maze, player, miniMap, availableMessages, shadowGenerator, scene){
-	var numberOfTerminals = Math.floor(maze.numberOfRooms/4);
+function initTerminals(maze, player, miniMap, availableMessages, shadowGenerator, scene) {
+	var numberOfTerminals = Math.floor(maze.numberOfRooms / 4);
 	// add a terminal to the first room
 	new Terminal(new BABYLON.Vector3(width - 1, height - 1, 0), maze, player, miniMap, availableMessages, shadowGenerator, scene);
 	var placedTerminals = 1;
 
-	while(numberOfTerminals - placedTerminals > 0){
+	while (numberOfTerminals - placedTerminals > 0) {
 		var x = Math.floor(Math.random() * width);
 		var y = Math.floor(Math.random() * height);
 		var z = Math.floor(Math.random() * depth);
-		if(!maze.map[y][x][z].hasTerminal){
+		if (!maze.map[y][x][z].hasTerminal) {
 			new Terminal(new BABYLON.Vector3(x, y, z), maze, player, miniMap, availableMessages, shadowGenerator, scene);
 			placedTerminals++;
 		}
 	}
 }
 
-function initEnemies(enemies, maze, player, mazeMesh, sounds, scene){
-	var numberOfEnemies = Math.floor(maze.numberOfRooms/4);
+function initEnemies(enemies, maze, player, mazeMesh, sounds, scene) {
+	var numberOfEnemies = Math.floor(maze.numberOfRooms / 4);
 	var spawnedEnemies = 0;
 
-	while(numberOfEnemies - spawnedEnemies > 0){
+	while (numberOfEnemies - spawnedEnemies > 0) {
 		var x = Math.floor(Math.random() * maze.width);
 		var y = Math.floor(Math.random() * maze.height);
 		var z = Math.floor(Math.random() * maze.depth);
-		// TODO add condition for not spawning enmies in the starting room or right next to it
-		if(!maze.map[y][x][z].hasEnemy && !maze.map[y][x][z].hasExit){
+		var distanceToPlayer = player.position.subtract(getCellPosition(x, y, z, maze, spacing)).length();
+		if (!maze.map[y][x][z].hasEnemy && !maze.map[y][x][z].hasExit && distanceToPlayer > spacing + 1) {
 			maze.map[y][x][z].hasEnemy = true;
 			enemies.push(new Enemy(maze, player, new BABYLON.Vector3(x, y, z), mazeMesh, sounds, scene));
 			spawnedEnemies++;

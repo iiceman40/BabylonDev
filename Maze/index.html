@@ -4,16 +4,18 @@
 	<meta charset="UTF-8">
 	<title>Babylon Dev - Maze</title>
 
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css"/>
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 
 	<!-- Libraries -->
 	<script src="../libs/jquery-2.1.1.min.js"></script>
 	<script src="../libs/babylon/babylon.2.3-alpha.js"></script>
-	<script src="../libs/babylon/bGUI-1.3.0.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
 
 	<script src="js/config.js"></script>
 	<script src="js/functions.js"></script>
 
+	<script src="js/Classes/Game.js"></script>
 	<script src="js/Classes/Cell.js"></script>
 	<script src="js/Classes/Player.js"></script>
 	<script src="js/Classes/Cannon.js"></script>
@@ -36,7 +38,29 @@
 <!-- Babylon -->
 <canvas id="renderCanvas"></canvas>
 <div class="hud"></div>
+<div class="level">Level <span class="levelNumber">1</span></div>
 <div class="closeMapHint">Click right mouse button to close the map</div>
+
+<!-- Modal -->
+<div class="modal fade" id="destroyedModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="myModalLabel"><strong>You got destroyed!</strong></h4>
+			</div>
+			<div class="modal-body">
+				<p>Sorry bro, you didn't make it.</p>
+				<p>:(</p>
+				<p><strong>But hey, cheer up, you got to level <span class="levelNumber"></span>!</strong></p>
+				<p>And you can always try again, starting from level 1 of course. Maybe next time you can advance further.</p>
+			</div>
+			<div class="modal-footer">
+				<!--<button type="button" class="btn btn-default">I am done for now...</button>-->
+				<button type="button" class="btn btn-primary retry" data-dismiss="modal">Restart at level 1!</button>
+			</div>
+		</div>
+	</div>
+</div>
 </body>
 
 </html>

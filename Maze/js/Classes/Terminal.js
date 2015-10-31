@@ -61,38 +61,38 @@ var Terminal = function (position, maze, player, miniMap, availableMessages, sha
 		}
 		// text, x, y, font, color, clearColor, invertY, update, dynamicTexture
 		wrapText(message, 20, 60, "bold 40px Lucida Console", "green", "#19321C", true, true, terminalScreen.material.diffuseTexture);
-	}, 100);
+	}, 300);
 
 
-	// add terminal to room
+	// add this terminal to a random wall in the room
 	var cell = maze.map[position.y][position.x][position.z];
 	for(var i=0; i < cell.directions.length; i++){
 		var direction = cell.directions[i];
 		var wallExists = cell.walls[direction];
 		// check if wall exists and if so place terminal there
 		if(wallExists){
-			terminalCase.position = getCellPosition(position.x, position.y, position.z, maze, spacing);
+			terminalCase.position = getCellPosition(position.x, position.y, position.z, maze, config.spacing);
 			if(direction == 'S') {
-				terminalCase.position.z += (cellSize - wallThickness) / 2 - 0.15;
+				terminalCase.position.z += (config.cellSize - config.wallThickness) / 2 - 0.15;
 				break;
 			}
 			if(direction == 'N') {
-				terminalCase.position.z -= (cellSize - wallThickness) / 2 - 0.15;
+				terminalCase.position.z -= (config.cellSize - config.wallThickness) / 2 - 0.15;
 				terminalCase.rotation.y = Math.PI;
 				break;
 			}
 			if(direction == 'E') {
-				terminalCase.position.x += (cellSize - wallThickness) / 2 - 0.15;
+				terminalCase.position.x += (config.cellSize - config.wallThickness) / 2 - 0.15;
 				terminalCase.rotation.y = Math.PI/2;
 				break;
 			}
 			if(direction == 'W') {
-				terminalCase.position.x -= (cellSize - wallThickness) / 2 - 0.15;
+				terminalCase.position.x -= (config.cellSize - config.wallThickness) / 2 - 0.15;
 				terminalCase.rotation.y = -Math.PI/2;
 				break;
 			}
 		}
-		// TODO handle if no wall was available??
 	}
+	// TODO handle if no wall was available??
 
 };

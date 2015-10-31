@@ -45,6 +45,50 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 		this.getScene().collisionCoordinator.getNewPosition(this._oldPosition, actualVelocity, this._collider, 3, null, this._onCollisionPositionChange, this.uniqueId);
 	};
 
+	BABYLON.TargetCamera.prototype._checkInputs = function () {
+		var needToMove = this._decideIfNeedsToMove();
+		var needToRotate = Math.abs(this.cameraRotation.x) > 0 || Math.abs(this.cameraRotation.y) > 0;
+		// Move
+		if (needToMove) {
+			this._updatePosition();
+		}
+		// Rotate
+		if (needToRotate) {
+			this.rotation.x += this.cameraRotation.x;
+			this.rotation.y += this.cameraRotation.y;
+			if (!this.noRotationConstraint) {
+				var limit = (Math.PI / 2 * 0.99);
+				if (this.rotation.x > limit)
+					this.rotation.x = limit;
+				if (this.rotation.x < -limit)
+					this.rotation.x = -limit;
+			}
+		}
+		// Inertia
+		if (needToMove) {
+			if (Math.abs(this.cameraDirection.x) < BABYLON.Engine.Epsilon) {
+				this.cameraDirection.x = 0;
+			}
+			if (Math.abs(this.cameraDirection.y) < BABYLON.Engine.Epsilon) {
+				this.cameraDirection.y = 0;
+			}
+			if (Math.abs(this.cameraDirection.z) < BABYLON.Engine.Epsilon) {
+				this.cameraDirection.z = 0;
+			}
+			this.cameraDirection.scaleInPlace(this.inertia);
+		}
+		if (needToRotate) {
+			if (Math.abs(this.cameraRotation.x) < BABYLON.Engine.Epsilon) {
+				this.cameraRotation.x = 0;
+			}
+			if (Math.abs(this.cameraRotation.y) < BABYLON.Engine.Epsilon) {
+				this.cameraRotation.y = 0;
+			}
+			this.cameraRotation.scaleInPlace(this.inertia);
+		}
+		BABYLON.Camera.prototype._checkInputs.call(this);
+	};
+
 	player.flashlight = new BABYLON.SpotLight("Spot0", new BABYLON.Vector3(0, 0, 0), new BABYLON.Vector3(1, 0, 0), 1.8, 2, scene);
 	player.flashlight.intensity = 0.5;
 	player.flashlight.range = 35;
@@ -65,23 +109,35 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 	player.healthBar.renderingGroupId = 2;
 	player.healthBar.material = new HealthBarMaterial(scene);
 
-	// recharge bars
-	setInterval(function () {
-		player.energyLevel += 2;
+	setInterval(function(){
+		// recharge bars
+		player.energyLevel += 1;
 		if (player.energyLevel > 100) {
 			player.energyLevel = 100;
 		}
 		updateBar(player.energyBar, player.energyLevel);
 	}, 100);
-	/*
-	 setInterval(function(){
-	 player.health += 1;
-	 if(player.health > 100){
-	 player.health = 100;
-	 }
-	 updateBar(player.healthBar, player.health);
-	 }, 300);
-	 */
+
+	player.hit = function(damage){
+		console.log('player got hit');
+		player.health -= damage;
+		if (player.health <= 0) {
+			engine.stopRenderLoop();
+			setTimeout(function() {
+				scene.dispose();
+				// You got destroyed!
+				$('#destroyedModal').modal('show');
+				document.exitPointerLock = document.exitPointerLock ||
+					document.mozExitPointerLock ||
+					document.webkitExitPointerLock;
+				document.exitPointerLock();
+				speakPart([$('.modal-body').text()], 0, null);
+			});
+		}
+		// TODO use class function
+		updateBar(player.healthBar, player.health);
+	};
+
 
 	var statusBarsLight = new BABYLON.PointLight("energyBarLight", new BABYLON.Vector3(1, 10, 1), scene);
 	statusBarsLight.diffuse = new BABYLON.Color3(1, 1, 1);
@@ -91,8 +147,8 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 
 	// SHOOTING
 	player.bullets = [];
-	var bulletMaterial = new BulletMaterial(scene);
-	var bulletMaterialOutside = new BulletMaterialOutside(scene);
+	var bulletMaterial = new PlayerBulletMaterial(scene);
+	var bulletMaterialOutside = new PlayerBulletMaterialOutside(scene);
 	var currentCannon = 1;
 
 	// init cannons
@@ -102,11 +158,11 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 
 	// shooting light effect
 	var cannonLight = new BABYLON.PointLight("cannonLight", new BABYLON.Vector3(1, 10, 1), scene);
-	cannonLight.diffuse = new BABYLON.Color3(1, 0, 0);
-	cannonLight.specular = new BABYLON.Color3(1, 0, 0);
-	cannonLight.position = player.position;
+	cannonLight.diffuse = bulletMaterialOutside.emissiveColor;
+	cannonLight.specular = bulletMaterialOutside.emissiveColor;
+	cannonLight.position = player.position.clone();
 	cannonLight.includedOnlyMeshes = [cannonLeft, cannonRight];
-	cannonLight.intensity = 2;
+	cannonLight.intensity = 1.5;
 	cannonLight.setEnabled(false);
 
 	// mouse events for shooting
@@ -150,25 +206,29 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 		player.flashlight.direction = player.getTarget().subtract(player.position);
 		player.flashlight.direction.y -= 0.2;
 
+		// update bullets
+		for (var i = player.bullets.length - 1; i >= 0; i--) {
+			player.bullets[i].updatePosition(i, mazeMesh, enemies, null);
+		}
+
 		// shooting
 		if (player.keepShooting && player.cannonReady && player.energyLevel >= 10) {
 			player.cannonReady = false;
-			player.energyLevel -= 10;
+			player.energyLevel -= 7;
 			if (player.energyLevel <= 0) {
 				player.energyLevel = 1;
 			}
-			updateBar(player.energyBar, player.energyLevel);
 			// fire laser bullet from player in the direction the player is currently looking
 			var newBullet = new Bullet(bulletMaterial, bulletMaterialOutside, player, gizmo.absolutePosition, scene);
 			cannonLight.setEnabled(true);
 			if (currentCannon == 1) {
-				newBullet.position = cannonLeft.outputEnd.absolutePosition.clone();
+				newBullet.mainMesh.position = cannonLeft.outputEnd.absolutePosition;
 				currentCannon = 2;
-				cannonLight.position = cannonLeft.outputEnd.absolutePosition.clone();
+				cannonLight.position = cannonLeft.outputEnd.absolutePosition;
 			} else {
-				newBullet.position = cannonRight.outputEnd.absolutePosition.clone();
+				newBullet.mainMesh.position = cannonRight.outputEnd.absolutePosition;
 				currentCannon = 1;
-				cannonLight.position = cannonRight.outputEnd.absolutePosition.clone();
+				cannonLight.position = cannonRight.outputEnd.absolutePosition;
 			}
 			player.bullets.push(newBullet);
 			sounds.laser.play();
@@ -177,45 +237,6 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 				player.cannonReady = true;
 				cannonLight.setEnabled(false);
 			}, 200);
-		}
-
-		// update bullets
-		for (var i = player.bullets.length - 1; i >= 0; i--) {
-			var bullet = player.bullets[i];
-			if (bullet) {
-				// check for all hit
-				var ray = new BABYLON.Ray(bullet.position.clone(), bullet.direction.clone().scale(0.5), 1);
-				var pickInfo = scene.pickWithRay(ray, function (mesh) {
-					return mesh == mazeMesh;
-				});
-
-				// dispose on out of range or wall hit
-				var disposeBullet = false;
-				bullet.position = bullet.position.clone().add(bullet.direction.clone().scale(bullet.speed));
-				if (bullet.position.length() > width * spacing + height * spacing + depth * spacing || pickInfo.hit) {
-					disposeBullet = true;
-				}
-
-				// ATTACKING ENEMY ACTION
-				for (var j = 0; j < enemies.length; j++) {
-					var enemy = enemies[j];
-					if (enemy.alive && bullet && bullet.intersectsMesh(enemy, true)) {
-						disposeBullet = true;
-						enemy.healthPercentage -= 10;
-						if (enemy.healthPercentage <= 0) {
-							enemy.healthPercentage = 0;
-							enemy.die();
-						}
-					}
-				}
-
-				if (disposeBullet) {
-					player.bullets[i] = null;
-					bullet.outside.dispose();
-					bullet.dispose();
-					player.bullets.splice(i, 1);
-				}
-			}
 		}
 
 	});

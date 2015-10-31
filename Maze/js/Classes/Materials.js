@@ -12,13 +12,6 @@ var WallMaterial = function(scene) {
 	return wallMaterial;
 };
 
-var DoorMaterial = function(scene) {
-	var doorMaterial = new BABYLON.StandardMaterial('playerMaterial', scene);
-	doorMaterial.diffuseColor = new BABYLON.Color3(0, 0.7, 0);
-	doorMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-	return doorMaterial;
-};
-
 var ExitMaterial = function(scene) {
 	var exitMaterial = new BABYLON.StandardMaterial('exitMaterial', scene);
 	exitMaterial.diffuseTexture = new BABYLON.Texture('img/panel_render.jpg', scene);
@@ -147,6 +140,23 @@ var CannonMaterial = function(scene) {
 	return cannonMaterial;
 };
 
+var PlayerBulletMaterial = function(scene) {
+	var bulletMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
+	bulletMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 1);
+	bulletMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.5);
+	bulletMaterial.emissiveColor = new BABYLON.Color3(0, 0.01, 1);
+	return bulletMaterial;
+};
+
+var PlayerBulletMaterialOutside = function(scene) {
+	var bulletMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
+	bulletMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 1);
+	bulletMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.5);
+	bulletMaterial.emissiveColor = new BABYLON.Color3(0.2, 0.5, 1);
+	bulletMaterial.alpha = 0.9;
+	return bulletMaterial;
+};
+
 var BulletMaterial = function(scene) {
 	var bulletMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
 	bulletMaterial.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2);
@@ -166,9 +176,9 @@ var BulletMaterialOutside = function(scene) {
 
 var EnergyBarMaterial = function(scene) {
 	var energyBarMaterial = new BABYLON.StandardMaterial("energyBarMaterial", scene);
-	energyBarMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.2, 1);
-	energyBarMaterial.specularColor = new BABYLON.Color3(0.5, 0.1, 1);
-	energyBarMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.1, 1);
+	energyBarMaterial.diffuseColor = new BABYLON.Color3(0.3, 0.2, 1);
+	energyBarMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.5);
+	energyBarMaterial.emissiveColor = new BABYLON.Color3(0.2, 0.5, 1);
 	energyBarMaterial.alpha = 0.7;
 	return energyBarMaterial;
 };
@@ -177,7 +187,7 @@ var HealthBarMaterial = function(scene) {
 	var healthBarMaterial = new BABYLON.StandardMaterial("healthBarMaterial", scene);
 	healthBarMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
 	healthBarMaterial.specularColor = new BABYLON.Color3(1, 0, 0);
-	healthBarMaterial.emissiveColor = new BABYLON.Color3(0.4, 0, 0);
+	healthBarMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.1, 0.1);
 	healthBarMaterial.alpha = 0.7;
 	return healthBarMaterial;
 };

@@ -1,38 +1,38 @@
 function createScene() {
-	var enemies = [];
-	// TODO create a Game Class to store all information needed and just hand the Game Object to important functions
 
 	// SCENE SETUP
 	var scene = new BABYLON.Scene(engine);
 	scene.clearColor = new BABYLON.Color3(0.8, 0.8, 1);
 	scene.collisionsEnabled = true;
-	scene.workerCollisions = true;
+	//scene.workerCollisions = true;
+
+	var game = new Game(config, scene);
+	$('.levelNumber').text(game.level);
+	$('.level').delay(700).fadeOut(500);
 
 	// CREATE MAZE
-	var maze = new Maze(width, height, depth, startingPoint);
+	var maze = new Maze(config.width, config.height, config.depth, config.startingPoint);
 
 	// DRAW MAZE
-	var mazeMesh = drawMaze(maze, scene);
-
-	// INIT SOUNDS
-	var sounds = new Sounds(scene); // TODO check if all are ready to play?
+	var mazeMesh = drawMaze(maze, config, scene);
 
 	// MESSAGES
 	var availableMessages = [
 		new Message("You are doing really great. <br/> <br/> Fun fact: <br/> <br/> A lot of people don't undestand sarcasm!", null),
 		new Message("Hey, what's up, buttercup?", null),
-		new Message("Hello! This is the part where I kill you.", null),
+		new Message("Hello! <br/> <br/> This is the part where I kill you.", null),
 		new Message("Are you still there?", null),
 		new Message("Get out of my head!", null),
 		new Message("Oh... It's you.", null),
-		new Message("If at first you don't succeed, fail 5 more times.", null),
-		new Message("Okay. Look. We both said a lot of things that you're going to regret. But I think we can put our differences behind us. For science. You monster.", null),
-		new Message("Well done. In fact, you did so well, I'm going to note this on your file, in the commendations section. Oh, there's lots of room here. 'Did.... well. ... Enough.'", null),
-		new Message("Oh, you are kidding me.", null)
+		new Message("If at first you don't succeed, ... <br/> <br/> fail 5 more times.", null),
+		new Message("Okay. Look. We both said a lot of things that you're going to regret. But I think we can put our differences behind us. For science. <br/> <br/> You monster.", null),
+		new Message("You broke it, didn't you.", null),
+		new Message("So. <br/> <br/> How are you holding up?", null),
+		new Message("Don't press that button. You don't know what you're doing.", null)
 	];
 
 	// CAMERA/PLAYER
-	var player = new Player(mazeMesh, getCellPosition(width - 1, height - 1, 0, maze, spacing), sounds, enemies, scene);
+	var player = new Player(mazeMesh, getCellPosition(config.width - 1, config.height - 1, 0, maze, config.spacing), game.sounds, game.enemies, scene);
 	initPointerLock(canvas, player);
 
 	// CREATE MINI MAP
@@ -40,7 +40,7 @@ function createScene() {
 	player.miniMap = miniMap;
 
 	// PLACE EXIT
-	maze.exit = new Exit(new BABYLON.Vector3(0, 0, depth - 1), maze, miniMap.playerOnMiniMap, mazeMesh, player, scene);
+	maze.exit = new Exit(new BABYLON.Vector3(0, 0, config.depth - 1), maze, miniMap.playerOnMiniMap, mazeMesh, game, player, scene);
 
 	// LIGHTS AND SHADOW
 	var hemiLight = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(0, 1, 0), scene);
@@ -56,7 +56,7 @@ function createScene() {
 	initTerminals(maze, player, miniMap, availableMessages, shadowGenerator, scene);
 
 	// ENEMIES
-	initEnemies(enemies, maze, player, mazeMesh, sounds, scene);
+	initEnemies(game.enemies, maze, player, mazeMesh, game, scene);
 
 	// DEBUG LAYER
 	if(window.location.hash == '#debug') {

@@ -1,9 +1,9 @@
-var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, camera, scene) {
+var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, game, camera, scene) {
 	var exit = BABYLON.Mesh.CreateTorus("exit", 3, 0.5, 64, scene, false);
 	exit.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
 	exit.material = new ExitMaterial(scene);
 	exit.rotation.x = Math.PI/2;
-	exit.position = getCellPosition(exitCoordinates.x, exitCoordinates.y, exitCoordinates.z, maze, spacing);
+	exit.position = getCellPosition(exitCoordinates.x, exitCoordinates.y, exitCoordinates.z, maze, config.spacing);
 	maze.map[exitCoordinates.x][exitCoordinates.y][exitCoordinates.z].hasExit = true;
 
 	var exitPortal = BABYLON.MeshBuilder.CreateDisc("exitPortal", {radius: 1.5, tessellation: 32}, scene);
@@ -43,14 +43,16 @@ var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, camera, s
 				engine.stopRenderLoop();
 				//alert('Exit reached!');
 				setTimeout(function(){
-					scene.dispose();
-					var sizes = [width, height, depth];
-					console.log(sizes.indexOf(Math.max.apply(Math, sizes)));
-					// TODO find a good way to increase map size
-					width = width + 1;
-					scene = createScene();
-					engine.runRenderLoop(function () {
-						scene.render();
+					$('.level').fadeIn(500, function(){
+						scene.dispose();
+						config.startingLevel++;
+						var sizes = ['width', 'height', 'depth'];
+						var sizeToIncrease = sizes[game.level % sizes.length];
+						config[sizeToIncrease]++;
+						scene = createScene();
+						engine.runRenderLoop(function () {
+							scene.render();
+						});
 					});
 				});
 			}

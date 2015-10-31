@@ -17,7 +17,7 @@ function shuffleArray(array) {
 	return array;
 }
 
-function drawMaze(maze, scene) {
+function drawMaze(maze, config, scene) {
 	// create maze representation
 	/*
 	 var mazeOuterBox = BABYLON.Mesh.CreateBox('mazeOuterBox', 1, scene);
@@ -69,14 +69,14 @@ function drawMaze(maze, scene) {
 			for (var z = 0; z < maze.depth; z++) {
 				var cell = maze.map[y][x][z];
 
-				var cellPos = getCellPosition(x, y, z, maze, spacing);
+				var cellPos = getCellPosition(x, y, z, maze, config.spacing);
 
 				var posX = cellPos.x;
 				var posY = cellPos.y;
 				var posZ = cellPos.z;
 
-				var outerBox = BABYLON.Mesh.CreateBox('mazeCellOuter', cellSize, scene);
-				var innerBox = BABYLON.Mesh.CreateBox('mazeCellInner', cellSize - wallThickness, scene);
+				var outerBox = BABYLON.Mesh.CreateBox('mazeCellOuter', config.cellSize, scene);
+				var innerBox = BABYLON.Mesh.CreateBox('mazeCellInner', config.cellSize - config.wallThickness, scene);
 
 				var outerBoxCSG = BABYLON.CSG.FromMesh(outerBox);
 				var innerBoxCSG = BABYLON.CSG.FromMesh(innerBox);
@@ -318,7 +318,9 @@ function initPointerLock(canvas, camera) {
 
 function speakPart(textArray, part, terminal) {
 
-	terminal.isPlayingMessage = true;
+	if(terminal) {
+		terminal.isPlayingMessage = true;
+	}
 
 	var html = $('<p>' + textArray[part] + '</p>');
 	var utterance = new SpeechSynthesisUtterance(html.text());
@@ -330,11 +332,15 @@ function speakPart(textArray, part, terminal) {
 		if (part < textArray.length - 1) {
 			speakPart(textArray, part + 1, terminal)
 		} else {
-			terminal.isPlayingMessage = false;
+			if(terminal) {
+				terminal.isPlayingMessage = false;
+			}
 		}
 	};
 
-	window.speechSynthesis.speak(utterance);
+	setTimeout(function(){
+		window.speechSynthesis.speak(utterance);
+	});
 }
 
 function updateBar(bar, value) {
@@ -344,13 +350,13 @@ function updateBar(bar, value) {
 function initTerminals(maze, player, miniMap, availableMessages, shadowGenerator, scene) {
 	var numberOfTerminals = Math.floor(maze.numberOfRooms / 4);
 	// add a terminal to the first room
-	new Terminal(new BABYLON.Vector3(width - 1, height - 1, 0), maze, player, miniMap, availableMessages, shadowGenerator, scene);
+	new Terminal(new BABYLON.Vector3(maze.width - 1, maze.height - 1, 0), maze, player, miniMap, availableMessages, shadowGenerator, scene);
 	var placedTerminals = 1;
 
 	while (numberOfTerminals - placedTerminals > 0) {
-		var x = Math.floor(Math.random() * width);
-		var y = Math.floor(Math.random() * height);
-		var z = Math.floor(Math.random() * depth);
+		var x = Math.floor(Math.random() * maze.width);
+		var y = Math.floor(Math.random() * maze.height);
+		var z = Math.floor(Math.random() * maze.depth);
 		if (!maze.map[y][x][z].hasTerminal) {
 			new Terminal(new BABYLON.Vector3(x, y, z), maze, player, miniMap, availableMessages, shadowGenerator, scene);
 			placedTerminals++;
@@ -358,7 +364,16 @@ function initTerminals(maze, player, miniMap, availableMessages, shadowGenerator
 	}
 }
 
-function initEnemies(enemies, maze, player, mazeMesh, sounds, scene) {
+/**
+ *
+ * @param enemies
+ * @param maze
+ * @param player
+ * @param mazeMesh
+ * @param game
+ * @param scene
+ */
+function initEnemies(enemies, maze, player, mazeMesh, game, scene) {
 	var numberOfEnemies = Math.floor(maze.numberOfRooms / 4);
 	var spawnedEnemies = 0;
 
@@ -366,10 +381,11 @@ function initEnemies(enemies, maze, player, mazeMesh, sounds, scene) {
 		var x = Math.floor(Math.random() * maze.width);
 		var y = Math.floor(Math.random() * maze.height);
 		var z = Math.floor(Math.random() * maze.depth);
-		var distanceToPlayer = player.position.subtract(getCellPosition(x, y, z, maze, spacing)).length();
-		if (!maze.map[y][x][z].hasEnemy && !maze.map[y][x][z].hasExit && distanceToPlayer > spacing + 1) {
+		var distanceToPlayer = player.position.subtract(getCellPosition(x, y, z, maze, config.spacing)).length();
+		console.log(distanceToPlayer, game.enemyDetectionDistance);
+		if (!maze.map[y][x][z].hasEnemy && !maze.map[y][x][z].hasExit && distanceToPlayer > game.enemyDetectionDistance) {
 			maze.map[y][x][z].hasEnemy = true;
-			enemies.push(new Enemy(maze, player, new BABYLON.Vector3(x, y, z), mazeMesh, sounds, scene));
+			enemies.push(new Enemy(maze, player, new BABYLON.Vector3(x, y, z), mazeMesh, game, scene));
 			spawnedEnemies++;
 		}
 	}

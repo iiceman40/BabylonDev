@@ -11,6 +11,8 @@ html, body, canvas {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+
+	font-family: 'Lucida Console', sans-serif;
 }
 
 .hud {
@@ -27,6 +29,29 @@ html, body, canvas {
 	pointer-events: none;
 }
 
+.level {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background: black;
+	z-index: 200;
+	display: block;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	pointer-events: none;
+	font-family: 'Console', sans-serif;
+	color: lightblue;
+	font-size: 15vw;
+	text-align: center;
+	padding-top: 30vh;
+}
+
+.levelNumber {
+
+}
+
 .closeMapHint {
 	position: absolute;
 	top: 30px;
@@ -37,4 +62,46 @@ html, body, canvas {
 	color: lightblue;
 	display: none;
 	text-shadow: 1px 1px 1px black;
+}
+
+.modal-dialog {
+	background: url('../img/panel_render.jpg');
+	-webkit-background-size: cover;
+	background-size: cover;
+	height: 600px;
+	padding-top: 7px;
+}
+.modal-content{
+	height: 475px;
+	border-radius: 0;
+	margin: 55px 68px;
+	font-size: 20px;
+	color: lightgreen;
+	text-shadow: -1px -1px #111, 1px 1px #5F615D;
+	background: darkolivegreen;
+	box-shadow: inset 0 0 15px #111;
+	border: 1px solid #222;
+}
+
+.modal-body {
+
+}
+
+.modal-header,
+.modal-footer {
+	border: none;
+}
+
+.modal-footer {
+	text-align: center;
+}
+
+button.btn.btn-primary.retry {
+	color: lightgreen;
+	border-radius: 0;
+	background: transparent;
+	border: 2px solid lightgreen;
+	box-shadow: -1px -1px #111, 1px 1px #5F615D;
+	text-shadow: -1px -1px #111, 1px 1px #5F615D;
+	font-size: 20px;
 }

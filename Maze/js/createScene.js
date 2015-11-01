@@ -10,8 +10,6 @@ function createScene() {
 	$('.levelNumber').text(game.level);
 	$('.level').delay(700).fadeOut(500);
 
-	var modal = new Modal(game);
-
 	// CREATE MAZE
 	var maze = new Maze(config.width, config.height, config.depth, config.startingPoint);
 

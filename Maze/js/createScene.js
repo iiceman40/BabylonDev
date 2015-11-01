@@ -10,6 +10,8 @@ function createScene() {
 	$('.levelNumber').text(game.level);
 	$('.level').delay(700).fadeOut(500);
 
+	var modal = new Modal(game);
+
 	// CREATE MAZE
 	var maze = new Maze(config.width, config.height, config.depth, config.startingPoint);
 
@@ -32,7 +34,7 @@ function createScene() {
 	];
 
 	// CAMERA/PLAYER
-	var player = new Player(mazeMesh, getCellPosition(config.width - 1, config.height - 1, 0, maze, config.spacing), game.sounds, game.enemies, scene);
+	var player = new Player(mazeMesh, getCellPosition(config.width - 1, config.height - 1, 0, maze, config.spacing), game, scene);
 	initPointerLock(canvas, player);
 
 	// CREATE MINI MAP

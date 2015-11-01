@@ -15,6 +15,7 @@
 	<script src="js/config.js"></script>
 	<script src="js/functions.js"></script>
 
+	<script src="js/Classes/Modal.js"></script>
 	<script src="js/Classes/Game.js"></script>
 	<script src="js/Classes/Cell.js"></script>
 	<script src="js/Classes/Player.js"></script>
@@ -49,13 +50,19 @@
 				<h4 class="modal-title" id="myModalLabel"><strong>You got destroyed!</strong></h4>
 			</div>
 			<div class="modal-body">
-				<p>Sorry bro, you didn't make it.</p>
-				<p>:(</p>
-				<p><strong>But hey, cheer up, you got to level <span class="levelNumber"></span>!</strong></p>
-				<p>And you can always try again, starting from level 1 of course. Maybe next time you can advance further.</p>
+				<div class="destroyed-message">
+					<p>Sorry bro, you didn't make it. :(</p>
+					<p><strong>But hey, cheer up, you got to level <span class="levelNumber"></span>!</strong></p>
+					<p>And you can always try again, starting from level 1 of course. Maybe next time you can advance further.</p>
+					<br />
+					<div class="text-center">
+						<label for="name">Nickname</label> <input type="text" id="name" name="name" />
+					</div>
+				</div>
+				<table class="highscores"></table>
 			</div>
 			<div class="modal-footer">
-				<!--<button type="button" class="btn btn-default">I am done for now...</button>-->
+				<button type="button" class="btn btn-primary save-highscore">Save Highscore</button><br />
 				<button type="button" class="btn btn-primary retry" data-dismiss="modal">Restart at level 1!</button>
 			</div>
 		</div>

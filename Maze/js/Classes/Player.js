@@ -1,4 +1,6 @@
-var Player = function (mazeMesh, position, sounds, enemies, scene) {
+var Player = function (mazeMesh, position, game, scene) {
+	var enemies = game.enemies;
+	var sounds = game.sounds;
 	var player = new BABYLON.FreeCamera("playerFreeCamera", new BABYLON.Vector3(0, 0, 0), scene);
 	player.attachControl(canvas, true);
 
@@ -119,23 +121,25 @@ var Player = function (mazeMesh, position, sounds, enemies, scene) {
 	}, 100);
 
 	player.hit = function(damage){
-		console.log('player got hit');
+		// TODO add shake effect and window tinting on the sides
+
 		player.health -= damage;
+		updateBar(player.healthBar, player.health); // TODO use class function
+
+		//////////////////////////////////
+		// Player destroyed!
+		//////////////////////////////////
 		if (player.health <= 0) {
 			engine.stopRenderLoop();
 			setTimeout(function() {
 				scene.dispose();
-				// You got destroyed!
-				$('#destroyedModal').modal('show');
-				document.exitPointerLock = document.exitPointerLock ||
-					document.mozExitPointerLock ||
-					document.webkitExitPointerLock;
+				var modal = new Modal(game);
+				document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
 				document.exitPointerLock();
-				speakPart([$('.modal-body').text()], 0, null);
+				speakPart([$('.modal-body .destroyed-message').text()], 0, null);
 			});
 		}
-		// TODO use class function
-		updateBar(player.healthBar, player.health);
+
 	};
 
 

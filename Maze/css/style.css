@@ -70,12 +70,13 @@ html, body, canvas {
 	background-size: cover;
 	height: 600px;
 	padding-top: 7px;
+	box-shadow: 5px 5px 15px black;
 }
 .modal-content{
 	height: 475px;
 	border-radius: 0;
 	margin: 55px 68px;
-	font-size: 20px;
+	font-size: 18px;
 	color: lightgreen;
 	text-shadow: -1px -1px #111, 1px 1px #5F615D;
 	background: darkolivegreen;
@@ -83,8 +84,18 @@ html, body, canvas {
 	border: 1px solid #222;
 }
 
-.modal-body {
+input {
+	background: darkolivegreen;
+	border: none;
+	border-bottom: 1px solid lightgreen;
+	outline: none;
+	text-shadow: -1px -1px #141, 1px 1px #5F615D;
+}
 
+.modal-body {
+	height: 265px;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 .modal-header,
@@ -96,12 +107,25 @@ html, body, canvas {
 	text-align: center;
 }
 
-button.btn.btn-primary.retry {
+button.btn.btn-primary {
 	color: lightgreen;
 	border-radius: 0;
 	background: transparent;
 	border: 2px solid lightgreen;
-	box-shadow: -1px -1px #111, 1px 1px #5F615D;
-	text-shadow: -1px -1px #111, 1px 1px #5F615D;
-	font-size: 20px;
+	box-shadow: -1px -1px #141, 1px 1px #5F615D;
+	text-shadow: -1px -1px #141, 1px 1px #5F615D;
+	font-size: 18px;
+	margin-bottom: 15px;
+}
+
+table.highscores {
+	width: 80%;
+	margin: 0 auto;
+}
+
+table.highscores td{
+	padding: 0 0 0 5px;
+}
+table.highscores tr.me{
+	background: #2B4E2D;
 }

@@ -14,19 +14,6 @@ $(document).ready(function () {
 		scene.render();
 	});
 
-	window.addEventListener("resize", function () {
-		engine.resize();
-	});
-
-	$('.retry').click(function(){
-		$('.level').fadeIn(500, function() {
-			config = clone(originalConfig);
-			scene = createScene();
-			engine.runRenderLoop(function () {
-				scene.render();
-			});
-		});
-	})
 });
 
 function clone(obj) {

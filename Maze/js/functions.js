@@ -382,7 +382,6 @@ function initEnemies(enemies, maze, player, mazeMesh, game, scene) {
 		var y = Math.floor(Math.random() * maze.height);
 		var z = Math.floor(Math.random() * maze.depth);
 		var distanceToPlayer = player.position.subtract(getCellPosition(x, y, z, maze, config.spacing)).length();
-		console.log(distanceToPlayer, game.enemyDetectionDistance);
 		if (!maze.map[y][x][z].hasEnemy && !maze.map[y][x][z].hasExit && distanceToPlayer > game.enemyDetectionDistance) {
 			maze.map[y][x][z].hasEnemy = true;
 			enemies.push(new Enemy(maze, player, new BABYLON.Vector3(x, y, z), mazeMesh, game, scene));

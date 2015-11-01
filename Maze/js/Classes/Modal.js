@@ -17,7 +17,7 @@ var Modal = function (game) {
 	});
 
 	var highscoreTable = $('.modal-body .highscores');
-	var destroyMessage = $('.destroyed-message');
+	var destroyMessage = $('.destroyed-message, form.nickname');
 
 	$('.save-highscore').click(function(){
 		var name = $('#name').val();
@@ -41,7 +41,6 @@ var Modal = function (game) {
 							highscoreTable.append('<tr class="' + css + '"><td>' + rank + '.</td><td>' + entry.name + '</td><td>' + entry.level + '</td></tr>');
 						}
 						var position = $('.me:first').position();
-						console.log(position);
 						$('.modal-body').scrollTop(position.top);
 					} else {
 						// could not retrieve high score list

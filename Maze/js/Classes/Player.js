@@ -2,6 +2,7 @@ var Player = function (mazeMesh, position, game, scene) {
 	var enemies = game.enemies;
 	var sounds = game.sounds;
 	var player = new BABYLON.FreeCamera("playerFreeCamera", new BABYLON.Vector3(0, 0, 0), scene);
+
 	player.attachControl(canvas, true);
 
 	var gizmo = BABYLON.Mesh.CreateBox('gizmo', 0.01, scene);
@@ -130,10 +131,12 @@ var Player = function (mazeMesh, position, game, scene) {
 		// Player destroyed!
 		//////////////////////////////////
 		if (player.health <= 0) {
+			scene.activeCamera.detachControl(canvas);
 			engine.stopRenderLoop();
 			setTimeout(function() {
 				scene.dispose();
-				var modal = new Modal(game);
+				destroyedModal.show(game); // TODO find better way to submit the game object to the modal class
+				// release mouse pointer
 				document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
 				document.exitPointerLock();
 				speakPart([$('.modal-body .destroyed-message').text()], 0, null);
@@ -151,19 +154,18 @@ var Player = function (mazeMesh, position, game, scene) {
 
 	// SHOOTING
 	player.bullets = [];
-	var bulletMaterial = new PlayerBulletMaterial(scene);
-	var bulletMaterialOutside = new PlayerBulletMaterialOutside(scene);
 	var currentCannon = 1;
 
 	// init cannons
 	var cannonMaterial = new CannonMaterial(scene);
 	var cannonLeft = new Cannon(new BABYLON.Vector3(-0.3, -0.3, 0), player, cannonMaterial, scene);
 	var cannonRight = new Cannon(new BABYLON.Vector3(0.3, -0.3, 0), player, cannonMaterial, scene);
+	var rocketLauncher = new Cannon(new BABYLON.Vector3(0, -0.4, -0.5), player, cannonMaterial, scene);
 
 	// shooting light effect
 	var cannonLight = new BABYLON.PointLight("cannonLight", new BABYLON.Vector3(1, 10, 1), scene);
-	cannonLight.diffuse = bulletMaterialOutside.emissiveColor;
-	cannonLight.specular = bulletMaterialOutside.emissiveColor;
+	cannonLight.diffuse = game.materials.brightBlue.emissiveColor;
+	cannonLight.specular = game.materials.brightBlue.emissiveColor;
 	cannonLight.position = player.position.clone();
 	cannonLight.includedOnlyMeshes = [cannonLeft, cannonRight];
 	cannonLight.intensity = 1.5;
@@ -178,14 +180,26 @@ var Player = function (mazeMesh, position, game, scene) {
 			player.keepShooting = true;
 		}
 	});
+	window.addEventListener("mousedown", function (evt) {
+		// left click to start fire
+		if (evt.button === 2 && !player.miniMap.isVisible) {
+			// shoot rocket
+			var newRocket = new Projectile(player, gizmo.absolutePosition, Projectile.PROJECTILETYPE_ROCKET, 'gray', game, scene);
+			newRocket.mainMesh.position = player.position.clone();
+			newRocket.mainMesh.position = rocketLauncher.outputEnd.absolutePosition;
+			player.bullets.push(newRocket);
+			sounds.rocket.play();
+		}
+	});
 	window.addEventListener("mouseup", function (evt) {
 		player.keepShooting = false;
 	});
 
 	// terminal interaction event listener
-	window.addEventListener("mouseup", function (evt) {
+	window.addEventListener("keydown", function (event) {
+		event = event || window.event;
 		// right click to interact with terminal
-		if (evt.button === 2) {
+		if (event.keyCode === 32) {
 			var ray = new BABYLON.Ray(player.position, player.getTarget().subtract(player.position), 5);
 			var pickingInfo = scene.pickWithRay(ray, function(mesh){
 				return mesh.name == 'terminalScreen';
@@ -215,7 +229,7 @@ var Player = function (mazeMesh, position, game, scene) {
 			player.bullets[i].updatePosition(i, mazeMesh, enemies, null);
 		}
 
-		// shooting
+		// shooting laser
 		if (player.keepShooting && player.cannonReady && player.energyLevel >= 10) {
 			player.cannonReady = false;
 			player.energyLevel -= 7;
@@ -223,7 +237,7 @@ var Player = function (mazeMesh, position, game, scene) {
 				player.energyLevel = 1;
 			}
 			// fire laser bullet from player in the direction the player is currently looking
-			var newBullet = new Bullet(bulletMaterial, bulletMaterialOutside, player, gizmo.absolutePosition, scene);
+			var newBullet = new Projectile(player, gizmo.absolutePosition, Projectile.PROJECTILETYPE_BULLET, 'blue', game, scene);
 			cannonLight.setEnabled(true);
 			if (currentCannon == 1) {
 				newBullet.mainMesh.position = cannonLeft.outputEnd.absolutePosition;

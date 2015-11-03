@@ -129,3 +129,10 @@ table.highscores td{
 table.highscores tr.me{
 	background: #2B4E2D;
 }
+
+button#menu {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	font-size: 25px;
+}

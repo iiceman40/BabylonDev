@@ -389,3 +389,13 @@ function initEnemies(enemies, maze, player, mazeMesh, game, scene) {
 		}
 	}
 }
+
+function showHighscores(highscoreTable, parsedData, currentPlayerId){
+	highscoreTable.html('');
+	for (var i = 0; i < parsedData.list.length; i++) {
+		var entry = parsedData.list[i];
+		var css = (currentPlayerId && currentPlayerId == entry.id) ? 'me' : '';
+		var rank = i + 1;
+		highscoreTable.append('<tr class="' + css + '"><td>' + rank + '.</td><td>' + entry.name + '</td><td>' + entry.level + '</td></tr>');
+	}
+}

@@ -140,7 +140,7 @@ var CannonMaterial = function(scene) {
 	return cannonMaterial;
 };
 
-var PlayerBulletMaterial = function(scene) {
+var BlueBulletMaterial = function(scene) {
 	var bulletMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
 	bulletMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 1);
 	bulletMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.5);
@@ -148,7 +148,7 @@ var PlayerBulletMaterial = function(scene) {
 	return bulletMaterial;
 };
 
-var PlayerBulletMaterialOutside = function(scene) {
+var BrightBlueBulletMaterial = function(scene) {
 	var bulletMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
 	bulletMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 1);
 	bulletMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.5);
@@ -157,7 +157,7 @@ var PlayerBulletMaterialOutside = function(scene) {
 	return bulletMaterial;
 };
 
-var BulletMaterial = function(scene) {
+var RedBulletMaterial = function(scene) {
 	var bulletMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
 	bulletMaterial.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2);
 	bulletMaterial.specularColor = new BABYLON.Color3(0.5, 0.1, 0.1);
@@ -165,13 +165,21 @@ var BulletMaterial = function(scene) {
 	return bulletMaterial;
 };
 
-var BulletMaterialOutside = function(scene) {
+var BrightRedBulletMaterial = function(scene) {
 	var bulletMaterial = new BABYLON.StandardMaterial("bulletMaterial", scene);
 	bulletMaterial.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2);
 	bulletMaterial.specularColor = new BABYLON.Color3(0.5, 0.1, 0.1);
 	bulletMaterial.emissiveColor = new BABYLON.Color3(1, 0.5, 0.5);
 	bulletMaterial.alpha = 0.9;
 	return bulletMaterial;
+};
+
+var RocketMaterial = function(scene) {
+	var rocketMaterial = new BABYLON.StandardMaterial("rocketMaterial", scene);
+	rocketMaterial.diffuseColor = new BABYLON.Color3(0.6, 0.6, 0.6);
+	rocketMaterial.specularColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+	rocketMaterial.emissiveColor = new BABYLON.Color3(0.01, 0.01, 0.01);
+	return rocketMaterial;
 };
 
 var EnergyBarMaterial = function(scene) {

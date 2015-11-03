@@ -39,9 +39,9 @@ var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, game, cam
 		scene.registerBeforeRender(function () {
 			if(!exitFound && exit.intersectsMesh(playerOnMiniMap, true)){
 				exitFound = true;
-				//camera.detachControl(canvas);
+				camera.detachControl(canvas);
 				engine.stopRenderLoop();
-				//alert('Exit reached!');
+				// exit reached
 				setTimeout(function(){
 					$('.level').fadeIn(500, function(){
 						scene.dispose();

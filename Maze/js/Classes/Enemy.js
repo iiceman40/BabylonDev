@@ -232,7 +232,7 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 		// attack player if in sight
 		if (enemy.alive && enemy.playerIsInRange && enemy.cannonReady) {
 			// fire laser bullet from player in the direction the player is currently looking
-			var newBullet = new Bullet(game.bulletMaterial, game.bulletMaterialOutside, enemy, player.position, scene);
+			var newBullet = new Projectile(enemy, player.position, Projectile.PROJECTILETYPE_BULLET, 'red', game, scene);
 			newBullet.mainMesh.position = enemy.absolutePosition.clone();
 			newBullet.mainMesh.lookAt(player.position);
 			enemy.bullets.push(newBullet);

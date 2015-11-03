@@ -20,7 +20,7 @@
 	<script src="js/Classes/Cell.js"></script>
 	<script src="js/Classes/Player.js"></script>
 	<script src="js/Classes/Cannon.js"></script>
-	<script src="js/Classes/Bullet.js"></script>
+	<script src="js/Classes/Projectile.js"></script>
 	<script src="js/Classes/Maze.js"></script>
 	<script src="js/Classes/Exit.js"></script>
 	<script src="js/Classes/Enemy.js"></script>
@@ -40,14 +40,15 @@
 <canvas id="renderCanvas"></canvas>
 <div class="hud"></div>
 <div class="level">Level <span class="levelNumber">1</span></div>
-<div class="closeMapHint">Click right mouse button to close the map</div>
+<div class="closeMapHint">Press the space key again to close the map</div>
+<button id="menu" class="btn btn-link" title="Options and Highscores"><span class="glyphicon glyphicon-list-alt"></span></button>
 
 <!-- Modal -->
 <div class="modal fade" id="destroyedModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title" id="myModalLabel"><strong>You got destroyed!</strong></h4>
+				<h4 class="modal-title" id="destroyedModalLabel"><strong>You got destroyed!</strong></h4>
 			</div>
 			<div class="modal-body">
 				<div class="destroyed-message">
@@ -68,6 +69,32 @@
 		</div>
 	</div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="menuModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="menuModalLabel"><strong>Menu</strong></h4>
+			</div>
+			<div class="modal-body">
+				<div class="checkbox">
+					<label>
+						<input type="checkbox">
+						Test Checkbox
+					</label>
+				</div>
+				<button class="btn btn-primary show-highscores">Show Highscores</button>
+				<table class="highscores"></table>
+			</div>
+			<div class="modal-footer">
+				<br /><br />
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 </body>
 
 </html>

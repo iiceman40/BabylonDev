@@ -1,56 +1,72 @@
-var Modal = function (game) {
-	$('#destroyedModal').modal('show');
+var Modal = function () {
+	var self = this;
 
+	this.game = null;
+	this.destroyedModal = $('#destroyedModal');
+	this.highscoreTable = this.destroyedModal.find('.modal-body .highscores');
+	this.destroyMessage = $('.destroyed-message, form.nickname');
+	this.retryButton = $('.retry');
+	this.saveHighscoreButton = $('.save-highscore');
 
-	window.addEventListener("resize", function () {
-		engine.resize();
-	});
+	this.show = function(game) {
+		self.game = game;
+		self.destroyedModal.modal('show');
+	};
 
-	$('.retry').click(function(){
+	//window.addEventListener("resize", function () {
+	//	engine.resize();
+	//});
+
+	this.restart = function(){
 		$('.level').fadeIn(500, function() {
 			config = clone(originalConfig);
 			scene = createScene();
+			$('.save-highscore').attr('disabled', false);
+			self.highscoreTable.html('');
+			self.destroyMessage.show(0);
+			console.log('restarting scene');
 			engine.runRenderLoop(function () {
 				scene.render();
 			});
 		});
-	});
+	};
 
-	var highscoreTable = $('.modal-body .highscores');
-	var destroyMessage = $('.destroyed-message, form.nickname');
-
-	$('.save-highscore').click(function(){
+	this.saveHighscore = function(){
 		var name = $('#name').val();
-		$.post('db/add_highscore.php', {
-			name: name,
-			level: game.level
-		}, function(data){
-			var parsedData = JSON.parse(data);
-			if(parsedData.success) {
-				// get updated highscore lsit
-				$.post('db/get_highscore.php', {}, function (data) {
-					var parsedData = JSON.parse(data);
-					if (parsedData.success) {
-						highscoreTable.html('');
-						destroyMessage.hide();
-						$('.save-highscore').attr('disabled', 'disabled');
-						for (var i = 0; i < parsedData.list.length; i++) {
-							var entry = parsedData.list[i];
-							var css = (name == entry.name) ? 'me' : '';
-							var rank = i + 1;
-							highscoreTable.append('<tr class="' + css + '"><td>' + rank + '.</td><td>' + entry.name + '</td><td>' + entry.level + '</td></tr>');
+		var level = (self.game) ? self.game.level : false;
+
+		if(name && level) {
+			$.post('db/add_highscore.php', {name: name, level: level}, function (data) {
+				var parsedData = JSON.parse(data);
+				if (parsedData.success) {
+					var currentPlayerId = parsedData.id;
+					// get updated highscore list
+					$.post('db/get_highscore.php', {}, function (data) {
+						var parsedData = JSON.parse(data);
+						if (parsedData.success) {
+							self.destroyMessage.hide(0);
+							$('.save-highscore').attr('disabled', 'disabled');
+							showHighscores(self.highscoreTable, parsedData, currentPlayerId);
+							var position = $('.me:first').position();
+							self.destroyedModal.find('.modal-body').scrollTop(position.top);
+						} else {
+							// could not retrieve high score list
+							alert(parsedData.error);
 						}
-						var position = $('.me:first').position();
-						$('.modal-body').scrollTop(position.top);
-					} else {
-						// could not retrieve high score list
-						alert(parsedData.error);
-					}
-				});
-			} else {
-				// could not make highscore entry
-				alert(parsedData.error);
-			}
-		});
-	})
+					});
+				} else {
+					// could not make highscore entry
+					alert(parsedData.error);
+				}
+			});
+		} else {
+			alert('Please enter your nickname to save your highscore.');
+		}
+	};
+
+	this.retryButton.unbind('click', this.restart);
+	this.retryButton.bind('click', this.restart);
+
+	this.saveHighscoreButton.unbind('click', this.saveHighscore);
+	this.saveHighscoreButton.bind('click', this.saveHighscore);
 };

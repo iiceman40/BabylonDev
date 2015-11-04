@@ -136,3 +136,18 @@ button#menu {
 	right: 15px;
 	font-size: 25px;
 }
+
+.rocketStatus {
+	width: 100px;
+	height: 100px;
+	background: url('../img/rocket_icon.svg');
+	background-size: cover;
+	position: fixed;
+	bottom: 50px;
+	right: 50px;
+}
+
+.rocketStatus.ready {
+	background: url('../img/rocket_icon_ready.svg');
+	background-size: cover;
+}

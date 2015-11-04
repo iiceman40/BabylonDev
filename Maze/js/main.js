@@ -15,6 +15,10 @@ $(document).ready(function () {
 		scene.render();
 	});
 
+	window.addEventListener("resize", function () {
+		engine.resize();
+	});
+
 	// UI
 	destroyedModal = new Modal();
 

@@ -13,10 +13,6 @@ var Modal = function () {
 		self.destroyedModal.modal('show');
 	};
 
-	//window.addEventListener("resize", function () {
-	//	engine.resize();
-	//});
-
 	this.restart = function(){
 		$('.level').fadeIn(500, function() {
 			config = clone(originalConfig);

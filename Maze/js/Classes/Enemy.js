@@ -89,7 +89,8 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 			// Re-calculate health bar length.
 			healthBar.scaling.x = enemy.healthPercentage / enemy.maxHealthPercentage;
 			healthBar.position.x = (1 - (enemy.healthPercentage / enemy.maxHealthPercentage)) * -1;
-			if (healthBar.scaling.x < 0) {
+			if (enemy.healthPercentage <= 0) {
+				enemy.healthPercentage = 0;
 				enemy.die();
 			} else if (enemy.healthPercentage <= 30) {
 				healthBar.material = new HealthBarMaterialCritical(scene);
@@ -98,13 +99,10 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 			}
 		}
 
-		if (enemy.healthPercentage <= 0) {
-			enemy.healthPercentage = 0;
-			enemy.die();
-		}
 	};
 
 	enemy.die = function () {
+		console.log('enemy dies');
 		// SPS creation
 		var tetra = BABYLON.MeshBuilder.CreatePolyhedron("tetra", {size: 0.5}, scene);
 		var box = BABYLON.MeshBuilder.CreateBox("box", {size: 0.5}, scene);
@@ -176,8 +174,10 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 		enemy.SPS.setParticles();
 
 		setTimeout(function () {
-			enemy.SPS.dispose();
-			enemy.SPS = null;
+			if(enemy.SPS) {
+				enemy.SPS.dispose();
+				enemy.SPS = null;
+			}
 		}, 2000);
 
 		enemy.alive = false;
@@ -217,6 +217,8 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 					enemy.playerIsInRange = false;
 				}
 
+			} else {
+				enemy.playerIsInRange = false;
 			}
 		}
 	}, 500);

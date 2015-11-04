@@ -399,3 +399,33 @@ function showHighscores(highscoreTable, parsedData, currentPlayerId){
 		highscoreTable.append('<tr class="' + css + '"><td>' + rank + '.</td><td>' + entry.name + '</td><td>' + entry.level + '</td></tr>');
 	}
 }
+
+function createRocket(game, scene){
+	var diameter = 0.2;
+
+	var rocketBody = BABYLON.MeshBuilder.CreateCylinder('rocket', {diameter: diameter, height: 0.8}, scene);
+	rocketBody.rotation.x = Math.PI/2;
+	rocketBody.bakeCurrentTransformIntoVertices();
+
+	var fin1 = BABYLON.MeshBuilder.CreateBox('finVertical', {size: 0.3, height: 0.3, width: 0.01}, scene);
+	fin1.parent = this.mainMesh;
+	fin1.rotation.x = Math.PI/4;
+	fin1.position.z = -0.2;
+
+	fin2 = BABYLON.MeshBuilder.CreateBox('finHorizontal', {size: 0.3, height: 0.01, width: 0.3}, scene);
+	fin2.parent = this.mainMesh;
+	fin2.rotation.y = Math.PI/4;
+	fin2.position.z = -0.2;
+
+	var warhead = BABYLON.MeshBuilder.CreateSphere('warhead', {diameter: diameter}, scene);
+	warhead.parent = this.mainMesh;
+	warhead.scaling.z = 1.5;
+	warhead.position.z = 0.4;
+
+	var rocket = BABYLON.Mesh.MergeMeshes([rocketBody, fin1, fin2, warhead], true);
+
+
+	rocket.material = game.materials['gray'];
+
+	return rocket
+}

@@ -174,6 +174,7 @@ var Player = function (mazeMesh, position, game, scene) {
 	// mouse events for shooting
 	player.keepShooting = false;
 	player.cannonReady = true;
+	player.rocktLauncherReady = true;
 	window.addEventListener("mousedown", function (evt) {
 		// left click to start fire
 		if (evt.button === 0 && !player.miniMap.isVisible) {
@@ -184,15 +185,25 @@ var Player = function (mazeMesh, position, game, scene) {
 		// left click to start fire
 		if (evt.button === 2 && !player.miniMap.isVisible) {
 			// shoot rocket
-			var newRocket = new Projectile(player, gizmo.absolutePosition, Projectile.PROJECTILETYPE_ROCKET, 'gray', game, scene);
-			newRocket.mainMesh.position = player.position.clone();
-			newRocket.mainMesh.position = rocketLauncher.outputEnd.absolutePosition;
-			player.bullets.push(newRocket);
-			sounds.rocket.play();
+			if(player.rocktLauncherReady) {
+				game.rocketStatusDiv.removeClass('ready');
+				player.rocktLauncherReady = false;
+				var newRocket = new Projectile(player, gizmo.absolutePosition, Projectile.PROJECTILETYPE_ROCKET, 'gray', game, scene);
+				newRocket.mainMesh.position = player.position.clone();
+				newRocket.mainMesh.position = rocketLauncher.outputEnd.absolutePosition;
+				player.bullets.push(newRocket);
+				sounds.rocket.play();
+				setTimeout(function () {
+					game.rocketStatusDiv.addClass('ready');
+					player.rocktLauncherReady = true;
+				}, 1000);
+			}
 		}
 	});
 	window.addEventListener("mouseup", function (evt) {
-		player.keepShooting = false;
+		if (evt.button === 0) {
+			player.keepShooting = false;
+		}
 	});
 
 	// terminal interaction event listener

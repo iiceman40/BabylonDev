@@ -199,3 +199,19 @@ var HealthBarMaterial = function(scene) {
 	healthBarMaterial.alpha = 0.7;
 	return healthBarMaterial;
 };
+
+var FireMaterial = function(scene) {
+	var fireMaterial = new BABYLON.StandardMaterial("fire", scene);
+	var fireTexture = new BABYLON.FireProceduralTexture("fire", 256, scene);
+	fireMaterial.specularColor = BABYLON.Color3.Black();
+	fireMaterial.diffuseTexture = fireTexture;
+	fireMaterial.opacityTexture = fireTexture;
+	fireMaterial.emissiveTexture = fireTexture;
+
+	fireMaterial.emissiveFresnelParameters = new BABYLON.FresnelParameters();
+	fireMaterial.emissiveFresnelParameters.bias = 0.2;
+	fireMaterial.emissiveFresnelParameters.leftColor = BABYLON.Color3.Black();
+	fireMaterial.emissiveFresnelParameters.rightColor = BABYLON.Color3.White();
+
+	return fireMaterial;
+};

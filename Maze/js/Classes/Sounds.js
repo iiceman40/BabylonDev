@@ -7,7 +7,7 @@ var Sounds = function (scene) {
 	this.laser.setVolume(0.2);
 
 	this.rocket = new BABYLON.Sound("rocketSound", "sounds/rocket_launch.mp3", scene);
-	//this.rocket.setVolume(0.2);
+	this.rocket.setVolume(0.5);
 
 	this.explosion = new BABYLON.Sound("explosionSound", "sounds/explosion.mp3", scene);
 

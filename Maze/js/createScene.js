@@ -4,7 +4,7 @@ function createScene() {
 	var scene = new BABYLON.Scene(engine);
 	scene.clearColor = new BABYLON.Color3(0.8, 0.8, 1);
 	scene.collisionsEnabled = true;
-	//scene.workerCollisions = true;
+	scene.workerCollisions = true;
 
 	var game = new Game(config, scene);
 	$('.levelNumber').text(game.level);

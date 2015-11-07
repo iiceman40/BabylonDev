@@ -39,20 +39,18 @@ var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, game, cam
 		scene.registerBeforeRender(function () {
 			if(!exitFound && exit.intersectsMesh(playerOnMiniMap, true)){
 				exitFound = true;
-				camera.detachControl(canvas);
+				scene.activeCamera.detachControl(canvas);
 				engine.stopRenderLoop();
 				// exit reached
-				setTimeout(function(){
-					$('.level').fadeIn(500, function(){
-						scene.dispose();
-						config.startingLevel++;
-						var sizes = ['width', 'height', 'depth'];
-						var sizeToIncrease = sizes[game.level % sizes.length];
-						config[sizeToIncrease]++;
-						scene = createScene();
-						engine.runRenderLoop(function () {
-							scene.render();
-						});
+				$('.level').fadeIn(500, function(){
+					scene.dispose();
+					config.startingLevel++;
+					var sizes = ['width', 'height', 'depth'];
+					var sizeToIncrease = sizes[game.level % sizes.length];
+					config[sizeToIncrease]++;
+					scene = createScene();
+					engine.runRenderLoop(function () {
+						scene.render();
 					});
 				});
 			}

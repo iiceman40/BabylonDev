@@ -1,7 +1,8 @@
 /**
  *
  * @param shooter
- * @param target
+ * @param impactInfo
+ * @param startingPosition
  * @param type
  * @param color
  * @param game
@@ -9,12 +10,16 @@
  * @returns {Projectile}
  * @constructor
  */
-function Projectile(shooter, target, type, color, game, scene) {
+function Projectile(shooter, impactInfo, startingPosition, type, color, game, scene) {
+	var self = this;
+	
 	this.game = game;
 	this.type = type;
 	this.shooter = shooter;
-	this.direction = target.subtract(shooter.position).normalize();
-	this.explosionSound = game.sounds.explosion;
+	this.impactInfo = impactInfo;
+	this.impactPosition = impactInfo.pickedPoint;
+	this.startingPosition = startingPosition || shooter.position;
+	this.direction = this.impactPosition.subtract(this.startingPosition).normalize();
 	this.speed = 1;
 	this.diameter = 0.08;
 	this.damage = 10;
@@ -123,115 +128,81 @@ function Projectile(shooter, target, type, color, game, scene) {
 		this.outsideMesh.parent = this.mainMesh;
 		this.outsideMesh.flipFaces(true);
 	}
+
 	this.mainMesh.rotation = shooter.rotation.clone();
+	this.mainMesh.position = this.startingPosition;
+
+	this.updatePosition = function(bulletIndex, mazeMesh, enemies, player){
+		var disposeProjectile = false;
+
+		// update bullet position
+		self.mainMesh.position = self.mainMesh.position.add(self.direction.scale(self.speed));
+
+		// check if enemy got hit - bullet fired by player
+		if(enemies) {
+			for (var j = 0; j < enemies.length; j++) {
+				var enemy = enemies[j];
+				if (enemy.alive && self.mainMesh.position.subtract(enemy.position).length() < 1) {
+					disposeProjectile = true;
+					self.impactInfo.pickedPoint = self.mainMesh.position.clone();
+					self.impactInfo.pickedMesh = enemy;
+					self.impactInfo.getNormal = function(){
+						return new BABYLON.Vector3(0,0,0);
+					};
+					enemy.hit(self.damage);
+				}
+			}
+		}
+		// check if player got hit - bullet fired by enemy
+		if (player && self.mainMesh.position.subtract(player.position).length() < 1) {
+			disposeProjectile = true;
+			player.hit(self.damage);
+		}
+
+		// if the projectile has not been marked for disposal yet ...
+		if(!disposeProjectile) {
+			// check if projectile has hit the maze wall
+			var distanceToImpact = self.mainMesh.position.subtract(self.impactPosition).length();
+
+			// dispose on out of range or wall hit // TODO fallback: dispose bullet if out of range
+			if (distanceToImpact <= 0.5) {
+				disposeProjectile = true;
+			}
+		}
+
+		if (disposeProjectile) {
+			if(self.type == Projectile.PROJECTILETYPE_ROCKET){
+				// create explosion
+				var explosion = new Explosion(self.impactInfo, self.shooter, self.game, scene);
+
+				// dispose smoke
+				if(self.smokeParticleSystem) {
+					self.smokeParticleSystem.stop();
+				}
+
+				// dispose after burner
+				if(self.thruster) {
+					self.thruster.parent = null;
+					var thruster = self.thruster;
+					setTimeout(function(){
+						thruster.dispose();
+					}, 5000);
+				}
+			}
+
+			self.shooter.projectiles[bulletIndex] = null;
+
+			if(self.outsideMesh) {
+				self.outsideMesh.dispose();
+			}
+
+			self.mainMesh.dispose();
+			self.shooter.projectiles.splice(bulletIndex, 1);
+		}
+	};
 
 	return this;
 }
 
 Projectile.PROJECTILETYPE_BULLET = 1;
 Projectile.PROJECTILETYPE_ROCKET = 2;
-
-Projectile.prototype.updatePosition = function(bulletIndex, mazeMesh, enemies, player){
-	var disposeBullet = false;
-
-	// update bullet position
-	this.mainMesh.position = this.mainMesh.position.add(this.direction.scale(this.speed));
-
-	// check if enemy got hit - bullet fired by player
-	if(enemies) {
-		for (var j = 0; j < enemies.length; j++) {
-			var enemy = enemies[j];
-			if (enemy.alive && this.mainMesh.position.subtract(enemy.position).length() < 1) {
-				disposeBullet = true;
-				enemy.hit(this.damage);
-			}
-		}
-	}
-	// check if player got hit - bullet fired by enemy
-	if (player && this.mainMesh.position.subtract(player.position).length() < 1) {
-		disposeBullet = true;
-		player.hit(this.damage);
-	}
-
-	if(enemies && !disposeBullet) {
-		// check if bullet fired by the player has hit the maze wall
-		var ray = new BABYLON.Ray(this.mainMesh.position.clone(), this.direction.scale(0.5), 1);
-		var pickInfo = scene.pickWithRay(ray, function (mesh) {
-			return mesh == mazeMesh;
-		});
-
-		// dispose on out of range or wall hit
-		if (this.mainMesh.position.length() > config.outOfBoundsDistance || pickInfo.hit) {
-			disposeBullet = true;
-		}
-	}
-
-	if (disposeBullet) {
-		if(this.type == Projectile.PROJECTILETYPE_ROCKET){
-			// create explosion
-			var explosion = BABYLON.Mesh.CreateSphere('explosion', 16, 0.1, scene);
-			explosion.material = this.game.materials.fire;
-			explosion.position = this.mainMesh.position;
-
-			// animation
-			var animationExplosion = new BABYLON.Animation("scalingAnimation", "scaling", 100, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_RELATIVE);
-			// Animation keys
-			var keys = [
-				{
-					frame: 0,
-					value: explosion.scaling
-				},
-				{
-					frame: 25,
-					value: new BABYLON.Vector3(15,15,15)
-				}
-			];
-			//Adding keys to the animation object
-			animationExplosion.setKeys(keys);
-			//Then add the animation object to box1
-			explosion.animations.push(animationExplosion);
-
-			var visibilityExplosion = new BABYLON.Animation("scalingAnimation", "visibility", 100, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-			// Animation keys
-			var visibilityKeys = [
-				{
-					frame: 25,
-					value: explosion.visibility
-				},
-				{
-					frame: 50,
-					value: 0
-				}
-			];
-			//Adding keys to the animation object
-			visibilityExplosion.setKeys(visibilityKeys);
-			//Then add the animation object to box1
-			explosion.animations.push(visibilityExplosion);
-
-			scene.beginAnimation(explosion, 0, 50, true, 1, function(){
-				explosion.dispose();
-			});
-
-
-			// sound
-			this.explosionSound.play();
-		}
-		if(this.smokeParticleSystem) {
-			this.smokeParticleSystem.stop();
-		}
-		this.shooter.bullets[bulletIndex] = null;
-		if(this.outsideMesh) {
-			this.outsideMesh.dispose();
-		}
-		if(this.thruster) {
-			this.thruster.parent = null;
-			var thruster = this.thruster;
-			setTimeout(function(){
-				thruster.dispose();
-			}, 5000);
-		}
-
-		this.mainMesh.dispose();
-		this.shooter.bullets.splice(bulletIndex, 1);
-	}
-};

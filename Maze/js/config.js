@@ -11,4 +11,5 @@ var config = {
 	cellSize: 10,
 	wallThickness: 2,
 	spacing: 20
+
 };

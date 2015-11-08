@@ -167,6 +167,16 @@ function Projectile(shooter, impactInfo, startingPosition, type, color, game, sc
 			// dispose on out of range or wall hit // TODO fallback: dispose bullet if out of range
 			if (distanceToImpact <= 0.5) {
 				disposeProjectile = true;
+
+				// impact decal
+				var newDecal;
+				if(self.type == Projectile.PROJECTILETYPE_ROCKET){
+					newDecal = BABYLON.Mesh.CreateDecal("decal", mazeMesh, self.impactInfo.pickedPoint, self.impactInfo.getNormal(true), this.game.objects.explosionDecalSize);
+					newDecal.material = self.game.materials.explosionDecal;
+				} else {
+					newDecal = BABYLON.Mesh.CreateDecal("decal", mazeMesh, self.impactInfo.pickedPoint, self.impactInfo.getNormal(true), this.game.objects.bulletHoleSize);
+					newDecal.material = self.game.materials.bulletHole;
+				}
 			}
 		}
 

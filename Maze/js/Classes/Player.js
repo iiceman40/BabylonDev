@@ -3,6 +3,8 @@ var Player = function (mazeMesh, position, game, scene) {
 	var sounds = game.sounds;
 	var player = new BABYLON.FreeCamera("playerFreeCamera", new BABYLON.Vector3(0, 0, 0), scene);
 
+	player.impactDecals =
+
 	player.attachControl(canvas, true);
 
 	player.ellipsoid = new BABYLON.Vector3(1, 1, 1);

@@ -177,6 +177,13 @@ function Projectile(shooter, impactInfo, startingPosition, type, color, game, sc
 					newDecal = BABYLON.Mesh.CreateDecal("decal", mazeMesh, self.impactInfo.pickedPoint, self.impactInfo.getNormal(true), this.game.objects.bulletHoleSize);
 					newDecal.material = self.game.materials.bulletHole;
 				}
+				this.shooter.impactDecals.push(newDecal);
+
+				if(shooter.impactDecals.length > 10){
+					shooter.impactDecals[0].dispose();
+					shooter.impactDecals[0] = null;
+					shooter.impactDecals.splice(0, 1);
+				}
 			}
 		}
 

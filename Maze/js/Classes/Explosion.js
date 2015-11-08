@@ -53,7 +53,5 @@ var Explosion = function (impactInfo, shooter, game, scene) {
 	// sound
 	game.sounds.explosion.play();
 
-	console.log('explosion created: ', explosion.position);
-
 	return explosion;
 };

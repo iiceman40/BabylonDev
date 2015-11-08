@@ -10,6 +10,9 @@
 var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) {
 
 	var enemy = BABYLON.Mesh.CreateSphere("enemy", 32, 2, scene, false);
+
+	enemy.impactDecals = [];
+
 	enemy.material = new EnemyMaterial(scene);
 	enemy.position = getCellPosition(positionCoordinates.x, positionCoordinates.y, positionCoordinates.z, maze, config.spacing);
 	enemy.position.y -= 1;

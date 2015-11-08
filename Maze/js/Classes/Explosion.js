@@ -1,8 +1,6 @@
 var Explosion = function (impactInfo, shooter, game, scene) {
 	this.impactPosition = impactInfo.pickedPoint;
 
-	console.log('creating explosion');
-
 	var explosion = BABYLON.Mesh.CreateSphere('explosion', 16, 0.1, scene);
 	explosion.material = game.materials.fire;
 	explosion.position = this.impactPosition;

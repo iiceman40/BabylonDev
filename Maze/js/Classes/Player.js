@@ -3,12 +3,9 @@ var Player = function (mazeMesh, position, game, scene) {
 	var sounds = game.sounds;
 	var player = new BABYLON.FreeCamera("playerFreeCamera", new BABYLON.Vector3(0, 0, 0), scene);
 
-	player.attachControl(canvas, true);
+	player.impactDecals = [];
 
-	var gizmo = BABYLON.Mesh.CreateBox('gizmo', 0.01, scene);
-	gizmo.parent = player;
-	gizmo.isVisible = false;
-	gizmo.position.z = 1;
+	player.attachControl(canvas, true);
 
 	player.ellipsoid = new BABYLON.Vector3(1, 1, 1);
 	player.checkCollisions = true;
@@ -92,9 +89,9 @@ var Player = function (mazeMesh, position, game, scene) {
 		BABYLON.Camera.prototype._checkInputs.call(this);
 	};
 
-	player.flashlight = new BABYLON.SpotLight("Spot0", new BABYLON.Vector3(0, 0, 0), new BABYLON.Vector3(1, 0, 0), 1.8, 2, scene);
+	player.flashlight = new BABYLON.SpotLight("Spot0", new BABYLON.Vector3(0, 0, 0), new BABYLON.Vector3(1, 0, 0), 1.3, 2, scene);
 	player.flashlight.intensity = 0.5;
-	player.flashlight.range = 35;
+	player.flashlight.range = 50;
 
 	// COCKPIT HUD
 	player.energyLevel = 100;
@@ -153,7 +150,7 @@ var Player = function (mazeMesh, position, game, scene) {
 	statusBarsLight.includedOnlyMeshes = [player.energyBar, player.healthBar];
 
 	// SHOOTING
-	player.bullets = [];
+	player.projectiles = [];
 	var currentCannon = 1;
 
 	// init cannons
@@ -180,23 +177,33 @@ var Player = function (mazeMesh, position, game, scene) {
 		if (evt.button === 0 && !player.miniMap.isVisible) {
 			player.keepShooting = true;
 		}
-	});
-	window.addEventListener("mousedown", function (evt) {
 		// left click to start fire
 		if (evt.button === 2 && !player.miniMap.isVisible) {
 			// shoot rocket
 			if(player.rocktLauncherReady) {
 				game.rocketStatusDiv.removeClass('ready');
 				player.rocktLauncherReady = false;
-				var newRocket = new Projectile(player, gizmo.absolutePosition, Projectile.PROJECTILETYPE_ROCKET, 'gray', game, scene);
-				newRocket.mainMesh.position = player.position.clone();
-				newRocket.mainMesh.position = rocketLauncher.outputEnd.absolutePosition;
-				player.bullets.push(newRocket);
-				sounds.rocket.play();
-				setTimeout(function () {
-					game.rocketStatusDiv.addClass('ready');
-					player.rocktLauncherReady = true;
-				}, 1000);
+
+				// pick rocket impact position
+				var ray = new BABYLON.Ray(player.position, player.getTarget().subtract(player.position));
+				var pickInfo = scene.pickWithRay(ray, function(mesh){
+					return mesh == mazeMesh;
+				});
+
+				if(pickInfo.hit){
+					//var impactPoint = BABYLON.MeshBuilder.CreateBox('impact', {size: 0.5}, scene);
+					//impactPoint.position = pickInfo.pickedPoint;
+
+					var newRocket = new Projectile(player, pickInfo, rocketLauncher.outputEnd.absolutePosition, Projectile.PROJECTILETYPE_ROCKET, 'gray', game, scene);
+
+					player.projectiles.push(newRocket);
+					sounds.rocket.play();
+					setTimeout(function () {
+						game.rocketStatusDiv.addClass('ready');
+						player.rocktLauncherReady = true;
+					}, 1000);
+				}
+
 			}
 		}
 	});
@@ -235,9 +242,9 @@ var Player = function (mazeMesh, position, game, scene) {
 		player.flashlight.direction = player.getTarget().subtract(player.position);
 		player.flashlight.direction.y -= 0.2;
 
-		// update bullets
-		for (var i = player.bullets.length - 1; i >= 0; i--) {
-			player.bullets[i].updatePosition(i, mazeMesh, enemies, null);
+		// update projectiles
+		for (var i = player.projectiles.length - 1; i >= 0; i--) {
+			player.projectiles[i].updatePosition(i, mazeMesh, enemies, null);
 		}
 
 		// shooting laser
@@ -248,24 +255,33 @@ var Player = function (mazeMesh, position, game, scene) {
 				player.energyLevel = 1;
 			}
 			// fire laser bullet from player in the direction the player is currently looking
-			var newBullet = new Projectile(player, gizmo.absolutePosition, Projectile.PROJECTILETYPE_BULLET, 'blue', game, scene);
-			cannonLight.setEnabled(true);
-			if (currentCannon == 1) {
-				newBullet.mainMesh.position = cannonLeft.outputEnd.absolutePosition;
-				currentCannon = 2;
-				cannonLight.position = cannonLeft.outputEnd.absolutePosition;
-			} else {
-				newBullet.mainMesh.position = cannonRight.outputEnd.absolutePosition;
-				currentCannon = 1;
-				cannonLight.position = cannonRight.outputEnd.absolutePosition;
-			}
-			player.bullets.push(newBullet);
-			sounds.laser.play();
+			var newBullet;
 
-			setTimeout(function () {
-				player.cannonReady = true;
-				cannonLight.setEnabled(false);
-			}, 200);
+			// pick rocket impact position
+			var ray = new BABYLON.Ray(player.position, player.getTarget().subtract(player.position));
+			var pickInfo = scene.pickWithRay(ray, function(mesh){
+				return mesh == mazeMesh;
+			});
+
+			if(pickInfo.hit) {
+				cannonLight.setEnabled(true);
+				if (currentCannon == 1) {
+					newBullet = new Projectile(player, pickInfo, cannonLeft.outputEnd.absolutePosition, Projectile.PROJECTILETYPE_BULLET, 'blue', game, scene);
+					currentCannon = 2;
+					cannonLight.position = cannonLeft.outputEnd.absolutePosition;
+				} else {
+					newBullet = new Projectile(player, pickInfo, cannonRight.outputEnd.absolutePosition, Projectile.PROJECTILETYPE_BULLET, 'blue', game, scene);
+					currentCannon = 1;
+					cannonLight.position = cannonRight.outputEnd.absolutePosition;
+				}
+				player.projectiles.push(newBullet);
+				sounds.laser.play();
+
+				setTimeout(function () {
+					player.cannonReady = true;
+					cannonLight.setEnabled(false);
+				}, 200);
+			}
 		}
 
 	});

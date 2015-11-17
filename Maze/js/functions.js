@@ -412,7 +412,7 @@ function createRocket(game, scene){
 	fin1.rotation.x = Math.PI/4;
 	fin1.position.z = -0.2;
 
-	fin2 = BABYLON.MeshBuilder.CreateBox('finHorizontal', {size: 0.3, height: 0.01, width: 0.3}, scene);
+	var fin2 = BABYLON.MeshBuilder.CreateBox('finHorizontal', {size: 0.3, height: 0.01, width: 0.3}, scene);
 	fin2.parent = this.mainMesh;
 	fin2.rotation.y = Math.PI/4;
 	fin2.position.z = -0.2;
@@ -423,7 +423,7 @@ function createRocket(game, scene){
 	warhead.position.z = 0.4;
 
 	var rocket = BABYLON.Mesh.MergeMeshes([rocketBody, fin1, fin2, warhead], true);
-
+	rocket.isVisible = false;
 
 	rocket.material = game.materials['gray'];
 

@@ -10,6 +10,9 @@
 var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) {
 
 	var enemy = BABYLON.Mesh.CreateSphere("enemy", 32, 2, scene, false);
+
+	enemy.impactDecals = [];
+
 	enemy.material = new EnemyMaterial(scene);
 	enemy.position = getCellPosition(positionCoordinates.x, positionCoordinates.y, positionCoordinates.z, maze, config.spacing);
 	enemy.position.y -= 1;
@@ -184,7 +187,7 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 		enemy.dispose();
 	};
 
-	enemy.bullets = [];
+	enemy.projectiles = [];
 
 	var decalMaterial = new BABYLON.StandardMaterial("decalMat", scene);
 	decalMaterial.diffuseTexture = new BABYLON.Texture("img/bullet_hole.png", scene);
@@ -234,21 +237,28 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 		// attack player if in sight
 		if (enemy.alive && enemy.playerIsInRange && enemy.cannonReady) {
 			// fire laser bullet from player in the direction the player is currently looking
-			var newBullet = new Projectile(enemy, player.position, Projectile.PROJECTILETYPE_BULLET, 'red', game, scene);
-			newBullet.mainMesh.position = enemy.absolutePosition.clone();
-			newBullet.mainMesh.lookAt(player.position);
-			enemy.bullets.push(newBullet);
-			enemy.cannonReady = false;
-			game.sounds.laser.play();
+			var ray = new BABYLON.Ray(enemy.position, player.position.subtract(enemy.position));
+			var pickInfo = scene.pickWithRay(ray, function(mesh){
+				return mesh == mazeMesh;
+			});
 
-			setTimeout(function () {
-				enemy.cannonReady = true;
-			}, 1000);
+			if(pickInfo.hit) {
+				var newBullet = new Projectile(enemy, pickInfo, player.position, Projectile.PROJECTILETYPE_BULLET, 'red', game, scene);
+				newBullet.mainMesh.position = enemy.absolutePosition.clone();
+				newBullet.mainMesh.lookAt(player.position);
+				enemy.projectiles.push(newBullet);
+				enemy.cannonReady = false;
+				game.sounds.laser.play();
+
+				setTimeout(function () {
+					enemy.cannonReady = true;
+				}, 1000);
+			}
 		}
 
-		// update bullets
-		for (var i = enemy.bullets.length - 1; i >= 0; i--) {
-			enemy.bullets[i].updatePosition(i, mazeMesh, null, player);
+		// update projectiles
+		for (var i = enemy.projectiles.length - 1; i >= 0; i--) {
+			enemy.projectiles[i].updatePosition(i, mazeMesh, null, player);
 		}
 
 	});

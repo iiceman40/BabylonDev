@@ -215,3 +215,29 @@ var FireMaterial = function(scene) {
 
 	return fireMaterial;
 };
+
+var BulletHoleMaterial = function(scene) {
+	var decalMaterial = new BABYLON.StandardMaterial("decalMat", scene);
+	decalMaterial.diffuseTexture = new BABYLON.Texture("img/bullethole.png", scene);
+	decalMaterial.diffuseTexture.hasAlpha = true;
+	decalMaterial.bumpTexture = new BABYLON.Texture("img/bullethole_normal.png", scene);
+	decalMaterial.bumpTexture.hasAlpha = true;
+	decalMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1);
+	decalMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+	decalMaterial.emissiveColor = new BABYLON.Color3(0.08, 0.08, 0.08);
+	decalMaterial.zOffset = -2;
+	return decalMaterial;
+};
+
+var ExplosionDecalMaterial = function(scene) {
+	var decalMaterial = new BABYLON.StandardMaterial("decalMat", scene);
+	decalMaterial.diffuseTexture = new BABYLON.Texture("img/explosion_decal.png", scene);
+	decalMaterial.diffuseTexture.hasAlpha = true;
+	decalMaterial.bumpTexture = new BABYLON.Texture("img/explosion_decal_normal.png", scene);
+	decalMaterial.bumpTexture.hasAlpha = true;
+	decalMaterial.opacityTexture = new BABYLON.Texture("img/explosion_decal.png", scene);
+	decalMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+	decalMaterial.emissiveColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+	decalMaterial.zOffset = -3;
+	return decalMaterial;
+}

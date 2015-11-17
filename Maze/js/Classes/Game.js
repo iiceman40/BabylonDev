@@ -9,11 +9,15 @@ var Game = function (config, scene) {
 		blue: new BlueBulletMaterial(scene),
 		brightBlue: new BrightBlueBulletMaterial(scene),
 		gray: new RocketMaterial(scene),
-		fire: new FireMaterial(scene)
+		fire: new FireMaterial(scene),
+		bulletHole: new BulletHoleMaterial(scene),
+		explosionDecal: new ExplosionDecalMaterial(scene)
 	};
 
 	this.objects = {
-		rocket: createRocket(this, scene)
+		rocket: createRocket(this, scene),
+		bulletHoleSize: new BABYLON.Vector3(0.2, 0.2, 0.2),
+		explosionDecalSize: new BABYLON.Vector3(2, 2, 2)
 	};
 
 	this.sounds = new Sounds(scene);

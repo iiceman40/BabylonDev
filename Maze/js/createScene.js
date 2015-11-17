@@ -20,7 +20,7 @@ function createScene() {
 	var availableMessages = [
 		new Message("You are doing really great. <br/> <br/> Fun fact: <br/> <br/> A lot of people don't undestand sarcasm!", null),
 		new Message("Hey, what's up, buttercup?", null),
-		new Message("Hello! <br/> <br/> This is the part where I kill you.", null),
+		new Message("Hello! <br/> <br/> This is the part where I kill you. <br/> <br/> Just a joke. <br/> <br/> Who knows...", null),
 		new Message("Are you still there?", null),
 		new Message("Get out of my head!", null),
 		new Message("Oh... It's you.", null),
@@ -28,7 +28,8 @@ function createScene() {
 		new Message("Okay. Look. We both said a lot of things that you're going to regret. But I think we can put our differences behind us. For science. <br/> <br/> You monster.", null),
 		new Message("You broke it, didn't you.", null),
 		new Message("So. <br/> <br/> How are you holding up?", null),
-		new Message("Don't press that button. You don't know what you're doing.", null)
+		new Message("Don't press that button. You don't know what you're doing.", null),
+		new Message("How much wood would a woodchuck chuck if a woodchuck could chuck wood?")
 	];
 
 	// CAMERA/PLAYER

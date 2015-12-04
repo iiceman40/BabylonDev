@@ -52,15 +52,17 @@ var Terminal = function (position, maze, player, miniMap, availableMessages, sha
 	}, 200);
 
 	setInterval(function() {
-		var message = self.activeMessageText;
-		if(blink){
-			if(self.activeMessageText.length == self.message.text.length){
-				message += ' <br/> ';
+		if(config.animateTerminals) {
+			var message = self.activeMessageText;
+			if (blink) {
+				if (self.activeMessageText.length == self.message.text.length) {
+					message += ' <br/> ';
+				}
+				message += '|'
 			}
-			message += '|'
+			// text, x, y, font, color, clearColor, invertY, update, dynamicTexture
+			wrapText(message, 20, 60, "bold 40px Lucida Console", "green", "#19321C", true, true, terminalScreen.material.diffuseTexture);
 		}
-		// text, x, y, font, color, clearColor, invertY, update, dynamicTexture
-		wrapText(message, 20, 60, "bold 40px Lucida Console", "green", "#19321C", true, true, terminalScreen.material.diffuseTexture);
 	}, 300);
 
 
@@ -95,4 +97,5 @@ var Terminal = function (position, maze, player, miniMap, availableMessages, sha
 	}
 	// TODO handle if no wall was available??
 
+	return terminalCase;
 };

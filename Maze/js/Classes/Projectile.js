@@ -21,7 +21,6 @@ function Projectile(shooter, impactInfo, startingPosition, type, color, game, sc
 	this.startingPosition = startingPosition || shooter.position;
 	this.direction = this.impactPosition.subtract(this.startingPosition).normalize();
 	this.speed = 1;
-	this.diameter = 0.08;
 	this.damage = 10;
 
 	if(this.type == Projectile.PROJECTILETYPE_ROCKET) {
@@ -119,14 +118,10 @@ function Projectile(shooter, impactInfo, startingPosition, type, color, game, sc
 
 	if(this.type == Projectile.PROJECTILETYPE_BULLET) {
 
-		this.mainMesh = BABYLON.MeshBuilder.CreateSphere('bullet', {diameter: this.diameter}, scene);
-		this.mainMesh.scaling.z = 30;
-		this.mainMesh.material = game.materials['bright' + color.charAt(0).toUpperCase() + color.slice(1)];
-
-		this.outsideMesh = BABYLON.MeshBuilder.CreateSphere('outsideMesh', {diameter: 0.1}, scene);
-		this.outsideMesh.material = game.materials[color];
+		this.mainMesh = game.objects.laserBullets[color].mainMesh.createInstance('laserBulletMainMeshInstance');
+		this.outsideMesh = game.objects.laserBullets[color].outsideMesh.createInstance('laserBulletOutsideMeshInstance');
 		this.outsideMesh.parent = this.mainMesh;
-		this.outsideMesh.flipFaces(true);
+
 	}
 
 	this.mainMesh.rotation = shooter.rotation.clone();
@@ -169,20 +164,22 @@ function Projectile(shooter, impactInfo, startingPosition, type, color, game, sc
 				disposeProjectile = true;
 
 				// impact decal
-				var newDecal;
-				if(self.type == Projectile.PROJECTILETYPE_ROCKET){
-					newDecal = BABYLON.Mesh.CreateDecal("decal", mazeMesh, self.impactInfo.pickedPoint, self.impactInfo.getNormal(true), this.game.objects.explosionDecalSize);
-					newDecal.material = self.game.materials.explosionDecal;
-				} else {
-					newDecal = BABYLON.Mesh.CreateDecal("decal", mazeMesh, self.impactInfo.pickedPoint, self.impactInfo.getNormal(true), this.game.objects.bulletHoleSize);
-					newDecal.material = self.game.materials.bulletHole;
-				}
-				this.shooter.impactDecals.push(newDecal);
+				if(config.useDecals) {
+					var newDecal;
+					if (self.type == Projectile.PROJECTILETYPE_ROCKET) {
+						newDecal = BABYLON.Mesh.CreateDecal("decal", mazeMesh, self.impactInfo.pickedPoint, self.impactInfo.getNormal(true), this.game.objects.explosionDecalSize);
+						newDecal.material = self.game.materials.explosionDecal;
+					} else {
+						newDecal = BABYLON.Mesh.CreateDecal("decal", mazeMesh, self.impactInfo.pickedPoint, self.impactInfo.getNormal(true), this.game.objects.bulletHoleSize);
+						newDecal.material = self.game.materials.bulletHole;
+					}
+					this.shooter.impactDecals.push(newDecal);
 
-				if(shooter.impactDecals.length > 10){
-					shooter.impactDecals[0].dispose();
-					shooter.impactDecals[0] = null;
-					shooter.impactDecals.splice(0, 1);
+					if (shooter.impactDecals.length > 10) {
+						shooter.impactDecals[0].dispose();
+						shooter.impactDecals[0] = null;
+						shooter.impactDecals.splice(0, 1);
+					}
 				}
 			}
 		}

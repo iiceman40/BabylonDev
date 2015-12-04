@@ -233,16 +233,17 @@ var Player = function (mazeMesh, position, game, scene) {
 		return false;
 	});
 
-	// REGISTER BEFORE RENDER FOR SHOOTING
-	scene.registerBeforeRender(function () {
-
+	scene.beforeCameraRender = function(){
 		// sync flashlight
 		player.flashlight.position = player.position.clone();
 		player.flashlight.position.y += 1;
 		player.flashlight.direction = player.getTarget().subtract(player.position);
 		player.flashlight.direction.y -= 0.2;
+	};
 
-		// update projectiles
+	// REGISTER BEFORE RENDER FOR SHOOTING
+	scene.registerBeforeRender(function () {
+
 		for (var i = player.projectiles.length - 1; i >= 0; i--) {
 			player.projectiles[i].updatePosition(i, mazeMesh, enemies, null);
 		}
@@ -257,7 +258,7 @@ var Player = function (mazeMesh, position, game, scene) {
 			// fire laser bullet from player in the direction the player is currently looking
 			var newBullet;
 
-			// pick rocket impact position
+			// pick laser impact position // TODO move out of registerBeforeRender ?
 			var ray = new BABYLON.Ray(player.position, player.getTarget().subtract(player.position));
 			var pickInfo = scene.pickWithRay(ray, function(mesh){
 				return mesh == mazeMesh;

@@ -11,9 +11,34 @@ $(document).ready(function () {
 	engine = new BABYLON.Engine(canvas, true);
 
 	scene = createScene();
-	engine.runRenderLoop(function () {
-		scene.render();
-	});
+
+	// preparing textures
+	var texturesToLoad = [
+		{name: 'wallTexture', path: 'img/Grill9_normal.png'}
+	];
+	var loadedTextures = {};
+
+	var assetsManager = new BABYLON.AssetsManager(scene);
+
+	for(var i=0; i < texturesToLoad.length; i++) {
+		var currentTexture = texturesToLoad[i];
+		var textureTask = assetsManager.addTextureTask("wall textures task", currentTexture.path);
+		textureTask.nameOfLoadedTexture = currentTexture.name;
+		textureTask.onSuccess = function (task) {
+			loadedTextures[task.nameOfLoadedTexture] = task.texture;
+			console.log('finished loading ', task.nameOfLoadedTexture);
+		};
+	}
+
+	assetsManager.onFinish = function (tasks) {
+		console.log('finished loading assets');
+		engine.runRenderLoop(function () {
+			scene.render();
+		});
+	};
+
+	assetsManager.load();
+
 
 	window.addEventListener("resize", function () {
 		engine.resize();

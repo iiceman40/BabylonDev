@@ -349,8 +349,9 @@ function updateBar(bar, value) {
 
 function initTerminals(maze, player, miniMap, availableMessages, shadowGenerator, scene) {
 	var numberOfTerminals = Math.floor(maze.numberOfRooms / 4);
+	var terminals = [];
 	// add a terminal to the first room
-	new Terminal(new BABYLON.Vector3(maze.width - 1, maze.height - 1, 0), maze, player, miniMap, availableMessages, shadowGenerator, scene);
+	terminals.push(new Terminal(new BABYLON.Vector3(maze.width - 1, maze.height - 1, 0), maze, player, miniMap, availableMessages, shadowGenerator, scene));
 	var placedTerminals = 1;
 
 	while (numberOfTerminals - placedTerminals > 0) {
@@ -358,10 +359,13 @@ function initTerminals(maze, player, miniMap, availableMessages, shadowGenerator
 		var y = Math.floor(Math.random() * maze.height);
 		var z = Math.floor(Math.random() * maze.depth);
 		if (!maze.map[y][x][z].hasTerminal) {
-			new Terminal(new BABYLON.Vector3(x, y, z), maze, player, miniMap, availableMessages, shadowGenerator, scene);
+			terminals.push(new Terminal(new BABYLON.Vector3(x, y, z), maze, player, miniMap, availableMessages, shadowGenerator, scene));
 			placedTerminals++;
 		}
 	}
+
+	var mergerTerminals = BABYLON.Mesh.MergeMeshes(terminals, true);
+	mergerTerminals.isPickable = false;
 }
 
 /**
@@ -406,26 +410,49 @@ function createRocket(game, scene){
 	var rocketBody = BABYLON.MeshBuilder.CreateCylinder('rocket', {diameter: diameter, height: 0.8}, scene);
 	rocketBody.rotation.x = Math.PI/2;
 	rocketBody.bakeCurrentTransformIntoVertices();
+	rocketBody.isPickable = false;
 
 	var fin1 = BABYLON.MeshBuilder.CreateBox('finVertical', {size: 0.3, height: 0.3, width: 0.01}, scene);
 	fin1.parent = this.mainMesh;
 	fin1.rotation.x = Math.PI/4;
 	fin1.position.z = -0.2;
+	fin1.isPickable = false;
 
 	var fin2 = BABYLON.MeshBuilder.CreateBox('finHorizontal', {size: 0.3, height: 0.01, width: 0.3}, scene);
 	fin2.parent = this.mainMesh;
 	fin2.rotation.y = Math.PI/4;
 	fin2.position.z = -0.2;
+	fin2.isPickable = false;
 
 	var warhead = BABYLON.MeshBuilder.CreateSphere('warhead', {diameter: diameter}, scene);
 	warhead.parent = this.mainMesh;
 	warhead.scaling.z = 1.5;
 	warhead.position.z = 0.4;
+	warhead.isPickable = false;
 
 	var rocket = BABYLON.Mesh.MergeMeshes([rocketBody, fin1, fin2, warhead], true);
 	rocket.isVisible = false;
+	rocket.isPickable = false;
 
 	rocket.material = game.materials['gray'];
 
 	return rocket
+}
+
+function createLaserBullet(color, diameter, game, scene){
+	var mainMesh = BABYLON.MeshBuilder.CreateSphere('laserBulletMainMesh', {diameter: diameter}, scene);
+	mainMesh.scaling.z = 30;
+	mainMesh.material = game.materials['bright' + color.charAt(0).toUpperCase() + color.slice(1)];
+	mainMesh.isPickable = false;
+
+	var outsideMesh = BABYLON.MeshBuilder.CreateSphere('laserBulletOutsideMesh', {diameter: diameter/4}, scene);
+	outsideMesh.material = game.materials[color];
+	outsideMesh.parent = mainMesh;
+	outsideMesh.flipFaces(true);
+	outsideMesh.isPickable = false;
+
+	return {
+		mainMesh: mainMesh,
+		outsideMesh: outsideMesh
+	};
 }

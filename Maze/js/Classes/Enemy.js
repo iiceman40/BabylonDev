@@ -19,19 +19,24 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 	enemy.checkCollisions = true;
 	enemy.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
 
-	var enemyEye = BABYLON.MeshBuilder.CreateCylinder('eye', {diameter: 0.3, height: 0.1}, scene);
-	enemyEye.material = new EnemyEyeMaterial(scene);
-	enemyEye.parent = enemy;
-	enemyEye.position.z = -1.95;
-	enemyEye.rotation.x = Math.PI / 2;
+	if(config.enemyEye) {
+		var enemyEye = BABYLON.MeshBuilder.CreateCylinder('eye', {diameter: 0.3, height: 0.1}, scene);
+		enemyEye.material = new EnemyEyeMaterial(scene);
+		enemyEye.parent = enemy;
+		enemyEye.position.z = -1.95;
+		enemyEye.rotation.x = Math.PI / 2;
+		enemyEye.isPickable = false;
+	}
 
-	var enemyLight = new BABYLON.PointLight("Omni0", new BABYLON.Vector3(0, 0, 0), scene);
-	enemyLight.diffuse = new BABYLON.Color3(0.5, 0, 0);
-	enemyLight.intensity = 1;
-	enemyLight.range = 4;
-	enemyLight.parent = enemy;
-	enemyLight.includedOnlyMeshes = [enemy];
-	enemyLight.position.z = -3;
+	if(config.enemyLight) {
+		var enemyLight = new BABYLON.PointLight("Omni0", new BABYLON.Vector3(0, 0, 0), scene);
+		enemyLight.diffuse = new BABYLON.Color3(0.5, 0, 0);
+		enemyLight.intensity = 1;
+		enemyLight.range = 4;
+		enemyLight.parent = enemy;
+		enemyLight.includedOnlyMeshes = [enemy];
+		enemyLight.position.z = -3;
+	}
 
 	// ANIMATIONS
 	var originalPosition = enemy.position.clone();
@@ -69,16 +74,22 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 
 
 	// HEALTH BAR
-	var healthBarContainer = BABYLON.MeshBuilder.CreatePlane("hb2", {width: 2, height: 0.5, subdivisions: 4}, scene);
-	healthBarContainer.position = new BABYLON.Vector3(0, 2, 0);
-	healthBarContainer.parent = enemy;
-	healthBarContainer.material = new HealthBarContainerMaterial(scene);
-	//healthBarContainer.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
+	if(config.enemyHealthBar) {
+		var healthBarContainer = BABYLON.MeshBuilder.CreatePlane("hb2", {
+			width: 2,
+			height: 0.5,
+			subdivisions: 4
+		}, scene);
+		healthBarContainer.position = new BABYLON.Vector3(0, 2, 0);
+		healthBarContainer.parent = enemy;
+		healthBarContainer.material = new HealthBarContainerMaterial(scene);
+		//healthBarContainer.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
 
-	var healthBar = BABYLON.MeshBuilder.CreatePlane("hb1", {width: 2, height: 0.5, subdivisions: 4}, scene);
-	healthBar.material = new HealthBarMaterialFull(scene);
-	healthBar.position = new BABYLON.Vector3(0, 0, -.01);
-	healthBar.parent = healthBarContainer;
+		var healthBar = BABYLON.MeshBuilder.CreatePlane("hb1", {width: 2, height: 0.5, subdivisions: 4}, scene);
+		healthBar.material = new HealthBarMaterialFull(scene);
+		healthBar.position = new BABYLON.Vector3(0, 0, -.01);
+		healthBar.parent = healthBarContainer;
+	}
 
 	enemy.alive = true;
 	enemy.healthPercentage = 50;

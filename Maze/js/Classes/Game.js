@@ -16,6 +16,10 @@ var Game = function (config, scene) {
 
 	this.objects = {
 		rocket: createRocket(this, scene),
+		laserBullets: {
+			red: createLaserBullet('red', 0.08, this, scene),
+			blue: createLaserBullet('blue', 0.08, this, scene)
+		},
 		bulletHoleSize: new BABYLON.Vector3(0.2, 0.2, 0.2),
 		explosionDecalSize: new BABYLON.Vector3(2, 2, 2)
 	};

@@ -19,6 +19,7 @@ $(document).ready(function () {
 	var loadedTextures = {};
 
 	var assetsManager = new BABYLON.AssetsManager(scene);
+	assetsManager.useDefaultLoadingScreen = false;
 
 	for(var i=0; i < texturesToLoad.length; i++) {
 		var currentTexture = texturesToLoad[i];
@@ -31,12 +32,12 @@ $(document).ready(function () {
 	}
 
 	assetsManager.onFinish = function (tasks) {
-		console.log('finished loading assets');
-		$('.hud').delay(700).fadeIn(500);
-		$('.level').show(0).delay(700).fadeOut(500);
+		scene.executeWhenReady(function(){
+			$('.loading').fadeOut(500);
 
-		engine.runRenderLoop(function () {
-			scene.render();
+			engine.runRenderLoop(function () {
+				scene.render();
+			});
 		});
 	};
 

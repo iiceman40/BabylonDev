@@ -63,5 +63,9 @@ function createScene() {
 		scene.debugLayer.show();
 	}
 
+	scene.executeWhenReady(function() {
+		$('.level').delay(1000).fadeOut(500);
+	});
+
 	return scene;
 }

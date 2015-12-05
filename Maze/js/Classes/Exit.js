@@ -37,7 +37,7 @@ var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, game, cam
 	var exitFound = false;
 	setTimeout(function(){
 		scene.registerBeforeRender(function () {
-			if(!exitFound && exit.intersectsMesh(playerOnMiniMap, true)){
+			if(!exitFound && BABYLON.Vector3.Distance(exit.position, playerOnMiniMap.position) < 1){
 				exitFound = true;
 				scene.activeCamera.detachControl(canvas);
 				engine.stopRenderLoop();

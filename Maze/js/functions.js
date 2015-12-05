@@ -444,12 +444,14 @@ function createLaserBullet(color, diameter, game, scene){
 	mainMesh.scaling.z = 30;
 	mainMesh.material = game.materials['bright' + color.charAt(0).toUpperCase() + color.slice(1)];
 	mainMesh.isPickable = false;
+	mainMesh.layerMask = 2;
 
 	var outsideMesh = BABYLON.MeshBuilder.CreateSphere('laserBulletOutsideMesh', {diameter: diameter/4}, scene);
 	outsideMesh.material = game.materials[color];
 	outsideMesh.parent = mainMesh;
 	outsideMesh.flipFaces(true);
 	outsideMesh.isPickable = false;
+	outsideMesh.layerMask = 2;
 
 	return {
 		mainMesh: mainMesh,

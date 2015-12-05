@@ -101,12 +101,14 @@ var Player = function (mazeMesh, position, game, scene) {
 	player.energyBar.parent = player;
 	player.energyBar.position = new BABYLON.Vector3(0, -0.37, 1);
 	player.energyBar.renderingGroupId = 2;
+	player.energyBar.layerMask = 2;
 	player.energyBar.material = new EnergyBarMaterial(scene);
 
 	player.healthBar = BABYLON.MeshBuilder.CreateBox('energyBar', {size: 0.02, width: 0.45}, scene);
 	player.healthBar.parent = player;
 	player.healthBar.position = new BABYLON.Vector3(0, -0.4, 1);
 	player.healthBar.renderingGroupId = 2;
+	player.healthBar.layerMask = 2;
 	player.healthBar.material = new HealthBarMaterial(scene);
 
 	setInterval(function(){

@@ -21,7 +21,7 @@ html, body, canvas {
 	position: absolute;
 	background: url('../img/crosshair.png') no-repeat 50% 50%;
 	z-index: 100;
-	display: block;
+	display: none;
 	top: 0;
 	left: 0;
 	bottom: 0;
@@ -35,7 +35,7 @@ html, body, canvas {
 	position: absolute;
 	background: black;
 	z-index: 200;
-	display: block;
+	display: none;
 	top: 0;
 	left: 0;
 	bottom: 0;

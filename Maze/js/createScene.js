@@ -8,7 +8,6 @@ function createScene() {
 
 	var game = new Game(config, scene);
 	$('.levelNumber').text(game.level);
-	$('.level').delay(700).fadeOut(500);
 
 	// CREATE MAZE
 	var maze = new Maze(config.width, config.height, config.depth, config.startingPoint);

@@ -134,11 +134,11 @@ var Player = function (mazeMesh, position, game, scene) {
 			engine.stopRenderLoop();
 			setTimeout(function() {
 				scene.dispose();
-				destroyedModal.show(game); // TODO find better way to submit the game object to the modal class
+				var menuScope = getScope('MenuCtrl');
+				menuScope.playerDied(game.level);
 				// release mouse pointer
 				document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
 				document.exitPointerLock();
-				speakPart([$('.modal-body .destroyed-message').text()], 0, null);
 			});
 		}
 
@@ -174,7 +174,7 @@ var Player = function (mazeMesh, position, game, scene) {
 	player.keepShooting = false;
 	player.cannonReady = true;
 	player.rocktLauncherReady = true;
-	window.addEventListener("mousedown", function (evt) {
+	canvas.addEventListener("mousedown", function (evt) {
 		// left click to start fire
 		if (evt.button === 0 && !player.miniMap.isVisible) {
 			player.keepShooting = true;
@@ -209,7 +209,7 @@ var Player = function (mazeMesh, position, game, scene) {
 			}
 		}
 	});
-	window.addEventListener("mouseup", function (evt) {
+	canvas.addEventListener("mouseup", function (evt) {
 		if (evt.button === 0) {
 			player.keepShooting = false;
 		}

@@ -15,6 +15,16 @@ html, body, canvas {
 	font-family: 'Lucida Console', sans-serif;
 }
 
+a {
+	color: lightblue;
+}
+
+a:hover,
+a:active {
+	color: #81a2ae;
+	text-decoration: none;
+}
+
 .hud {
 	width: 100%;
 	height: 100%;
@@ -91,28 +101,29 @@ html, body, canvas {
 	padding-top: 7px;
 	box-shadow: 5px 5px 15px black;
 }
-.modal-content{
+
+.modal-content {
 	height: 475px;
 	border-radius: 0;
 	margin: 55px 68px;
 	font-size: 18px;
-	color: lightgreen;
+	color: lightblue;
 	text-shadow: -1px -1px #111, 1px 1px #5F615D;
-	background: darkolivegreen;
+	background: darkslategray;
 	box-shadow: inset 0 0 15px #111;
 	border: 1px solid #222;
 }
 
 input {
-	background: darkolivegreen;
+	background: #426f6f;
 	border: none;
-	border-bottom: 1px solid lightgreen;
+	border-bottom: 1px solid lightblue;
 	outline: none;
 	text-shadow: -1px -1px #141, 1px 1px #5F615D;
 }
 
 .modal-body {
-	height: 265px;
+	height: 350px;
 	overflow-x: hidden;
 	overflow-y: auto;
 }
@@ -122,17 +133,23 @@ input {
 	border: none;
 }
 
+.modal-footer .btn + .btn {
+	margin-bottom: 15px;
+	margin-left: 0;
+}
+
 .modal-footer {
 	text-align: center;
+	height: 70px;
 }
 
 button.btn.btn-primary {
-	color: lightgreen;
+	color: lightblue;
 	border-radius: 0;
 	background: transparent;
-	border: 2px solid lightgreen;
-	box-shadow: -1px -1px #141, 1px 1px #5F615D;
-	text-shadow: -1px -1px #141, 1px 1px #5F615D;
+	border: 2px solid lightblue;
+	box-shadow: -1px -1px #141, 1px 1px #183131;
+	text-shadow: -1px -1px #141, 1px 1px #183131;
 	font-size: 18px;
 	margin-bottom: 15px;
 }
@@ -142,11 +159,19 @@ table.highscores {
 	margin: 0 auto;
 }
 
-table.highscores td{
+table.highscores td {
 	padding: 0 0 0 5px;
 }
-table.highscores tr.me{
-	background: #2B4E2D;
+
+table.highscores tr.me {
+	background: #183131;
+}
+
+#menuModal h4 {
+	text-align: center;
+}
+#menuModal ul {
+	text-align: center;
 }
 
 button#menu {

@@ -2,6 +2,8 @@
  * MAZE VARIABLES
  */
 var config = {
+	version: 0.1,
+
 	startingLevel: 1,
 	width: 2,
 	height: 2,

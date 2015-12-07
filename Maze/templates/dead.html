@@ -1,0 +1,23 @@
+<div ng-if="gameData.playerIsDead">
+
+	<form class="nickname text-center" ng-if="!highscoreData.submitted">
+		<div class="destroyed-message">
+			<p>Sorry bro, you didn't make it. :(</p>
+			<p><strong>But hey, cheer up, you got to level {{highscoreData.level}}!</strong></p>
+			<p>And you can always try again, starting from level 1 of course. Maybe next time you can advance further.</p>
+		</div>
+
+		<br />
+
+		<p>
+			<label for="name">Nickname</label>
+			<input type="text" id="name" name="name" ng-model="highscoreData.name"/>
+		</p>
+	</form>
+
+	<div ng-if="highscoreData.submitted">
+		<h4>Highscores</h4>
+		<div class="content" ng-include="'templates/partials/highscores.html'"></div>
+	</div>
+
+</div>

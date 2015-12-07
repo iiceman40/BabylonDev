@@ -48,26 +48,6 @@ $(document).ready(function () {
 		engine.resize();
 	});
 
-	// UI
-	destroyedModal = new Modal();
-
-	$('#menu').click(function(){
-		$('#menuModal').modal('show');
-	});
-
-	$('.show-highscores').click(function(){
-		var highscoreTable = $('#menuModal').find('.modal-body .highscores');
-		$.post('db/get_highscore.php', {}, function (data) {
-			var parsedData = JSON.parse(data);
-			if (parsedData.success) {
-				showHighscores(highscoreTable, parsedData, null);
-			} else {
-				// could not retrieve high score list
-				alert(parsedData.error);
-			}
-		});
-	});
-
 });
 
 function clone(obj) {

@@ -394,16 +394,6 @@ function initEnemies(enemies, maze, player, mazeMesh, game, scene) {
 	}
 }
 
-function showHighscores(highscoreTable, parsedData, currentPlayerId){
-	highscoreTable.html('');
-	for (var i = 0; i < parsedData.list.length; i++) {
-		var entry = parsedData.list[i];
-		var css = (currentPlayerId && currentPlayerId == entry.id) ? 'me' : '';
-		var rank = i + 1;
-		highscoreTable.append('<tr class="' + css + '"><td>' + rank + '.</td><td>' + entry.name + '</td><td>' + entry.level + '</td></tr>');
-	}
-}
-
 function createRocket(game, scene){
 	var diameter = 0.2;
 
@@ -457,4 +447,9 @@ function createLaserBullet(color, diameter, game, scene){
 		mainMesh: mainMesh,
 		outsideMesh: outsideMesh
 	};
+}
+
+function getScope(ctrlName) {
+	var sel = 'div[ng-controller="' + ctrlName + '"]';
+	return angular.element(sel).scope();
 }

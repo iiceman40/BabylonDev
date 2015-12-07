@@ -1,0 +1,11 @@
+<div ng-if="highscores.length > 0">
+	<table class="highscores">
+		<tr ng-repeat="highscore in highscores" ng-class="{me: highscore.id == highscoreData.entryId}">
+			<td>{{highscore.name}}</td>
+			<td>{{highscore.level}}</td>
+		</tr>
+	</table>
+</div>
+<div ng-if="highscores.length == 0">
+	No highscores yet.
+</div>

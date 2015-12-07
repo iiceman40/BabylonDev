@@ -62,7 +62,7 @@ var Terminal = function (position, maze, player, miniMap, availableMessages, sha
 				message += '|'
 			}
 			// text, x, y, font, color, clearColor, invertY, update, dynamicTexture
-			wrapText(message, 20, 60, "bold 40px Lucida Console", "green", "#19321C", true, true, terminalScreen.material.diffuseTexture);
+			wrapText(message, 20, 60, "bold 40px Lucida Console", "lightblue", "darkslategray", true, true, terminalScreen.material.diffuseTexture);
 		}, 300);
 	}
 

@@ -123,6 +123,10 @@ var Player = function (mazeMesh, position, game, scene) {
 
 	player.hit = function(damage){
 		// TODO add shake effect and window tinting on the sides
+		$('.hud').addClass('hit');
+		setTimeout(function(){
+			$('.hud').removeClass('hit');
+		}, 300);
 
 		player.health -= damage;
 		updateBar(player.healthBar, player.health); // TODO use class function

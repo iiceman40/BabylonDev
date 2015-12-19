@@ -55,7 +55,7 @@
 						display: inline-block;
 						font-size: 40px;
 						color: $blue;
-						box-shadow: 0 0 15px rgba($blue, 0);
+						box-shadow: 0 0 15px rgba($lightBlue, 0.0);
 						transition: all 200ms;
 						width: 100%;
 
@@ -86,48 +86,5 @@
 			}
 		}
 
-	}
-}
-
-@keyframes screenFlickering {
-	0% {
-		background-color: rgba($slate, 0.7);
-		box-shadow: inset 0 0 $menuInsetShadowWidth $lightSlate, 0 0 $menuShadowWidth $lightSlate;
-	}
-	20% {
-		background-color: rgba(darken($slate, 2%), 0.7);
-		box-shadow: inset 0 0 $menuInsetShadowWidth $lightSlate, 0 0 $menuShadowWidth $lightSlate;
-	}
-	40% {
-		background-color: rgba($slate, 0.7);
-		box-shadow: inset 0 0 $menuInsetShadowWidth $lightSlate, 0 0 $menuShadowWidth $lightSlate;
-	}
-	41% {
-		background-color: rgba($slate, 0.7);
-		box-shadow: inset 0 0 $menuInsetShadowWidth darken($lightSlate, 10%), 0 0 $menuShadowWidth darken($lightSlate, 10%);
-	}
-	42% {
-		background-color: rgba($slate, 0.7);
-		box-shadow: inset 0 0 $menuInsetShadowWidth $lightSlate, 0 0 $menuShadowWidth $lightSlate;
-	}
-	75% {
-		background-color: rgba(darken($slate, 2%), 0.7);
-		box-shadow: inset 0 0 $menuInsetShadowWidth $lightSlate, 0 0 $menuShadowWidth $lightSlate;
-	}
-	94% {
-		background-color: rgba($slate, 0.7);
-		box-shadow: inset 0 0 $menuInsetShadowWidth $lightSlate, 0 0 $menuShadowWidth $lightSlate;
-	}
-	96% {
-		background-color: rgba(lighten($slate, 2%), 0.7);
-		box-shadow: inset 0 0 $menuInsetShadowWidth $lightSlate, 0 0 $menuShadowWidth lighten($lightSlate, 5%);
-	}
-	97% {
-		background-color: rgba(darken($slate, 3%), 0.7);
-		box-shadow: inset 0 0 $menuInsetShadowWidth darken($lightSlate, 15%), 0 0 $menuShadowWidth darken($lightSlate, 15%);
-	}
-	100% {
-		background-color: rgba(lighten($slate, 2%), 0.7);
-		box-shadow: inset 0 0 $menuInsetShadowWidth $lightSlate, 0 0 $menuShadowWidth lighten($lightSlate, 5%);
 	}
 }

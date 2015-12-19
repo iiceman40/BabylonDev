@@ -56,8 +56,10 @@
 	</div>
 
 	<div id="menu" ng-class="{open: menuOpen}">
-		<div ng-include="'templates/menu.html'"></div>
-		<div ng-include="'templates/dead.html'"></div>
+		<div class="menu-inner-wrapper">
+			<div ng-include="'templates/menu.html'"></div>
+			<div ng-include="'templates/dead.html'"></div>
+		</div>
 	</div>
 </div>
 

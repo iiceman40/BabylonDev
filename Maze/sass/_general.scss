@@ -31,6 +31,26 @@ a {
 	}
 }
 
+p {
+	margin: 0 0 15px 0;
+}
+
+button {
+	background: rgba($slate, 0.7);
+	box-shadow: inset 0 0 $menuInsetShadowWidth $lightSlate, 0 0 $menuShadowWidth $lightSlate;
+	color: $blue;
+	border: none;
+	font-size: 20px;
+	padding: 15px;
+	cursor: pointer;
+	transition: all 500ms;
+
+	&:hover {
+		background: rgba($slate, 1);
+		box-shadow: inset 0 0 $menuInsetShadowWidth + 20 lighten($lightSlate, 10%), 0 0 $menuShadowWidth + 10 lighten($lightSlate, 10%);
+	}
+}
+
 .list-unstyled {
 	list-style: none;
 	padding: 0;

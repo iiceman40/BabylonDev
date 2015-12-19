@@ -185,6 +185,28 @@ a:hover, a:active {
 }
 
 /* line 34, ../sass/_general.scss */
+p {
+  margin: 0 0 15px 0;
+}
+
+/* line 38, ../sass/_general.scss */
+button {
+  background: rgba(47, 79, 79, 0.7);
+  box-shadow: inset 0 0 50px #426f6f, 0 0 30px #426f6f;
+  color: lightblue;
+  border: none;
+  font-size: 20px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 500ms;
+}
+/* line 48, ../sass/_general.scss */
+button:hover {
+  background: darkslategray;
+  box-shadow: inset 0 0 70px #558f8f, 0 0 40px #558f8f;
+}
+
+/* line 54, ../sass/_general.scss */
 .list-unstyled {
   list-style: none;
   padding: 0;
@@ -334,44 +356,56 @@ table .highscores tr.me {
 /* line 32, ../sass/_menu.scss */
 .menu-wrapper #menu.open {
   margin-top: 30px;
-  margin-left: 5px;
+  margin-left: 0;
 }
 /* line 37, ../sass/_menu.scss */
-.menu-wrapper #menu .menu-inner-wrapper {
-  padding: 20px 45px;
-  max-height: 400px;
+.menu-wrapper #menu .menu-header {
+  margin: 0 45px;
+}
+/* line 41, ../sass/_menu.scss */
+.menu-wrapper #menu .menu-body {
+  margin: 0 -5px;
+  width: 410px;
+  height: 420px;
   overflow: hidden;
   overflow-y: auto;
+  position: relative;
 }
-/* line 44, ../sass/_menu.scss */
-.menu-wrapper #menu li {
-  margin: 0 -50px;
+/* line 50, ../sass/_menu.scss */
+.menu-wrapper #menu .menu-body ul li {
+  width: 100%;
 }
-/* line 47, ../sass/_menu.scss */
-.menu-wrapper #menu li a {
+/* line 53, ../sass/_menu.scss */
+.menu-wrapper #menu .menu-body ul li a {
   padding: 15px 50px;
   display: inline-block;
   font-size: 40px;
   color: lightblue;
   box-shadow: 0 0 15px rgba(173, 216, 230, 0);
   transition: all 200ms;
-  width: 405px;
+  width: 100%;
 }
-/* line 56, ../sass/_menu.scss */
-.menu-wrapper #menu li a:hover {
+/* line 62, ../sass/_menu.scss */
+.menu-wrapper #menu .menu-body ul li a:hover {
   background: lightblue;
   box-shadow: 0 0 15px rgba(212, 235, 242, 0.7);
   color: black;
   opacity: 0.9;
 }
-/* line 65, ../sass/_menu.scss */
-.menu-wrapper #menu .control-buttons {
-  position: absolute;
-  bottom: 15px;
-  left: 45px;
+/* line 72, ../sass/_menu.scss */
+.menu-wrapper #menu .menu-body .content {
+  padding: 15px 50px;
 }
-/* line 71, ../sass/_menu.scss */
-.menu-wrapper #menu .control-buttons ul li {
+/* line 77, ../sass/_menu.scss */
+.menu-wrapper #menu .menu-footer {
+  position: absolute;
+  bottom: -75px;
+  left: 0;
+  text-align: center;
+  width: 100%;
+}
+/* line 84, ../sass/_menu.scss */
+.menu-wrapper #menu .menu-footer li {
   display: inline-block;
 }
 

@@ -1,0 +1,11 @@
+$black:         black;
+$blue:          rgb(173, 216, 230);
+$lightBlue:     lighten($blue, 10%);
+$slate:         rgb(47, 79, 79);
+$lightSlate:    lighten($slate, 10%);
+$darkSlate:     darken($slate, 30%);
+
+$icon-color:    $blue;
+
+$menuShadowWidth: 30px;
+$menuInsetShadowWidth: 50px;

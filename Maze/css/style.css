@@ -1,197 +1,413 @@
+/* line 1, ../sass/_transformicons.scss */
+.tcon {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  height: 40px;
+  transition: 0.3s;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 40px;
+  background: transparent;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* line 27, ../sass/_transformicons.scss */
+.tcon > * {
+  display: block;
+}
+
+/* line 29, ../sass/_transformicons.scss */
+.tcon:hover,
+.tcon:focus {
+  outline: none;
+}
+
+/* line 32, ../sass/_transformicons.scss */
+.tcon::-moz-focus-inner {
+  border: 0;
+}
+
+/* line 35, ../sass/_transformicons.scss */
+.tcon-menu__lines {
+  display: inline-block;
+  height: 5.71429px;
+  width: 40px;
+  border-radius: 2.85714px;
+  transition: 0.3s;
+  background: lightblue;
+  position: relative;
+}
+
+/* line 43, ../sass/_transformicons.scss */
+.tcon-menu__lines::before,
+.tcon-menu__lines::after {
+  display: inline-block;
+  height: 5.71429px;
+  width: 40px;
+  border-radius: 2.85714px;
+  transition: 0.3s;
+  background: lightblue;
+  content: '';
+  position: absolute;
+  left: 0;
+  -webkit-transform-origin: 2.85714px center;
+  transform-origin: 2.85714px center;
+  width: 100%;
+}
+
+/* line 57, ../sass/_transformicons.scss */
+.tcon-menu__lines::before {
+  top: 10px;
+}
+
+/* line 59, ../sass/_transformicons.scss */
+.tcon-menu__lines::after {
+  top: -10px;
+}
+
+/* line 61, ../sass/_transformicons.scss */
+.tcon-transform .tcon-menu__lines {
+  -webkit-transform: scale3d(0.8, 0.8, 0.8);
+  transform: scale3d(0.8, 0.8, 0.8);
+}
+
+/* line 65, ../sass/_transformicons.scss */
+.tcon-menu--xbutterfly {
+  width: auto;
+}
+
+/* line 67, ../sass/_transformicons.scss */
+.tcon-menu--xbutterfly .tcon-menu__lines::before,
+.tcon-menu--xbutterfly .tcon-menu__lines::after {
+  -webkit-transform-origin: 50% 50%;
+  transform-origin: 50% 50%;
+  transition: top 0.3s 0.6s ease, -webkit-transform 0.3s ease;
+  transition: top 0.3s 0.6s ease, transform 0.3s ease;
+}
+
+/* line 73, ../sass/_transformicons.scss */
+.tcon-menu--xbutterfly.tcon-transform .tcon-menu__lines {
+  background: transparent;
+}
+
+/* line 75, ../sass/_transformicons.scss */
+.tcon-menu--xbutterfly.tcon-transform .tcon-menu__lines::before,
+.tcon-menu--xbutterfly.tcon-transform .tcon-menu__lines::after {
+  top: 0;
+  transition: top 0.3s ease, -webkit-transform 0.3s 0.5s ease;
+  transition: top 0.3s ease, transform 0.3s 0.5s ease;
+  width: 40px;
+}
+
+/* line 81, ../sass/_transformicons.scss */
+.tcon-menu--xbutterfly.tcon-transform .tcon-menu__lines::before {
+  -webkit-transform: rotate3d(0, 0, 1, 45deg);
+  transform: rotate3d(0, 0, 1, 45deg);
+}
+
+/* line 84, ../sass/_transformicons.scss */
+.tcon-menu--xbutterfly.tcon-transform .tcon-menu__lines::after {
+  -webkit-transform: rotate3d(0, 0, 1, -45deg);
+  transform: rotate3d(0, 0, 1, -45deg);
+}
+
+/* line 88, ../sass/_transformicons.scss */
+.tcon-visuallyhidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+/* line 97, ../sass/_transformicons.scss */
+.tcon-visuallyhidden:active,
+.tcon-visuallyhidden:focus {
+  clip: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  position: static;
+  width: auto;
+}
+
+/* line 1, ../sass/_general.scss */
 html, body, canvas {
-	width: 100%;
-	height: 100%;
-	padding: 0;
-	margin: 0;
-	overflow: hidden;
-
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-
-	font-family: 'Lucida Console', sans-serif;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Lucida Console', sans-serif;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
+/* line 17, ../sass/_general.scss */
+h1, h2, h3, h4, h5, h6 {
+  margin: 30px 0;
+  padding: 0;
+}
+
+/* line 22, ../sass/_general.scss */
 a {
-	color: lightblue;
+  color: lightblue;
+  text-decoration: none;
+}
+/* line 26, ../sass/_general.scss */
+a:hover, a:active {
+  color: lightblue;
+  outline: none;
+  text-decoration: none;
 }
 
-a:hover,
-a:active {
-	color: #81a2ae;
-	text-decoration: none;
+/* line 34, ../sass/_general.scss */
+.list-unstyled {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
+/* line 1, ../sass/_highscores.scss */
+table {
+  width: 100%;
+}
+/* line 4, ../sass/_highscores.scss */
+table .highscores {
+  margin: 0 50px;
+}
+/* line 8, ../sass/_highscores.scss */
+table .highscores tr.me {
+  background: #183131;
+}
+
+/* line 1, ../sass/_ui.scss */
 .hud {
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	background: url('../img/crosshair.png') no-repeat 50% 50%;
-	z-index: 100;
-	display: block;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	pointer-events: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: url("../img/crosshair.png") no-repeat 50% 50%;
+  z-index: 100;
+  display: block;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
 }
 
+/* line 15, ../sass/_ui.scss */
+.rocketStatus-wrapper {
+  perspective: 600px;
+  height: 100%;
+  width: 500px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+/* line 23, ../sass/_ui.scss */
+.rocketStatus-wrapper .rocketStatus {
+  width: 100px;
+  height: 100px;
+  background: url("../img/rocket_icon.svg");
+  background-size: cover;
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  transform: rotateZ(-45deg);
+}
+/* line 33, ../sass/_ui.scss */
+.rocketStatus-wrapper .rocketStatus.ready {
+  background: url("../img/rocket_icon_ready.svg");
+  background-size: cover;
+}
+
+/* line 40, ../sass/_ui.scss */
 .level {
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	background: black;
-	z-index: 200;
-	display: block;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	pointer-events: none;
-	font-family: 'Console', sans-serif;
-	color: lightblue;
-	font-size: 15vw;
-	text-align: center;
-	padding-top: 30vh;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: black;
+  z-index: 200;
+  display: block;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
+  font-family: 'Console', sans-serif;
+  color: lightblue;
+  font-size: 15vw;
+  text-align: center;
+  padding-top: 30vh;
 }
 
+/* line 59, ../sass/_ui.scss */
 .loading {
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	background: black;
-	z-index: 300;
-	display: block;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	pointer-events: none;
-	font-family: 'Console', sans-serif;
-	color: lightblue;
-	font-size: 5vw;
-	text-align: center;
-	padding-top: 30vh;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: black;
+  z-index: 300;
+  display: block;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
+  font-family: 'Console', sans-serif;
+  color: lightblue;
+  font-size: 5vw;
+  text-align: center;
+  padding-top: 30vh;
 }
 
-.levelNumber {
-
-}
-
+/* line 78, ../sass/_ui.scss */
 .closeMapHint {
-	position: absolute;
-	top: 30px;
-	left: 0;
-	width: 100%;
-	text-align: center;
-	font-family: 'Lucida Console', sans-serif;
-	color: lightblue;
-	display: none;
-	text-shadow: 1px 1px 1px black;
+  position: absolute;
+  top: 30px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: 'Lucida Console', sans-serif;
+  color: lightblue;
+  display: none;
+  text-shadow: 1px 1px 1px black;
 }
 
-.modal-dialog {
-	background: url('../img/panel_render.jpg');
-	-webkit-background-size: cover;
-	background-size: cover;
-	height: 600px;
-	padding-top: 7px;
-	box-shadow: 5px 5px 15px black;
+/* line 1, ../sass/_menu.scss */
+.menu-wrapper {
+  top: 0;
+  left: 0;
+  position: absolute;
+  width: 400px;
+  height: 100%;
+  perspective: 600px;
+}
+/* line 9, ../sass/_menu.scss */
+.menu-wrapper #shortcuts {
+  margin-top: 120px;
+  font-size: 25px;
+  transform: rotateY(45deg);
+}
+/* line 15, ../sass/_menu.scss */
+.menu-wrapper #menu {
+  float: left;
+  color: white;
+  margin-top: -100px;
+  margin-left: -500px;
+  font-size: 20px;
+  z-index: 150;
+  transition: all 500ms;
+  background: rgba(47, 79, 79, 0.7);
+  animation-name: screenFlickering;
+  animation-duration: 5000ms;
+  animation-iteration-count: infinite;
+  box-shadow: inset 0 0 50px #426f6f, 0 0 30px #426f6f;
+  transform: rotateY(45deg);
+  padding: 20px 45px;
+  height: 500px;
+  width: 100%;
+}
+/* line 33, ../sass/_menu.scss */
+.menu-wrapper #menu.open {
+  margin-top: 50px;
+  margin-left: 5px;
+}
+/* line 38, ../sass/_menu.scss */
+.menu-wrapper #menu li {
+  margin: 0 -50px;
+}
+/* line 41, ../sass/_menu.scss */
+.menu-wrapper #menu li a {
+  padding: 15px 50px;
+  display: inline-block;
+  font-size: 40px;
+  color: lightblue;
+  box-shadow: 0 0 15px rgba(173, 216, 230, 0);
+  transition: all 200ms;
+  width: 405px;
+}
+/* line 50, ../sass/_menu.scss */
+.menu-wrapper #menu li a:hover {
+  background: lightblue;
+  box-shadow: 0 0 15px rgba(212, 235, 242, 0.7);
+  color: black;
+  opacity: 0.9;
+}
+/* line 59, ../sass/_menu.scss */
+.menu-wrapper #menu .control-buttons {
+  position: absolute;
+  bottom: 15px;
+  left: 45px;
+}
+/* line 65, ../sass/_menu.scss */
+.menu-wrapper #menu .control-buttons ul li {
+  display: inline-block;
 }
 
-.modal-content {
-	height: 475px;
-	border-radius: 0;
-	margin: 55px 68px;
-	font-size: 18px;
-	color: lightblue;
-	text-shadow: -1px -1px #111, 1px 1px #5F615D;
-	background: darkslategray;
-	box-shadow: inset 0 0 15px #111;
-	border: 1px solid #222;
-}
-
-input {
-	background: #426f6f;
-	border: none;
-	border-bottom: 1px solid lightblue;
-	outline: none;
-	text-shadow: -1px -1px #141, 1px 1px #5F615D;
-}
-
-.modal-body {
-	height: 350px;
-	overflow-x: hidden;
-	overflow-y: auto;
-}
-
-.modal-header,
-.modal-footer {
-	border: none;
-}
-
-.modal-footer .btn + .btn {
-	margin-bottom: 15px;
-	margin-left: 0;
-}
-
-.modal-footer {
-	text-align: center;
-	height: 70px;
-}
-
-button.btn.btn-primary {
-	color: lightblue;
-	border-radius: 0;
-	background: transparent;
-	border: 2px solid lightblue;
-	box-shadow: -1px -1px #141, 1px 1px #183131;
-	text-shadow: -1px -1px #141, 1px 1px #183131;
-	font-size: 18px;
-	margin-bottom: 15px;
-}
-
-table.highscores {
-	width: 80%;
-	margin: 0 auto;
-}
-
-table.highscores td {
-	padding: 0 0 0 5px;
-}
-
-table.highscores tr.me {
-	background: #183131;
-}
-
-#menuModal h4 {
-	text-align: center;
-}
-#menuModal ul {
-	text-align: center;
-}
-
-button#menu {
-	position: absolute;
-	top: 15px;
-	right: 15px;
-	font-size: 25px;
-}
-
-.rocketStatus {
-	width: 100px;
-	height: 100px;
-	background: url('../img/rocket_icon.svg');
-	background-size: cover;
-	position: fixed;
-	bottom: 50px;
-	right: 50px;
-}
-
-.rocketStatus.ready {
-	background: url('../img/rocket_icon_ready.svg');
-	background-size: cover;
+@keyframes screenFlickering {
+  0% {
+    background-color: rgba(47, 79, 79, 0.7);
+    box-shadow: inset 0 0 50px #426f6f, 0 0 30px #426f6f;
+  }
+  20% {
+    background-color: rgba(43, 73, 73, 0.7);
+    box-shadow: inset 0 0 50px #426f6f, 0 0 30px #426f6f;
+  }
+  40% {
+    background-color: rgba(47, 79, 79, 0.7);
+    box-shadow: inset 0 0 50px #426f6f, 0 0 30px #426f6f;
+  }
+  41% {
+    background-color: rgba(47, 79, 79, 0.7);
+    box-shadow: inset 0 0 50px darkslategray, 0 0 30px darkslategray;
+  }
+  42% {
+    background-color: rgba(47, 79, 79, 0.7);
+    box-shadow: inset 0 0 50px #426f6f, 0 0 30px #426f6f;
+  }
+  75% {
+    background-color: rgba(43, 73, 73, 0.7);
+    box-shadow: inset 0 0 50px #426f6f, 0 0 30px #426f6f;
+  }
+  94% {
+    background-color: rgba(47, 79, 79, 0.7);
+    box-shadow: inset 0 0 50px #426f6f, 0 0 30px #426f6f;
+  }
+  96% {
+    background-color: rgba(51, 85, 85, 0.7);
+    box-shadow: inset 0 0 50px #426f6f, 0 0 30px #4c7f7f;
+  }
+  97% {
+    background-color: rgba(41, 69, 69, 0.7);
+    box-shadow: inset 0 0 50px #253f3f, 0 0 30px #253f3f;
+  }
+  100% {
+    background-color: rgba(51, 85, 85, 0.7);
+    box-shadow: inset 0 0 50px #426f6f, 0 0 30px #4c7f7f;
+  }
 }

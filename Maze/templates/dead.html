@@ -20,4 +20,19 @@
 		<div class="content" ng-include="'templates/partials/highscores.html'"></div>
 	</div>
 
+	<div class="control-buttons">
+		<ul ng-if="gameData.playerIsDead">
+			<li ng-if="!highscoreData.submitted">
+				<button type="button" class="btn btn-primary" ng-click="saveHighscore()">Save
+					Highscore
+				</button>
+			</li>
+			<li>
+				<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="restart()">
+					Restart at level 1!
+				</button>
+			</li>
+		</ul>
+	</div>
+
 </div>

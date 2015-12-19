@@ -1,0 +1,88 @@
+.hud {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background: url('../img/crosshair.png') no-repeat 50% 50%;
+	z-index: 100;
+	display: block;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	pointer-events: none;
+}
+
+.rocketStatus-wrapper {
+	perspective: 600px;
+	height: 100%;
+	width: 500px;
+	position: absolute;
+	top: 0;
+	right: 0;
+
+	.rocketStatus {
+		width: 100px;
+		height: 100px;
+		background: url('../img/rocket_icon.svg');
+		background-size: cover;
+		position: fixed;
+		bottom: 50px;
+		right: 50px;
+		transform: rotateZ(-45deg);
+
+		&.ready {
+			background: url('../img/rocket_icon_ready.svg');
+			background-size: cover;
+		}
+	}
+}
+
+.level {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background: black;
+	z-index: 200;
+	display: block;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	pointer-events: none;
+	font-family: 'Console', sans-serif;
+	color: $blue;
+	font-size: 15vw;
+	text-align: center;
+	padding-top: 30vh;
+}
+
+.loading {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background: black;
+	z-index: 300;
+	display: block;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	pointer-events: none;
+	font-family: 'Console', sans-serif;
+	color: $blue;
+	font-size: 5vw;
+	text-align: center;
+	padding-top: 30vh;
+}
+
+.closeMapHint {
+	position: absolute;
+	top: 30px;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	font-family: 'Lucida Console', sans-serif;
+	color: $blue;
+	display: none;
+	text-shadow: 1px 1px 1px black;
+}

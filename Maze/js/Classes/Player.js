@@ -2,6 +2,8 @@ var Player = function (mazeMesh, position, game, scene) {
 	var enemies = game.enemies;
 	var sounds = game.sounds;
 	var player = new BABYLON.FreeCamera("playerFreeCamera", new BABYLON.Vector3(0, 0, 0), scene);
+	player.inertiaRotation = 0.5;
+	player.angularSensibility = 750;
 
 	player.impactDecals = [];
 
@@ -9,9 +11,8 @@ var Player = function (mazeMesh, position, game, scene) {
 
 	player.ellipsoid = new BABYLON.Vector3(1, 1, 1);
 	player.checkCollisions = true;
-	player.speed = 0.4;
+	player.speed = 0.5;
 	player.layerMask = 2; // 010 in binary
-	player.angularSensibility = 2000;
 
 	scene.activeCameras.push(player);
 	scene.cameraToUseForPointers = player;
@@ -84,7 +85,7 @@ var Player = function (mazeMesh, position, game, scene) {
 			if (Math.abs(this.cameraRotation.y) < BABYLON.Engine.Epsilon) {
 				this.cameraRotation.y = 0;
 			}
-			this.cameraRotation.scaleInPlace(this.inertia);
+			this.cameraRotation.scaleInPlace(this.inertiaRotation);
 		}
 		BABYLON.Camera.prototype._checkInputs.call(this);
 	};
@@ -238,9 +239,7 @@ var Player = function (mazeMesh, position, game, scene) {
 	scene.beforeCameraRender = function(){
 		// sync flashlight
 		player.flashlight.position = player.position.clone();
-		player.flashlight.position.y += 1;
 		player.flashlight.direction = player.getTarget().subtract(player.position);
-		player.flashlight.direction.y -= 0.2;
 	};
 
 	// REGISTER BEFORE RENDER FOR SHOOTING

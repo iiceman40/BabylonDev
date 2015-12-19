@@ -4,14 +4,13 @@
 	<meta charset="UTF-8">
 	<title>Babylon Dev - Maze</title>
 
-	<link rel="stylesheet" type="text/css" href="css/bootstrap.css"/>
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 
 	<!-- Libraries -->
 	<script src="../libs/jquery-2.1.1.min.js"></script>
 	<script src="../libs/babylon/babylon.2.3-alpha.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="../libs/angular/angular.min.js"></script>
+	<script src="../libs/angular/angular.js"></script>
+	<script src="js/vendor/transformicons.js"></script>
 
 	<script src="js/config.js"></script>
 	<script src="js/functions.js"></script>
@@ -44,43 +43,21 @@
 <div class="level">Level <span class="levelNumber">1</span></div>
 <div class="loading">Please wait, game is loading...</div>
 <div class="closeMapHint">Press the space key again to close the map</div>
-<div class="rocketStatus ready"></div>
+<div class="rocketStatus-wrapper">
+	<div class="rocketStatus ready"></div>
+</div>
 
 <!-- MODAL -->
-<div class="menu">
-	<div ng-controller="MenuCtrl">
-		<button id="menu" class="btn btn-link" title="Options and Highscores" ng-click="showMenuModal()">
-			<span class="glyphicon glyphicon-list-alt"></span>
+<div class="menu-wrapper" ng-controller="MenuCtrl">
+	<div id="shortcuts">
+		<button type="button" id="toggle-menu" class="tcon tcon-menu--xbutterfly" title="Options and Highscores" ng-click="toggleMenu()">
+			<span class="tcon-menu__lines" aria-hidden="true"></span>
 		</button>
+	</div>
 
-		<div class="modal fade" id="menuModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
-			<div class="modal-dialog" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h4 class="modal-title" id="menuModalLabel"><strong>The Maze Descent v{{versionNumber}}</strong>
-						</h4>
-					</div>
-					<div class="modal-body">
-
-						<div class="content" ng-include="'templates/menu.html'"></div>
-						<div class="content" ng-include="'templates/dead.html'"></div>
-
-					</div>
-					<div class="modal-footer">
-						<div ng-if="!gameData.playerIsDead">
-							<button class="btn btn-primary" ng-click="selectEntry(null)" ng-if="selectedEntry">&lt; Back</button>
-							<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-						</div>
-						<div ng-if="gameData.playerIsDead">
-							<span ng-if="!highscoreData.submitted">
-								<button type="button" class="btn btn-primary" ng-click="saveHighscore()">Save Highscore</button>
-							</span>
-							<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="restart()">Restart at level 1!</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+	<div id="menu" ng-class="{open: menuOpen}">
+		<div ng-include="'templates/menu.html'"></div>
+		<div ng-include="'templates/dead.html'"></div>
 	</div>
 </div>
 

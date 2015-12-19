@@ -3,6 +3,7 @@ app.controller('MenuCtrl', function ($scope, $http) {
 
 	$scope.versionNumber = config.version;
 	$scope.selectedEntry = null;
+	$scope.menuOpen = false;
 
 	$scope.gameData = {
 		playerIsDead: false
@@ -39,8 +40,16 @@ app.controller('MenuCtrl', function ($scope, $http) {
 		console.log('new selected entry: ', $scope.selectedEntry);
 	};
 
-	$scope.showMenuModal = function () {
-		$('#menuModal').modal('show');
+	$scope.showMenu = function () {
+		$scope.menuOpen = true;
+	};
+
+	$scope.hideMenu = function () {
+		$scope.menuOpen = false;
+	};
+
+	$scope.toggleMenu = function () {
+		$scope.menuOpen = !$scope.menuOpen;
 	};
 
 	$scope.saveHighscore = function () {
@@ -69,6 +78,10 @@ app.controller('MenuCtrl', function ($scope, $http) {
 			entryId: null,
 			submitted: false
 		};
+		$scope.gameData = {
+			playerIsDead: false
+		};
+		$scope.hideMenu();
 		$('.level').fadeIn(500, function () {
 			config = clone(originalConfig);
 			scene = createScene();
@@ -80,7 +93,7 @@ app.controller('MenuCtrl', function ($scope, $http) {
 	};
 
 	$scope.playerDied = function(level){
-		$scope.showModal();
+		$scope.showMenu();
 		$scope.$apply(function(){
 			$scope.highscoreData.level = level;
 			$scope.gameData.playerIsDead = true;
@@ -91,7 +104,4 @@ app.controller('MenuCtrl', function ($scope, $http) {
 
 	};
 
-	$scope.showModal = function(){
-		$('#menuModal').modal('show');
-	};
 });

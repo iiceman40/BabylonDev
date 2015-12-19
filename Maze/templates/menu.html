@@ -1,11 +1,11 @@
 <div ng-if="!gameData.playerIsDead">
+
 	<!--- TOP LEVEL MENU -->
 	<div ng-if="!selectedEntry">
 		<h4>Main Menu</h4>
-		<br/>
-		<ul class="list-unstyled" ng-repeat="entry in menu">
-			<li>
-				<button class="btn btn-primary" ng-click="selectEntry(entry)">{{entry.name}}</button>
+		<ul class="list-unstyled">
+			<li ng-repeat="entry in menu">
+				<a href="#" ng-click="selectEntry(entry)">{{entry.name}}</a>
 			</li>
 		</ul>
 	</div>
@@ -13,15 +13,25 @@
 	<!--- SUB MENU -->
 	<div ng-if="selectedEntry">
 		<h4>{{selectedEntry.name}}</h4>
-		<br/>
-		<ul class="list-unstyled" ng-repeat="subEntry in selectedEntry.subMenu">
-			<li>
-				<button class="btn btn-primary">{{subEntry.name}}</button>
+		<ul class="list-unstyled">
+			<li ng-repeat="subEntry in selectedEntry.subMenu">
+				<a href="#">{{subEntry.name}}</a>
 			</li>
 		</ul>
 
 		<div ng-if="selectedEntry.name == 'Highscores'">
-			<div class="content" ng-include="'templates/partials/highscores.html'"></div>
+			<div ng-include="'templates/partials/highscores.html'"></div>
 		</div>
 	</div>
+
+	<div class="control-buttons">
+		<ul class="list-unstyled">
+			<li>
+				<a href="#" ng-click="selectEntry(null)" ng-if="selectedEntry">
+					&lt; Back
+				</a>
+			</li>
+		</ul>
+	</div>
+
 </div>

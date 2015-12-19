@@ -223,11 +223,10 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 
 				if (pickingInfo.hit && pickingInfo.pickedMesh.name == 'player') {
 					// player spotted
-					enemy.playerIsInRange = true;
+					setTimeout(function() {
+						enemy.playerIsInRange = true;
+					}, 750);
 				} else {
-					if (enemy.playerIsInRange) {
-						// lost sight of player
-					}
 					enemy.playerIsInRange = false;
 				}
 
@@ -254,6 +253,7 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 			});
 
 			if(pickInfo.hit) {
+
 				var newBullet = new Projectile(enemy, pickInfo, player.position, Projectile.PROJECTILETYPE_BULLET, 'red', game, scene);
 				newBullet.mainMesh.position = enemy.absolutePosition.clone();
 				newBullet.mainMesh.lookAt(player.position);
@@ -264,6 +264,7 @@ var Enemy = function (maze, player, positionCoordinates, mazeMesh, game, scene) 
 				setTimeout(function () {
 					enemy.cannonReady = true;
 				}, 1000);
+
 			}
 		}
 

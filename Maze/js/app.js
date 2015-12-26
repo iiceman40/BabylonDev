@@ -82,8 +82,9 @@ app.controller('MenuCtrl', function ($scope, $http) {
 	};
 
 	$scope.stopAndRestart = function(options){
-		$scope.hideMenu();
-		scene.activeCamera.detachControl(canvas);
+		if(scene.activeCamera) {
+			scene.activeCamera.detachControl(canvas);
+		}
 		engine.stopRenderLoop();
 		setTimeout(function() {
 			scene.dispose();

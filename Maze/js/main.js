@@ -1,6 +1,7 @@
 var canvas, engine, scene;
 var destroyedModal;
 var originalConfig = clone(config);
+var mouseDownEvent, mouseUpEvent, keyDownEvent;
 
 $(document).ready(function () {
 	$('body').on('contextmenu', 'canvas', function (e) {

@@ -17,7 +17,7 @@ function createScene() {
 	// DRAW MAZE
 	var mazeMesh = drawMaze(maze, config, scene);
 
-	// MESSAGES
+	// MESSAGES // TODO move to config or separate file
 	var availableMessages = [
 		new Message("You are doing really great. <br/> <br/> Fun fact: <br/> <br/> A lot of people don't undestand sarcasm!", null),
 		new Message("Hey, what's up, buttercup?", null),
@@ -33,16 +33,58 @@ function createScene() {
 		new Message("How much wood would a woodchuck chuck if a woodchuck could chuck wood?")
 	];
 
-	// CAMERA/PLAYER
+	// PLAYER
 	var player = new Player(mazeMesh, getCellPosition(config.width - 1, config.height - 1, 0, maze, config.spacing), game, scene);
-	initPointerLock(canvas, player);
+	player.initPointerLock(canvas);
+	player.initStatusBarUpdateInterval();
+	// sync flashlight
+	scene.beforeCameraRender = function(){
+		player.syncFlashlight();
+	};
+	// triggers the shooting if player.keepShooting is active
+	scene.registerBeforeRender(function () {
+		player.shooting();
+	});
+	// EVENT LISTENERS
+	// start shooting
+	canvas.removeEventListener("mousedown", mouseDownEvent);
+	mouseDownEvent = function (evt) {
+		// left click to start fire
+		if (evt.button === config.controls.shootPrimary && !player.miniMap.isVisible) {
+			player.keepShooting = true;
+		}
+		// right click to launch a rocket
+		if (evt.button === config.controls.shootSecondary && !player.miniMap.isVisible) {
+			player.shootRocket();
+		}
+	};
+	canvas.addEventListener("mousedown", mouseDownEvent);
+	// stop shooting
+	canvas.removeEventListener("mouseup", mouseUpEvent);
+	mouseUpEvent = function (evt) {
+		if (evt.button === config.controls.shootPrimary) {
+			player.keepShooting = false;
+		}
+	};
+	canvas.addEventListener("mouseup", mouseUpEvent);
+	// terminal interactions
+	window.removeEventListener("keydown", keyDownEvent);
+	keyDownEvent = function (event) {
+		event = event || window.event;
+		// space click to interact with terminal
+		if (event.keyCode === config.controls.use) {
+			player.useTerminal();
+		}
+		return false;
+	};
+	window.addEventListener("keydown", keyDownEvent);
 
 	// CREATE MINI MAP
-	var miniMap = new MiniMap(100, 100, maze, player, scene);
+	var miniMap = new MiniMap(100, 100, maze, player.camera, scene);
 	player.miniMap = miniMap;
 
 	// PLACE EXIT
-	maze.exit = new Exit(new BABYLON.Vector3(0, 0, config.depth - 1), maze, miniMap.playerOnMiniMap, mazeMesh, game, player, scene);
+	maze.exit = new Exit(new BABYLON.Vector3(0, 0, config.depth - 1), maze, miniMap.playerOnMiniMap, mazeMesh, game, player.camera, scene);
 
 	// LIGHTS AND SHADOW
 	var hemiLight = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(0, 1, 0), scene);
@@ -55,7 +97,7 @@ function createScene() {
 	shadowGenerator.setDarkness(0.3);
 
 	// TERMINALS
-	initTerminals(maze, player, miniMap, availableMessages, shadowGenerator, scene);
+	initTerminals(maze, player.camera, miniMap, availableMessages, shadowGenerator, scene);
 
 	// ENEMIES
 	initEnemies(game.enemies, maze, player, mazeMesh, game, scene);

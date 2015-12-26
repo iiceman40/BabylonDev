@@ -124,7 +124,7 @@ function Projectile(shooter, impactInfo, startingPosition, type, color, game, sc
 
 	}
 
-	this.mainMesh.rotation = shooter.rotation.clone();
+	this.mainMesh.rotation = shooter.rotation ? shooter.rotation.clone() : shooter.camera.rotation.clone();
 	this.mainMesh.position = this.startingPosition;
 
 	this.updatePosition = function(bulletIndex, mazeMesh, enemies, player){

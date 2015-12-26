@@ -285,37 +285,6 @@ function wrapText(text, x, y, font, color, clearColor, invertY, update, dynamicT
 	}
 }
 
-function initPointerLock(canvas, camera) {
-	// On click event, request pointer lock
-	canvas.addEventListener("click", function (evt) {
-		canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
-		if (canvas.requestPointerLock) {
-			canvas.requestPointerLock();
-		}
-	}, false);
-
-	// Event listener when the pointerlock is updated (or removed by pressing ESC for example).
-	var pointerlockchange = function (event) {
-		var controlEnabled = (
-		document.mozPointerLockElement === canvas
-		|| document.webkitPointerLockElement === canvas
-		|| document.msPointerLockElement === canvas
-		|| document.pointerLockElement === canvas);
-		// If the user is already locked
-		if (!controlEnabled) {
-			camera.detachControl(canvas);
-		} else {
-			camera.attachControl(canvas);
-		}
-	};
-
-	// Attach events to the document
-	document.addEventListener("pointerlockchange", pointerlockchange, false);
-	document.addEventListener("mspointerlockchange", pointerlockchange, false);
-	document.addEventListener("mozpointerlockchange", pointerlockchange, false);
-	document.addEventListener("webkitpointerlockchange", pointerlockchange, false);
-}
-
 function speakPart(textArray, part, terminal) {
 
 	if(terminal) {
@@ -341,10 +310,6 @@ function speakPart(textArray, part, terminal) {
 	setTimeout(function(){
 		window.speechSynthesis.speak(utterance);
 	});
-}
-
-function updateBar(bar, value) {
-	bar.scaling.x = value / 100;
 }
 
 function initTerminals(maze, player, miniMap, availableMessages, shadowGenerator, scene) {

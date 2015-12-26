@@ -18,6 +18,16 @@ var config = {
 	animateTerminals: true,
 	enemyEye: true,
 	enemyLight: true,
-	enemyHealthBar: true
+	enemyHealthBar: true,
+
+	controls: {
+		up: 87,
+		down: 83,
+		left: 65,
+		right: 68,
+		use: 32,
+		shootPrimary: 0,
+		shootSecondary: 2
+	}
 
 };

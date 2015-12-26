@@ -27,7 +27,7 @@
 		<div class="menu-body">
 			<ul class="list-unstyled">
 				<li ng-repeat="subEntry in selectedEntry.subMenu">
-					<a href="#">{{subEntry.name}}</a>
+					<a href="#" ng-click="subEntry.action()">{{subEntry.name}}</a>
 				</li>
 			</ul>
 

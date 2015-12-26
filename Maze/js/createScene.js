@@ -1,5 +1,7 @@
 function createScene() {
 
+	console.log(config.mode);
+
 	// SCENE SETUP
 	var scene = new BABYLON.Scene(engine);
 	scene.clearColor = new BABYLON.Color3(0.8, 0.8, 1);

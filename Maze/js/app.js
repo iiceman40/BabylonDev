@@ -21,8 +21,18 @@ app.controller('MenuCtrl', function ($scope, $http) {
 		{
 			name: "New Game",
 			subMenu: [
-				{name: "Shooter Mode"},
-				{name: "Speed Mode"}
+				{
+					name: "Shooter Mode",
+					action: function(){
+						$scope.stopAndRestart({mode: 'shooter'});
+					}
+				},
+				{
+					name: "Speed Mode",
+					action: function(){
+						$scope.stopAndRestart({mode: 'speed'});
+					}
+				}
 			]
 		},
 		{name: "Options"},
@@ -71,7 +81,17 @@ app.controller('MenuCtrl', function ($scope, $http) {
 		});
 	};
 
-	$scope.restart = function () {
+	$scope.stopAndRestart = function(options){
+		$scope.hideMenu();
+		scene.activeCamera.detachControl(canvas);
+		engine.stopRenderLoop();
+		setTimeout(function() {
+			scene.dispose();
+			$scope.restart(options);
+		});
+	};
+
+	$scope.restart = function (options) {
 		$scope.highscoreData = {
 			name: '',
 			level: 1,
@@ -84,6 +104,7 @@ app.controller('MenuCtrl', function ($scope, $http) {
 		$scope.hideMenu();
 		$('.level').fadeIn(500, function () {
 			config = clone(originalConfig);
+			config.mode = options.mode || 'shooter';
 			scene = createScene();
 			console.log('restarting scene');
 			engine.runRenderLoop(function () {
@@ -92,13 +113,13 @@ app.controller('MenuCtrl', function ($scope, $http) {
 		});
 	};
 
-	$scope.playerDied = function(level){
+	$scope.playerDied = function (level) {
 		$scope.showMenu();
-		$scope.$apply(function(){
+		$scope.$apply(function () {
 			$scope.highscoreData.level = level;
 			$scope.gameData.playerIsDead = true;
 		});
-		setTimeout(function(){
+		setTimeout(function () {
 			speakPart([$('.destroyed-message').text()], 0, null);
 		});
 

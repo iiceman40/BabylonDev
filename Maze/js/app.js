@@ -1,6 +1,7 @@
 var app = angular.module('mazeApp', []);
 app.controller('MenuCtrl', function ($scope, $http) {
 
+	$scope.config = config;
 	$scope.versionNumber = config.version;
 	$scope.selectedEntry = null;
 	$scope.menuOpen = false;
@@ -38,6 +39,13 @@ app.controller('MenuCtrl', function ($scope, $http) {
 		{name: "Options"},
 		{name: "Highscores", action: 'showHighscores'}
 	];
+
+	$scope.$watch('config.mobileCamera', function(newValue, oldValue){
+		if(scene) {
+			console.log('switch cam');
+			scene.player.switchCameraType();
+		}
+	});
 
 	// methods
 	$scope.selectEntry = function (entry) {

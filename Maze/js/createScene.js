@@ -35,7 +35,10 @@ function createScene() {
 
 	// PLAYER
 	var player = new Player(mazeMesh, getCellPosition(config.width - 1, config.height - 1, 0, maze, config.spacing), game, scene);
-	player.initPointerLock(canvas);
+	scene.player = player;
+	if(!config.mobileCamera) {
+		player.initPointerLock(canvas);
+	}
 	player.initStatusBarUpdateInterval();
 	// sync flashlight
 	scene.beforeCameraRender = function(){

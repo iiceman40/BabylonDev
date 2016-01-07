@@ -20,6 +20,8 @@ var config = {
 	enemyLight: true,
 	enemyHealthBar: true,
 
+	mobileCamera: true,
+
 	controls: {
 		up: 87,
 		down: 83,

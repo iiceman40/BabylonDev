@@ -3,23 +3,30 @@ var Player = function (mazeMesh, position, game, scene) {
 	this.scene = scene;
 
 	// CAMERA
-	this.camera = new BABYLON.FreeCamera("playerFreeCamera", new BABYLON.Vector3(0, 0, 0), scene);
+	if(config.mobileCamera){
+		console.log('init VJC');
+		this.camera = new BABYLON.VirtualJoysticksCamera("playerVJC", new BABYLON.Vector3(0, 0, 0), scene);
+	} else {
+		this.camera = new BABYLON.FreeCamera("playerFreeCamera", new BABYLON.Vector3(0, 0, 0), scene);
+		// the camera acts as the this.camera
+		this.camera.keysUp.push(87);
+		this.camera.keysDown.push(83);
+		this.camera.keysLeft.push(65);
+		this.camera.keysRight.push(68);
+	}
 	this.camera.inertiaRotation = 0.5;
 	this.camera.angularSensibility = 750;
 	this.camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
-	this.camera.checkCollisions = true;
 	this.camera.speed = 0.5;
 	this.camera.layerMask = 2; // 010 in binary
 	this.camera.position = position;
-	// the camera acts as the this.camera
-	this.camera.keysUp.push(87);
-	this.camera.keysDown.push(83);
-	this.camera.keysLeft.push(65);
-	this.camera.keysRight.push(68);
+	this.camera.checkCollisions = true;
 	// attach controls and set as active camera
 	this.camera.attachControl(canvas, true);
 	this.scene.activeCameras.push(this.camera);
 	this.scene.cameraToUseForPointers = this.camera;
+
+	console.log(scene.activeCameras);
 
 	// GENERAL
 	this.mazeMesh = mazeMesh;
@@ -176,7 +183,7 @@ Player.prototype.hit = function (damage) {
 	///////////////////////
 	// Player destroyed! //
 	///////////////////////
-	if (this.camera.health <= 0) {
+	if (this.health <= 0) {
 		this.scene.activeCamera.detachControl(canvas);
 		engine.stopRenderLoop();
 		setTimeout(function () {
@@ -290,4 +297,37 @@ Player.prototype.shooting = function () {
 		}
 	}
 
+};
+
+Player.prototype.switchCameraType = function(){
+	var position = this.camera.position.clone();
+	this.camera.dispose();
+
+	if(config.mobileCamera){
+		console.log('init VJC');
+		this.camera = new BABYLON.VirtualJoysticksCamera("playerVJC", new BABYLON.Vector3(0, 0, 0), scene);
+	} else {
+		this.camera = new BABYLON.FreeCamera("playerFreeCamera", new BABYLON.Vector3(0, 0, 0), scene);
+		// the camera acts as the this.camera
+		this.camera.keysUp.push(87);
+		this.camera.keysDown.push(83);
+		this.camera.keysLeft.push(65);
+		this.camera.keysRight.push(68);
+	}
+	this.camera.inertiaRotation = 0.5;
+	this.camera.angularSensibility = 750;
+	this.camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
+	this.camera.speed = 0.5;
+	this.camera.layerMask = 2; // 010 in binary
+	this.camera.position = position;
+	this.camera.checkCollisions = true;
+	// attach controls and set as active camera
+	this.camera.attachControl(canvas, true);
+	this.scene.activeCameras.push(this.camera);
+	this.scene.cameraToUseForPointers = this.camera;
+
+	// TODO wrapp access to camera in a getter? maybe initialize both cameras and only switch which on is active
+	// TODO separate mini map player
+	// TODO check-exit-reached
+	// TODO reinit flashlight, cannons, status bars and so on
 };

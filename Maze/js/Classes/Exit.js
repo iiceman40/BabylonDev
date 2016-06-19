@@ -12,14 +12,29 @@ var Exit = function (exitCoordinates, maze, playerOnMiniMap, mazeMesh, game, cam
 	exitPortal.material = new ExitPortalMaterial(scene);
 	exitPortal.parent = exit;
 
+	var probe = new BABYLON.ReflectionProbe("main", 1024, scene);
+	probe.position = exit.position;
+	probe.renderList.push(mazeMesh);
+	//exitPortal.material.diffuseColor = new BABYLON.Color3(1, 0.5, 0.5);
+	exitPortal.material.refractionTexture = probe.cubeTexture;
+	/*
+	exitPortal.material.refractionFresnelParameters = new BABYLON.FresnelParameters();
+	exitPortal.material.refractionFresnelParameters.bias = 0.5;
+	exitPortal.material.refractionFresnelParameters.power = 16;
+	exitPortal.material.refractionFresnelParameters.leftColor = BABYLON.Color3.Black();
+	exitPortal.material.refractionFresnelParameters.rightColor = BABYLON.Color3.White();
+	exitPortal.material.refractionFresnelParameters.isEnabled = false;
+	exitPortal.material.indexOfRefraction = 1.05;
+	*/
+
 	var exitLight = new BABYLON.PointLight("Omni0", new BABYLON.Vector3(0, 0, 0), scene);
 	exitLight.diffuse = new BABYLON.Color3(0.5, 0, 0.5);
-	exitLight.intensity = 0.8;
+	exitLight.intensity = 0.5;
 	exitLight.range = 15;
 	exitLight.parent = exit;
 	exitLight.includedOnlyMeshes = [mazeMesh,exit, exitPortal];
 
-	var animationLight = new BABYLON.Animation("exitLightPosition", "position.y", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+	var animationLight = new BABYLON.Animation("exitLightPosition", "position.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
 	// Animation keys
 	var keys = [
 		{frame: 0, value: 0.5},

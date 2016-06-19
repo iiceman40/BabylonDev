@@ -32,7 +32,8 @@ var ExitPortalMaterial = function(scene) {
 	exitMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
 	exitMaterial.emissiveColor = new BABYLON.Color3(0.8, 0.1, 0.8);
 	exitMaterial.specularColor = new BABYLON.Color3(1, 0.5, 1);
-	exitMaterial.alpha = 0.7;
+	exitMaterial.alpha = 0.9;
+
 	return exitMaterial;
 };
 
@@ -202,11 +203,11 @@ var HealthBarMaterial = function(scene) {
 
 var FireMaterial = function(scene) {
 	var fireMaterial = new BABYLON.StandardMaterial("fire", scene);
-	var fireTexture = new BABYLON.FireProceduralTexture("fire", 256, scene);
+	//var fireTexture = new BABYLON.FireProceduralTexture("fire", 256, scene);
 	fireMaterial.specularColor = BABYLON.Color3.Black();
-	fireMaterial.diffuseTexture = fireTexture;
-	fireMaterial.opacityTexture = fireTexture;
-	fireMaterial.emissiveTexture = fireTexture;
+	//fireMaterial.diffuseTexture = fireTexture;
+	//fireMaterial.opacityTexture = fireTexture;
+	//fireMaterial.emissiveTexture = fireTexture;
 
 	fireMaterial.emissiveFresnelParameters = new BABYLON.FresnelParameters();
 	fireMaterial.emissiveFresnelParameters.bias = 0.2;

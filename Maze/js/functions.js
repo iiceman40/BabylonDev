@@ -285,7 +285,10 @@ function wrapText(text, x, y, font, color, clearColor, invertY, update, dynamicT
 	}
 }
 
+var voices = window.speechSynthesis.getVoices();
 function speakPart(textArray, part, terminal) {
+	var voices = window.speechSynthesis.getVoices(),
+		voice = voices[3];
 
 	if(terminal) {
 		terminal.isPlayingMessage = true;
@@ -293,6 +296,7 @@ function speakPart(textArray, part, terminal) {
 
 	var html = $('<p>' + textArray[part] + '</p>');
 	var utterance = new SpeechSynthesisUtterance(html.text());
+	utterance.voice = voice;
 	utterance.lang = 'en-US';
 	utterance.rate = 0.7;
 	utterance.pitch = 0.8;

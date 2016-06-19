@@ -18,7 +18,6 @@ var Terminal = function (position, maze, player, miniMap, availableMessages, sha
 	terminalScreen.terminal = this;
 	terminalScreen.isPickable = false;
 
-
 	this.activateTerminal = function () {
 		miniMap.showMiniMap();
 
@@ -32,6 +31,7 @@ var Terminal = function (position, maze, player, miniMap, availableMessages, sha
 		}
 		if (!this.isPlayingMessage) {
 			this.isPlayingMessage = true;
+			// FIXME speak doesnt work or doesnt load the right language
 			speakPart(self.message.text.split('<br/> <br/>'), 0, this);
 			this.isPlayingMessage = false;
 		}

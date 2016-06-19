@@ -4,8 +4,8 @@
 var config = {
 	version: 0.1,
 
-	startingLevel: 1,
-	width: 2,
+	startingLevel: 2,
+	width: 3,
 	height: 2,
 	depth: 2,
 	startingPoint: new BABYLON.Vector3(0, 0, 0),
@@ -20,7 +20,7 @@ var config = {
 	enemyLight: true,
 	enemyHealthBar: true,
 
-	mobileCamera: true,
+	mobileCamera: false,
 
 	controls: {
 		up: 87,

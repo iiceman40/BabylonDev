@@ -1,0 +1,22 @@
+{
+  "name": "multidice",
+  "version": "1.0.0",
+  "description": "A configurable dice with BabylonJs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "BabylonJs",
+    "Angular"
+  ],
+  "author": "iice",
+  "license": "ISC",
+  "dependencies": {
+    "angular": "^1.5.8",
+    "bootstrap": "^3.3.7",
+    "handjs": "^1.3.11",
+    "pepjs": "^0.4.2",
+    "requirejs": "^2.3.2"
+  }
+}

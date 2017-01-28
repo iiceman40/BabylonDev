@@ -177,7 +177,7 @@ $(document).ready(function () {
 		// water material for inner gate
 		var innerGate = BABYLON.Mesh.CreateSphere("innerGate", 64, 2 * radius, scene);
 		innerGate.rotation.x = Math.PI / 2;
-		innerGate.scaling.y = 0.005;
+		innerGate.scaling.y = 0.003;
 		innerGate.parent = gate;
 
 		innerGate.material = waterMaterial;
